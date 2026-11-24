@@ -148,6 +148,50 @@ async def get_report_summary(
     return data
 
 
+@router.get("/csv")
+async def export_report_csv(
+    status: Optional[str] = Query(None),
+    category: Optional[str] = Query(None),
+    change_type: Optional[str] = Query(None),
+    environment: Optional[str] = Query(None),
+    search: Optional[str] = Query(None),
+    from_date: Optional[str] = Query(None),
+    to_date: Optional[str] = Query(None),
+    session: AsyncSession = Depends(get_async_session),
+    user=Depends(get_current_active_user),
+):
+    """Export filtered changes as CSV."""
+    import csv
+    import io
+
+    where, params = _fetch_filter(session, status, category, change_type, environment, search, from_date, to_date)
+    data = await _get_data(session, where, params)
+
+    output = io.StringIO()
+    writer = csv.writer(output)
+    writer.writerow([
+        "No. CRF", "Judul", "Status", "Risiko", "Kategori", "Tipe",
+        "Lingkungan", "Pemohon", "Tgl Dibuat",
+    ])
+    for it in data["items"]:
+        writer.writerow([
+            it.get("change_number", ""),
+            it.get("title", ""),
+            STATUS_LABELS.get(it.get("status", ""), it.get("status", "")),
+            it.get("risk_level") or "",
+            CAT_LABELS.get(it.get("category", ""), it.get("category", "")),
+            it.get("change_type") or "",
+            it.get("environment") or "",
+            it.get("requester_name") or "",
+            (it.get("created_at") or "")[:19].replace("T", " "),
+        ])
+    return Response(
+        content=output.getvalue(),
+        media_type="text/csv",
+        headers={"Content-Disposition": "attachment; filename=\"laporan-perubahan.csv\""},
+    )
+
+
 @router.get("/pdf")
 async def generate_report_pdf(
     status: Optional[str] = Query(None),
@@ -260,7 +304,7 @@ async def generate_report_pdf(
 
     for label, key in [("Distribusi Status", "by_status"), ("Distribusi Kategori", "by_category"),
                         ("Distribusi Lingkungan", "by_environment"), ("Distribusi Tipe", "by_type")]:
-        story.append(dist_table(label, summary.get(key, {})))
+        story.extend(dist_table(label, summary.get(key, {})))
         story.append(Spacer(1, 6))
 
     # Detail table

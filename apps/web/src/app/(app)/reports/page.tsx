@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Card, Page, PageHeader, Spinner, Skeleton, StatusBadge, Notice } from "@/components/ui";
+import { Card, Page, PageHeader, Skeleton, StatusBadge, Notice, useMe } from "@/components/ui";
 import { statusLabel, categoryLabel, riskLabel } from "@/lib/labels";
 
 const STATUS_OPTIONS = [
@@ -14,6 +14,7 @@ const TYPE_OPTIONS = ["PLANNED", "UNPLANNED", "EMERGENCY"];
 const ENV_OPTIONS = ["PRODUCTION", "STAGING", "DEVELOPMENT", "TESTING"];
 
 export default function ReportsPage() {
+  const { me } = useMe();
   const [loading, setLoading] = useState(true);
   const [exporting, setExporting] = useState(false);
   const [error, setError] = useState("");
@@ -35,7 +36,11 @@ export default function ReportsPage() {
     setLoading(true);
     setError("");
     const token = localStorage.getItem("token");
-    if (!token) return;
+    if (!token) {
+      setLoading(false);
+      setError("Sesi login berakhir. Silakan masuk ulang.");
+      return;
+    }
 
     const params = new URLSearchParams();
     Object.entries(filters).forEach(([k, v]) => {
@@ -65,7 +70,11 @@ export default function ReportsPage() {
     setExporting(true);
     setError("");
     const token = localStorage.getItem("token");
-    if (!token) return;
+    if (!token) {
+      setExporting(false);
+      setError("Sesi login berakhir. Silakan masuk ulang.");
+      return;
+    }
 
     const params = new URLSearchParams();
     Object.entries(filters).forEach(([k, v]) => {
@@ -105,6 +114,8 @@ export default function ReportsPage() {
 
   const pct = (n: number, total: number) =>
     total > 0 ? `${(n / total * 100).toFixed(1)}%` : "0.0%";
+
+  if (!me) return null;
 
   return (
     <>
@@ -364,8 +375,8 @@ export default function ReportsPage() {
                         <td className="td font-bold">{item.change_number}</td>
                         <td className="td max-w-xs truncate">{item.title}</td>
                         <td className="td"><StatusBadge status={item.status} /></td>
-                        <td className="td">{item.risk_level || "-"}</td>
-                        <td className="td">{item.category || "-"}</td>
+                        <td className="td">{riskLabel(item.risk_level) || "-"}</td>
+                        <td className="td">{categoryLabel(item.category) || "-"}</td>
                         <td className="td">{item.change_type || "-"}</td>
                         <td className="td">{item.environment || "-"}</td>
                         <td className="td">{item.requester_name || "-"}</td>
