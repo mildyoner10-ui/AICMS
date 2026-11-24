@@ -1,0 +1,6 @@
+# AICMS API
+-r requirements.txt
+pytest>=8.0
+pytest-asyncio>=0.23.0
+aiosqlite>=0.20.0
+ruff>=0.5.0

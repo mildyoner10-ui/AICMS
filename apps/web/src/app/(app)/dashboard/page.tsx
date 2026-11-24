@@ -1,0 +1,455 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { Card, Page, PageHeader, Spinner, StatusBadge, fmtDateTime, useMe } from "@/components/ui";
+import { categoryLabel, statusLabel } from "@/lib/labels";
+
+// ── SVG Donut Pie Chart (inline) ────────────────────────────────────────────
+
+/* DESIGN.md §2 semantic colors, brightened for chart contrast on white surface. */
+const CHART_COLORS = {
+  success:    "#16a34a", // bright green — approved, successful
+  danger:     "#dc2626", // bright red — rejected, cancelled, critical
+  warning:    "#eab308", // bright yellow — pending, requires review
+  brand:      "#2563eb", // bright blue — scheduled, in progress
+  info:       "#0891b2", // bright cyan — submitted, document validation
+  purple:     "#9333ea", // bright purple — validation phase
+  neutral:    "#6b7280", // gray — closed, cancelled
+  teal:       "#0d9488", // bright teal — AI review, operational
+};
+
+const PIE_COLORS = [
+  CHART_COLORS.success,
+  CHART_COLORS.danger,
+  CHART_COLORS.warning,
+  CHART_COLORS.brand,
+  CHART_COLORS.info,
+  CHART_COLORS.purple,
+  CHART_COLORS.neutral,
+  CHART_COLORS.teal,
+];
+
+interface PieSlice {
+  label: string;
+  value: number;
+  color?: string;
+}
+
+function DonutChart({ data, size = 200, cx = 100, cy = 100, r = 70, thickness = 28 }: { data: PieSlice[]; size?: number; cx?: number; cy?: number; r?: number; thickness?: number }) {
+  const total = data.reduce((s, d) => s + d.value, 0) || 1;
+  const ratio = thickness / (2 * Math.PI * r); // fraction of circumference
+
+  // Build path for each slice using arc commands
+  let cumulative = 0;
+  const slices = data
+    .filter((d) => d.value > 0)
+    .map((d, i) => {
+      const frac = d.value / total;
+      const startAngle = cumulative * 2 * Math.PI - Math.PI / 2;
+      cumulative += frac;
+      const endAngle = cumulative * 2 * Math.PI - Math.PI / 2;
+      const largeArc = frac > 0.5 ? 1 : 0;
+
+      const x1 = cx + r * Math.cos(startAngle);
+      const y1 = cy + r * Math.sin(startAngle);
+      const x2 = cx + r * Math.cos(endAngle);
+      const y2 = cy + r * Math.sin(endAngle);
+      const ir = r - thickness; // inner radius
+
+      const ix1 = cx + ir * Math.cos(startAngle);
+      const iy1 = cy + ir * Math.sin(startAngle);
+      const ix2 = cx + ir * Math.cos(endAngle);
+      const iy2 = cy + ir * Math.sin(endAngle);
+
+      const path = `M ${x1} ${y1} A ${r} ${r} 0 ${largeArc} 1 ${x2} ${y2} L ${ix2} ${iy2} A ${ir} ${ir} 0 ${largeArc} 0 ${ix1} ${iy1} Z`;
+
+      // Label mid-angle
+      const midAngle = (startAngle + endAngle) / 2;
+      const labelR = r - thickness / 2;
+      const lx = cx + labelR * Math.cos(midAngle);
+      const ly = cy + labelR * Math.sin(midAngle);
+
+      return { path, label: d.label, value: d.value, frac, color: d.color ?? PIE_COLORS[i % PIE_COLORS.length], lx, ly };
+    });
+
+  return (
+    <div className="flex flex-col items-center gap-3">
+      <svg viewBox={`0 0 ${size} ${size}`} width={size} height={size} role="img" aria-label="Grafik donat" className="drop-shadow-sm">
+        {slices.map((s, i) => (
+          <path
+            key={i}
+            d={s.path}
+            fill={s.color}
+            stroke="#ffffff"
+            strokeWidth={2}
+            className="transition-opacity duration-ui hover:opacity-80"
+          />
+        ))}
+        {/* Center text */}
+        <text x={cx} y={cy - 6} textAnchor="middle" className="fill-foreground" fontSize="22" fontWeight={700}>
+          {total}
+        </text>
+        <text x={cx} y={cy + 12} textAnchor="middle" className="fill-foreground-muted" fontSize="11">
+          Total
+        </text>
+      </svg>
+      {/* Legend */}
+      <div className="flex flex-wrap justify-center gap-x-4 gap-y-1.5">
+        {slices.map((s, i) => (
+          <span key={i} className="flex items-center gap-1.5 text-xs text-foreground-muted">
+            <span className="inline-block h-2.5 w-2.5 rounded-sm" style={{ backgroundColor: s.color || CHART_COLORS.brand }} />
+            <span>{s.label} ({s.value})</span>
+          </span>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+interface DashboardData {
+  total_changes: number;
+  by_status: Record<string, number>;
+  by_category: Record<string, number>;
+  by_type: Record<string, number>;
+  pending_approvals: number;
+  ai_review_pending: number;
+  ai_review_flagged: number;
+  upcoming_changes: number;
+  completed: number;
+  failed: number;
+  rolled_back: number;
+  weekly_counts: Array<{ label: string; value: number }>;
+  kpi: {
+    total_active: number;
+    approval_avg_hours: number | null;
+    acceptance_rate: number;
+  };
+}
+
+interface RecentChange {
+  id: string;
+  change_number: string;
+  title: string;
+  status: string;
+  updated_at: string;
+}
+
+const OPEN_STATUSES = [
+  "SUBMITTED",
+  "DOCUMENT_VALIDATION",
+  "AI_REVIEW",
+  "PENDING_APPROVAL",
+  "REVISION_REQUIRED",
+  "APPROVED",
+  "SCHEDULED",
+  "IN_PROGRESS",
+  "VALIDATION",
+];
+
+// ── Weekly bar chart (SVG, inline) ──────────────────────────────────────────
+
+const CHART_H = 180;
+const CHART_PAD = { top: 20, right: 16, bottom: 36, left: 44 };
+const CHART_W = 500;
+const BAR_W = 48;
+const GAP = (CHART_W - CHART_PAD.left - CHART_PAD.right - BAR_W * 4) / 5;
+
+function WeeklyChart({ data }: { data: DashboardData["weekly_counts"] }) {
+  const maxVal = Math.max(1, ...data.map((d) => d.value));
+  const steps = [0, 0.25, 0.5, 0.75, 1].map((f) => maxVal * f);
+  const tickH = CHART_H - CHART_PAD.top - CHART_PAD.bottom;
+
+  return (
+    <div className="overflow-x-auto">
+      <svg
+        viewBox={`0 0 ${CHART_W} ${CHART_H}`}
+        className="h-56 w-full min-w-[320px]"
+        role="img"
+        aria-label="Grafik jumlah request per minggu"
+      >
+        {/* Y grid + ticks */}
+        {steps.map((v, i) => {
+          const y = CHART_PAD.top + tickH - (v / maxVal) * tickH;
+          return (
+            <g key={i}>
+              <line x1={CHART_PAD.left} y1={y} x2={CHART_W - CHART_PAD.right} y2={y} stroke="var(--border)" strokeDasharray="4 3" />
+              <text x={CHART_PAD.left - 6} y={y + 4} textAnchor="end" className="fill-foreground-muted" fontSize="11" fontFamily="monospace">
+                {v}
+              </text>
+            </g>
+          );
+        })}
+        {/* Bars */}
+        {data.map((d, i) => {
+          const x = CHART_PAD.left + i * (BAR_W + GAP) + GAP / 2;
+          const barH = (d.value / maxVal) * tickH;
+          const y = CHART_PAD.top + tickH - barH;
+          return (
+            <g key={i}>
+              <rect x={x} y={y} width={BAR_W} height={barH} rx={4} fill="var(--brand)" opacity={0.85} />
+              <text x={x + BAR_W / 2} y={y - 6} textAnchor="middle" className="fill-foreground" fontSize="12" fontWeight={600}>
+                {d.value}
+              </text>
+              <text x={x + BAR_W / 2} y={CHART_PAD.top + tickH + 18} textAnchor="middle" className="fill-foreground-muted" fontSize="11">
+                {d.label}
+              </text>
+            </g>
+          );
+        })}
+      </svg>
+    </div>
+  );
+}
+
+// ── KPI card ────────────────────────────────────────────────────────────────
+
+function KpiCard({
+  label,
+  help,
+  value,
+  sub,
+  href,
+  tone = "text-foreground",
+}: {
+  label: string;
+  help: string;
+  value: string | number;
+  sub?: string;
+  href?: string;
+  tone?: string;
+}) {
+  const wrap = href ? (
+    <Link href={href} className="card group p-4 transition-colors duration-ui hover:border-brand">
+      <p className={`text-kpi tabular-nums ${tone}`}>{value}</p>
+      <p className="mt-1 text-[13px] font-semibold text-foreground">{label}</p>
+      <p className="mt-0.5 text-meta text-foreground-muted">{help}</p>
+      {sub && <p className="mt-0.5 text-meta text-foreground-muted">{sub}</p>}
+    </Link>
+  ) : (
+    <div className="card p-4">
+      <p className={`text-kpi tabular-nums ${tone}`}>{value}</p>
+      <p className="mt-1 text-[13px] font-semibold text-foreground">{label}</p>
+      <p className="mt-0.5 text-meta text-foreground-muted">{help}</p>
+      {sub && <p className="mt-0.5 text-meta text-foreground-muted">{sub}</p>}
+    </div>
+  );
+  return wrap;
+}
+
+// ── Main ────────────────────────────────────────────────────────────────────
+
+export default function Dashboard() {
+  const { me } = useMe();
+  const router = useRouter();
+  const [data, setData] = useState<DashboardData | null>(null);
+  const [recent, setRecent] = useState<RecentChange[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!me) return;
+    const token = localStorage.getItem("token");
+    const h = { Authorization: `Bearer ${token}` };
+    Promise.all([
+      fetch("/api/v1/dashboard/summary", { headers: h }).then((r) => (r.ok ? r.json() : null)),
+      fetch("/api/v1/changes?page=1", { headers: h }).then((r) => (r.ok ? r.json() : null)),
+    ])
+      .then(([summary, list]) => {
+        setData(summary);
+        setRecent((list?.items ?? []).slice(0, 6));
+      })
+      .catch(() => undefined)
+      .finally(() => setLoading(false));
+  }, [me]);
+
+  if (!me) return <Spinner label="Memuat ringkasan…" />;
+
+  const open = (data?.by_status ? OPEN_STATUSES.reduce((n, s) => n + (data.by_status[s] ?? 0), 0) : 0);
+
+  const statusEntries = Object.entries(data?.by_status ?? {})
+    .filter(([, n]) => n > 0)
+    .sort((a, b) => b[1] - a[1]);
+  const categoryEntries = Object.entries(data?.by_category ?? {})
+    .filter(([, n]) => n > 0)
+    .sort((a, b) => b[1] - a[1]);
+
+  const kpi = data?.kpi ?? { total_active: 0, approval_avg_hours: null, acceptance_rate: 0 };
+
+  return (
+    <>
+      <PageHeader
+        title="Ringkasan"
+        description="Kondisi antrean perubahan hari ini. Setiap angka dapat diklik menuju daftar terkait."
+        actions={
+          <Link href="/changes/new" className="btn-primary">
+            + Buat CRF Baru
+          </Link>
+        }
+      />
+
+      <Page wide>
+        {loading ? (
+          <Spinner label="Memuat ringkasan…" />
+        ) : (
+          <div className="space-y-6">
+            {/* KPI row */}
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5">
+              <KpiCard
+                label="Perubahan Aktif"
+                help="Belum sampai selesai atau ditutup"
+                value={kpi.total_active ?? open}
+                href="/changes"
+                tone="text-foreground"
+              />
+              <KpiCard
+                label="Menunggu Persetujuan"
+                help="CRF dalam antrian persetujuan"
+                value={data?.by_status?.PENDING_APPROVAL ?? 0}
+                href="/approvals"
+                tone="text-warning"
+              />
+              <KpiCard
+                label="Tinjauan AI Tertunda"
+                help="Antrean atau berjalan di worker"
+                value={data?.ai_review_pending ?? 0}
+                href="/changes?status=AI_REVIEW"
+                tone="text-info"
+              />
+              <KpiCard
+                label="Waktu Persetujuan"
+                help="Rata-rata dari submit → disetujui"
+                value={kpi.approval_avg_hours != null ? `${kpi.approval_avg_hours} jam` : "—"}
+                tone="text-brand"
+              />
+              <KpiCard
+                label="Tingkat Penerimaan"
+                help="Disetujui / (disetujui + ditutup)"
+                value={kpi.acceptance_rate ? `${kpi.acceptance_rate}%` : "—"}
+                tone={kpi.acceptance_rate != null && kpi.acceptance_rate >= 80 ? "text-success" : "text-warning"}
+                sub={kpi.acceptance_rate != null ? `${data?.by_status?.APPROVED ?? 0} disetujui, ${data?.by_status?.CLOSED ?? 0} ditutup` : ""}
+              />
+            </div>
+
+            <div className="grid grid-cols-1 gap-6 lg:grid-cols-5">
+              <Card title="Perubahan per Status" description="Distribusi seluruh CRF aktif dan arsip" className="lg:col-span-3">
+                {statusEntries.length === 0 ? (
+                  <p className="text-sm text-foreground-muted">Belum ada perubahan tercatat.</p>
+                ) : (
+                  <DonutChart
+                    data={statusEntries.map(([status, count]) => ({
+                      label: statusLabel(status),
+                      value: count,
+                      color: {
+                        SUBMITTED: CHART_COLORS.info,
+                        DOCUMENT_VALIDATION: CHART_COLORS.teal,
+                        AI_REVIEW: CHART_COLORS.teal,
+                        PENDING_APPROVAL: CHART_COLORS.warning,
+                        REVISION_REQUIRED: CHART_COLORS.danger,
+                        APPROVED: CHART_COLORS.success,
+                        SCHEDULED: CHART_COLORS.brand,
+                        IN_PROGRESS: CHART_COLORS.brand,
+                        VALIDATION: CHART_COLORS.purple,
+                        CLOSED: CHART_COLORS.neutral,
+                        CANCELLED: CHART_COLORS.danger,
+                      }[status],
+                    }))}
+                  />
+                )}
+              </Card>
+
+              <div className="space-y-6 lg:col-span-2">
+                <Card title="Perubahan per Kategori" description="Sumber daya yang terdampak">
+                  {categoryEntries.length === 0 ? (
+                    <p className="text-sm text-foreground-muted">Belum ada data kategori.</p>
+                  ) : (
+                    <DonutChart
+                      data={categoryEntries.map(([cat, count], i) => ({
+                        label: categoryLabel(cat),
+                        value: count,
+                      }))}
+                      size={180}
+                    />
+                  )}
+                </Card>
+
+                <Card title="Tinjauan AI" description="AI memberi rekomendasi; keputusan tetap pada manusia">
+                  <dl className="grid grid-cols-2 gap-3 text-sm">
+                    <div className="rounded-control bg-surface-muted p-3">
+                      <dt className="text-meta text-foreground-muted">Tertunda</dt>
+                      <dd className="text-xl font-bold tabular-nums">{data?.ai_review_pending ?? 0}</dd>
+                    </div>
+                    <div className="rounded-control bg-surface-muted p-3">
+                      <dt className="text-meta text-foreground-muted">Ditandai risiko</dt>
+                      <dd className="text-xl font-bold tabular-nums text-warning">{data?.ai_review_flagged ?? 0}</dd>
+                    </div>
+                  </dl>
+                  <p className="mt-3 text-meta text-foreground-muted">
+                    Skor AI yang tinggi tidak menjamin perubahan aman, dan AI tidak pernah menyetujui.
+                  </p>
+                </Card>
+              </div>
+            </div>
+
+            {/* Weekly bar chart */}
+            <Card title="Jumlah Request per Minggu" description="4 minggu terakhir (non-dihapus)">
+              {data?.weekly_counts.length === 0 ? (
+                <p className="text-sm text-foreground-muted">Belum ada data request dalam 4 minggu terakhir.</p>
+              ) : (
+                <WeeklyChart data={data!.weekly_counts} />
+              )}
+            </Card>
+
+            <Card
+              title="Perubahan Terbaru"
+              description="Diurutkan berdasarkan pembaruan terakhir"
+              actions={
+                <Link href="/changes" className="btn-ghost btn-sm">
+                  Lihat semua →
+                </Link>
+              }
+            >
+              {recent.length === 0 ? (
+                <p className="text-sm text-foreground-muted">Belum ada perubahan. Mulai dengan membuat CRF baru.</p>
+              ) : (
+                <div className="-mx-5 overflow-x-auto md:-mx-6">
+                  <table className="w-full min-w-[560px]">
+                    <thead className="border-b border-border bg-surface-muted">
+                      <tr>
+                        <th className="th">Change ID</th>
+                        <th className="th">Judul</th>
+                        <th className="th">Status</th>
+                        <th className="th">Diperbarui</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {recent.map((c) => (
+                        <tr
+                          key={c.id}
+                          onClick={() => router.push(`/changes/${c.id}`)}
+                          className="cursor-pointer border-b border-border last:border-0 hover:bg-surface-muted"
+                        >
+                          <td className="td font-mono text-brand">{c.change_number}</td>
+                          <td className="td font-medium">{c.title}</td>
+                          <td className="td">
+                            <StatusBadge status={c.status} />
+                          </td>
+                          <td className="td text-foreground-muted">{fmtDateTime(c.updated_at)}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </Card>
+
+            <p className="text-meta text-foreground-muted">
+              Ringkasan dibuat dari {data?.total_changes ?? 0} perubahan (tidak termasuk yang dihapus). Status terbanyak:{" "}
+              {statusEntries[0] ? statusLabel(statusEntries[0][0]) : "—"}.
+            </p>
+          </div>
+        )}
+      </Page>
+    </>
+  );
+}

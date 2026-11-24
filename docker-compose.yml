@@ -1,0 +1,117 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: aicms
+      POSTGRES_PASSWORD: aicms_dev_secret
+      POSTGRES_DB: aicms
+    ports:
+      - "15432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U aicms"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "16001:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  # ponytail: MinIO dropped — Docker Hub rejects minio/minio here and quay.io
+  # requires auth. Dev uses LocalStorageAdapter (STORAGE_BACKEND=local).
+  # Add an S3 service once a reachable registry/S3 endpoint exists.
+
+  api:
+    build: apps/api
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: postgresql+asyncpg://aicms:aicms_dev_secret@postgres:5432/aicms
+      REDIS_URL: redis://redis:6379/0
+      STORAGE_BACKEND: local
+      STORAGE_LOCAL_PATH: /data/docs
+      JWT_SECRET: ${JWT_SECRET:-dev-secret-change-in-production}
+      # AI settings come from .env (copy .env.example to .env). Defaults keep DEMO/MOCK.
+      AI_PROVIDER: ${AI_PROVIDER:-mock}
+      AI_BASE_URL: ${AI_BASE_URL:-https://api.openai.com/v1}
+      AI_API_KEY: ${AI_API_KEY:-}
+      AI_MODEL: ${AI_MODEL:-gpt-4o-mini}
+      AI_TEMPERATURE: ${AI_TEMPERATURE:-0.0}
+      AI_MAX_TOKENS: ${AI_MAX_TOKENS:-2000}
+      AI_TIMEOUT_SECONDS: ${AI_TIMEOUT_SECONDS:-60}
+      AI_MAX_DOCUMENTS: ${AI_MAX_DOCUMENTS:-10}
+      AI_MAX_DOCUMENT_CHARS: ${AI_MAX_DOCUMENT_CHARS:-12000}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      OPENAI_MODEL: ${OPENAI_MODEL:-}
+      REVIEW_MODE: ${REVIEW_MODE:-queue}
+      ALLOW_LOCAL_LOGIN: "true"
+    # Lets AI_BASE_URL point at a provider on the host (e.g. http://host.docker.internal:20128/v1).
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - ./apps/api:/app
+      - docdata:/data/docs
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    command: ["sh", "-c", "alembic upgrade head && python seed.py && uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"]
+
+  worker:
+    build: apps/api
+    working_dir: /app
+    environment:
+      DATABASE_URL: postgresql+asyncpg://aicms:aicms_dev_secret@postgres:5432/aicms
+      REDIS_URL: redis://redis:6379/0
+      STORAGE_BACKEND: local
+      STORAGE_LOCAL_PATH: /data/docs
+      JWT_SECRET: ${JWT_SECRET:-dev-secret-change-in-production}
+      AI_PROVIDER: ${AI_PROVIDER:-mock}
+      AI_BASE_URL: ${AI_BASE_URL:-https://api.openai.com/v1}
+      AI_API_KEY: ${AI_API_KEY:-}
+      AI_MODEL: ${AI_MODEL:-gpt-4o-mini}
+      AI_TEMPERATURE: ${AI_TEMPERATURE:-0.0}
+      AI_MAX_TOKENS: ${AI_MAX_TOKENS:-2000}
+      AI_TIMEOUT_SECONDS: ${AI_TIMEOUT_SECONDS:-60}
+      AI_MAX_DOCUMENTS: ${AI_MAX_DOCUMENTS:-10}
+      AI_MAX_DOCUMENT_CHARS: ${AI_MAX_DOCUMENT_CHARS:-12000}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      OPENAI_MODEL: ${OPENAI_MODEL:-}
+      REVIEW_MODE: ${REVIEW_MODE:-queue}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - ./apps/api:/app
+      - docdata:/data/docs
+    depends_on:
+      api:
+        condition: service_started
+      redis:
+        condition: service_healthy
+    command: ["python", "-m", "app.worker"]
+
+  web:
+    build:
+      context: apps/web
+      args:
+        API_BASE_URL: http://api:8000
+    ports:
+      - "3000:3000"
+    environment:
+      API_BASE_URL: http://api:8000
+    depends_on:
+      api:
+        condition: service_started
+
+volumes:
+  pgdata:
+  docdata:

@@ -1,0 +1,829 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<title>Panduan Implementasi &amp; Operasional AICMS</title>
+<style>
+  @page { size: A4; margin: 18mm 16mm 20mm; }
+  :root {
+    --ink: #111827; --muted: #4b5563; --line: #d1d5db; --soft: #f3f4f6;
+    --brand: #1d4ed8; --danger: #b91c1c; --warn: #b45309; --ok: #15803d;
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    color: var(--ink); font-size: 10.5pt; line-height: 1.55; margin: 0;
+  }
+  h1, h2, h3, h4 { line-height: 1.25; margin: 0 0 .4em; page-break-after: avoid; }
+  h1 { font-size: 22pt; }
+  h2 { font-size: 15pt; border-bottom: 2px solid var(--ink); padding-bottom: .25em; margin-top: 0; }
+  h3 { font-size: 12pt; margin-top: 1.4em; }
+  h4 { font-size: 10.5pt; margin-top: 1.1em; }
+  p { margin: 0 0 .7em; }
+  ul, ol { margin: 0 0 .8em; padding-left: 1.4em; }
+  li { margin-bottom: .3em; }
+  code, pre, kbd { font-family: "Cascadia Mono", Consolas, "Courier New", monospace; }
+  code { background: var(--soft); padding: .08em .3em; border-radius: 3px; font-size: 9.5pt; }
+  pre {
+    background: var(--soft); border-left: 3px solid var(--muted); padding: .7em .9em;
+    overflow-x: auto; font-size: 9pt; line-height: 1.45; margin: 0 0 .9em;
+    white-space: pre-wrap; word-break: break-word; page-break-inside: avoid;
+  }
+  pre code { background: none; padding: 0; font-size: inherit; }
+  table { border-collapse: collapse; width: 100%; font-size: 9.5pt; margin: 0 0 1em; page-break-inside: avoid; }
+  th, td { border: 1px solid var(--line); padding: .38em .5em; text-align: left; vertical-align: top; }
+  th { background: var(--soft); font-weight: 600; }
+  .page { page-break-after: always; }
+  .page:last-child { page-break-after: auto; }
+  .cover { padding-top: 18mm; }
+  .cover .kicker { font-size: 10pt; letter-spacing: .16em; text-transform: uppercase; color: var(--muted); }
+  .cover h1 { font-size: 30pt; margin: .25em 0 .15em; }
+  .cover .sub { font-size: 13pt; color: var(--muted); margin-bottom: 1.6em; }
+  .meta { border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); padding: .6em 0; font-size: 9.5pt; color: var(--muted); }
+  .meta div { display: flex; gap: .5em; }
+  .meta b { color: var(--ink); min-width: 8.5em; display: inline-block; font-weight: 600; }
+  .toc ol { list-style: none; padding: 0; counter-reset: sec; }
+  .toc > ol > li { counter-increment: sec; margin-bottom: .45em; font-weight: 600; }
+  .toc > ol > li::before { content: counter(sec) ". "; color: var(--brand); }
+  .toc ol ol { list-style: none; padding-left: 1.5em; font-weight: 400; counter-reset: sub; margin: .25em 0 .6em; }
+  .toc ol ol li { counter-increment: sub; font-size: 9.5pt; color: var(--muted); margin-bottom: .15em; }
+  .toc ol ol li::before { content: counter(sec) "." counter(sub) " "; }
+  .note, .warn, .danger, .ok {
+    border-left: 4px solid var(--muted); background: var(--soft); padding: .6em .8em;
+    margin: 0 0 1em; font-size: 9.8pt; page-break-inside: avoid;
+  }
+  .warn { border-left-color: var(--warn); background: #fffbeb; }
+  .danger { border-left-color: var(--danger); background: #fef2f2; }
+  .ok { border-left-color: var(--ok); background: #f0fdf4; }
+  .note b, .warn b, .danger b, .ok b { display: block; margin-bottom: .15em; }
+  .steps { counter-reset: step; list-style: none; padding: 0; }
+  .steps > li { counter-increment: step; position: relative; padding-left: 2.1em; margin-bottom: .7em; page-break-inside: avoid; }
+  .steps > li::before {
+    content: counter(step); position: absolute; left: 0; top: .05em;
+    width: 1.5em; height: 1.5em; border-radius: 50%; background: var(--ink); color: #fff;
+    font-size: 8.5pt; font-weight: 700; display: flex; align-items: center; justify-content: center;
+  }
+  .flow { font-size: 9.5pt; border: 1px solid var(--line); padding: .7em .8em; margin-bottom: 1em; background: var(--soft); }
+  .flow b { color: var(--danger); }
+  .two { display: grid; grid-template-columns: 1fr 1fr; gap: 1.2em; }
+  .small { font-size: 9pt; color: var(--muted); }
+  .tag { display: inline-block; font-size: 8.5pt; font-family: Consolas, monospace; background: var(--ink); color: #fff; padding: .1em .45em; border-radius: 3px; }
+  footer.end { margin-top: 2em; border-top: 1px solid var(--line); padding-top: .6em; font-size: 9pt; color: var(--muted); }
+  .meta div { white-space: nowrap; }
+  .meta b { flex: 0 0 9em; }
+  .cover .toc-inline { border-top: 1px solid var(--line); padding-top: 1em; margin-top: 0; }
+  .cover .toc-inline ol { margin: 0; }
+  @media screen {
+    body { background: #8a8a8a; padding: 10px 0; margin: 0; }
+    section.page {
+      width: 178mm; min-height: 259mm; background: #fff; margin: 0 auto 10px;
+      padding: 18mm 16mm 20mm; box-shadow: 0 0 6px rgba(0,0,0,.4);
+    }
+  }
+</style>
+</head>
+<body>
+
+<!-- ============ COVER ============ -->
+<section class="page cover">
+  <p class="kicker">Dokumen Operasional Internal</p>
+  <h1>Panduan Implementasi &amp; Operasional<br>AICMS</h1>
+  <p class="sub">AI Change Management System — instalasi, konfigurasi, pengelolaan layanan, dan tata cara pengisian formulir satu siklus perubahan penuh.</p>
+  <div class="meta">
+    <div><b>Produk</b> AICMS (AI Change Management System)</div>
+    <div><b>Versi dokumen</b> 1.0</div>
+    <div><b>Tanggal</b> 23 November 2026</div>
+    <div><b>Audiens</b> Administrator sistem, Change Manager, Pemohon, Peninjau, Approver</div>
+    <div><b>Bahasa antarmuka</b> Bahasa Indonesia (default)</div>
+  </div>
+  <p style="margin-top:2em" class="small">
+    Dokumen ini memakai data contoh sintetis. Jangan menyalin kredensial, kunci API, atau konfigurasi perangkat
+    nyata ke dalam contoh, tiket, atau dokumen uji. AICMS tidak pernah mengeksekusi perintah ke perangkat dan tidak
+    pernah menyetujui perubahan tanpa manusia.
+  </p>
+</section>
+
+<!-- ============ TOC ============ -->
+<section class="page toc">
+  <h2>Daftar Isi</h2>
+  <ol>
+    <li>Ringkasan Sistem
+      <ol><li>Arsitektur</li><li>Batasan yang wajib dipahami</li></ol>
+    </li>
+    <li>Prasyarat Instalasi
+      <ol><li>Perangkat lunak</li><li>Sumber daya</li><li>Port</li></ol>
+    </li>
+    <li>Instalasi
+      <ol><li>Unduh dan siapkan berkas</li><li>Konfigurasi <code>.env</code></li><li>Build dan jalankan</li><li>Pemeriksaan pasca-instalasi</li></ol>
+    </li>
+    <li>Konfigurasi Lanjutan
+      <ol><li>Penyedia AI</li><li>Mode tinjauan (queue vs inline)</li><li>Penyimpanan dokumen</li><li>Autentikasi</li><li>Database dan migrasi</li></ol>
+    </li>
+    <li>Pengelolaan Layanan
+      <ol><li>Start, stop, restart</li><li>Menerapkan perubahan kode/konfigurasi</li><li>Log dan diagnosa</li><li>Backup dan restore</li></ol>
+    </li>
+    <li>Manajemen Pengguna dan Peran
+      <ol><li>Peran dan tanggung jawab</li><li>Membuat pengguna</li><li>Aturan SoD</li></ol>
+    </li>
+    <li>Operasional: Siklus Penuh Pengisian Formulir
+      <ol>
+        <li>Tahap 1 — Login</li>
+        <li>Tahap 2 — Buat RFC (draf)</li>
+        <li>Tahap 3 — Unggah dokumen</li>
+        <li>Tahap 4 — Ajukan dan tinjauan AI</li>
+        <li>Tahap 5 — Keputusan reviewer atas tinjauan AI</li>
+        <li>Tahap 6 — Persetujuan berjenjang</li>
+        <li>Tahap 7 — Penjadwalan</li>
+        <li>Tahap 8 — Eksekusi dan catat hasil</li>
+        <li>Tahap 9 — PIR dan penutupan</li>
+        <li>Tahap 10 — Audit dan pemantauan</li>
+        <li>Siklus alternatif — tolak, revisi, batal, darurat</li>
+      </ol>
+    </li>
+    <li>Kalender Perubahan</li>
+    <li>Penghapusan Data Perubahan</li>
+    <li>Pemecahan Masalah</li>
+    <li>Lampiran: Daftar Periksa dan Contoh Isian</li>
+  </ol>
+</section>
+
+<!-- ============ 1 ============ -->
+<section class="page">
+  <h2>1. Ringkasan Sistem</h2>
+  <p>AICMS mengelola permintaan perubahan (RFC) infrastruktur IT dari draf sampai ditutup: dokumen terkunci per revisi,
+  tinjauan AI yang bersifat <b>hanya saran</b>, skor risiko deterministik, persetujuan berjenjang dengan pemisahan tugas
+  (separation of duties), penjadwalan, pencatatan eksekusi manusia, tinjauan pasca-implementasi (PIR), dan jejak audit
+  yang hanya bisa ditambah.</p>
+
+  <h3>1.1 Arsitektur</h3>
+  <table>
+    <tr><th>Komponen</th><th>Fungsi</th><th>Port host</th></tr>
+    <tr><td><code>web</code></td><td>Next.js 14 App Router, TypeScript, Tailwind — antarmuka pengguna</td><td>3000</td></tr>
+    <tr><td><code>api</code></td><td>FastAPI + SQLAlchemy async — aturan bisnis, REST <code>/api/v1</code></td><td>8000</td></tr>
+    <tr><td><code>worker</code></td><td>RQ worker — menjalankan tinjauan AI secara asinkron</td><td>—</td></tr>
+    <tr><td><code>postgres</code></td><td>PostgreSQL 16 — data perubahan, revisi, persetujuan, audit</td><td>15432</td></tr>
+    <tr><td><code>redis</code></td><td>Redis 7 — antrian pekerjaan</td><td>16001</td></tr>
+  </table>
+  <p>Penyimpanan dokumen memakai volume Docker <code>docdata</code> (adapter lokal). Adapter S3 tersedia di kode tetapi
+  tidak diaktifkan pada stack bawaan.</p>
+
+  <h3>1.2 Batasan yang wajib dipahami</h3>
+  <ul>
+    <li><b>AI hanya memberi saran.</b> AI tidak menyetujui, menolak, mengubah status, atau menjalankan perintah.</li>
+    <li><b>Tidak ada push konfigurasi ke perangkat.</b> Eksekusi dilakukan manusia; AICMS mencatatnya.</li>
+    <li><b>Pemeriksaan yang tidak didukung = “Tidak Dinilai”</b>, tidak pernah “Lulus”.</li>
+    <li><b>Setiap temuan AI menyitir bukti</b> (dokumen + baris/bagian, atau kolom RFC).</li>
+    <li><b>Isi unggahan tidak tepercaya.</b> Percobaan prompt injection dilaporkan sebagai temuan SECURITY, bukan diikuti.</li>
+    <li><b>Rahasia disamarkan</b> (<code>[REDACTED]</code>) sebelum konten dikirim ke AI atau disimpan sebagai bukti.</li>
+    <li><b>Revisi bersifat tetap.</b> Mengubah RFC yang sudah diajukan membuat revisi baru; tinjauan dan persetujuan revisi lama menjadi kedaluwarsa.</li>
+    <li><b>Batas waktu tidak pernah menyetujui</b> otomatis.</li>
+  </ul>
+</section>
+
+<!-- ============ 2 ============ -->
+<section class="page">
+  <h2>2. Prasyarat Instalasi</h2>
+  <h3>2.1 Perangkat lunak</h3>
+  <table>
+    <tr><th>Kebutuhan</th><th>Versi minimum</th><th>Catatan</th></tr>
+    <tr><td>Docker Engine / Docker Desktop</td><td>24</td><td>Wajib mendukung <code>docker compose</code> v2</td></tr>
+    <tr><td>Docker Compose plugin</td><td>2.20</td><td>Perintah <code>docker compose</code> (bukan <code>docker-compose</code>)</td></tr>
+    <tr><td>PowerShell (Windows) / bash (Linux, macOS)</td><td>5.1 / 5.0</td><td>Contoh perintah ditulis untuk PowerShell</td></tr>
+  </table>
+  <p class="small">Python dan Node.js <b>tidak</b> perlu dipasang di host — semuanya berjalan di dalam kontainer.</p>
+
+  <h3>2.2 Sumber daya</h3>
+  <ul>
+    <li>CPU 2 core, RAM 4 GB kosong, disk 10 GB (build image + volume).</li>
+    <li>Akses jaringan ke registry Docker dan, bila memakai AI nyata, ke endpoint penyedia AI.</li>
+  </ul>
+
+  <h3>2.3 Port</h3>
+  <table>
+    <tr><th>Port host</th><th>Dipakai</th><th>Bila bentrok</th></tr>
+    <tr><td>3000</td><td>Web</td><td>Ubah pemetaan di <code>docker-compose.yml</code> untuk service <code>web</code></td></tr>
+    <tr><td>8000</td><td>API</td><td>Ubah pemetaan untuk service <code>api</code></td></tr>
+    <tr><td>15432</td><td>PostgreSQL</td><td>Bebas diubah; hanya dipakai untuk akses host (mis. psql)</td></tr>
+    <tr><td>16001</td><td>Redis</td><td>Bebas diubah; hanya dipakai untuk akses host</td></tr>
+  </table>
+  <div class="note">
+    <b>Kenapa 15432 dan 16001?</b>
+    Windows dengan Hyper-V sering mencadangkan rentang port <code>5141–5940</code> sehingga <code>5432</code> dan
+    <code>6379</code> gagal dipakai. Pemetaan port host sengaja digeser; port di dalam jaringan Docker tetap standar.
+  </div>
+
+  <h3>2.4 Struktur repositori</h3>
+<pre><code>AICMS/
+├── docker-compose.yml
+├── .env.example          salinan menjadi .env
+├── apps/
+│   ├── api/              FastAPI, Alembic, seed.py, worker
+│   └── web/              Next.js
+├── tests/                pytest (butuh Postgres hidup)
+└── docs/manual/          dokumen ini</code></pre>
+</section>
+
+<!-- ============ 3 ============ -->
+<section class="page">
+  <h2>3. Instalasi</h2>
+
+  <h3>3.1 Unduh dan siapkan berkas</h3>
+  <ol class="steps">
+    <li>Salin repositori AICMS ke direktori kerja, mis. <code>D:\Aplikasi\AICMS</code>.</li>
+    <li>Buka PowerShell di direktori tersebut. Semua perintah berikut dijalankan dari root repositori.</li>
+  </ol>
+
+  <h3>3.2 Konfigurasi <code>.env</code></h3>
+  <p><code>docker compose</code> membaca berkas <code>.env</code> di root. Mulai dari contoh yang disediakan:</p>
+<pre><code>Copy-Item .env.example .env</code></pre>
+  <p>Nilai minimum yang harus diperiksa:</p>
+  <table>
+    <tr><th>Variabel</th><th>Nilai dev</th><th>Keterangan</th></tr>
+    <tr><td><code>JWT_SECRET</code></td><td><code>dev-secret-change-in-production</code></td><td><b>Wajib diganti</b> di luar pengembangan</td></tr>
+    <tr><td><code>ALLOW_LOCAL_LOGIN</code></td><td><code>true</code></td><td>Login lokal (username/password). OIDC belum diaktifkan</td></tr>
+    <tr><td><code>REVIEW_MODE</code></td><td><code>queue</code></td><td><code>queue</code> = tinjauan AI lewat worker; <code>inline</code> hanya untuk uji</td></tr>
+    <tr><td><code>AI_PROVIDER</code></td><td><code>mock</code></td><td><code>mock</code> = heuristik deterministik tanpa jaringan</td></tr>
+    <tr><td><code>STORAGE_BACKEND</code></td><td><code>local</code></td><td>Dokumen disimpan di volume <code>docdata</code></td></tr>
+  </table>
+  <div class="danger">
+    <b>Jangan simpan rahasia nyata di <code>.env.example</code>.</b>
+    Berkas <code>.env</code> berisi kredensial dan tidak boleh dimasukkan ke repositori atau dikirim lewat surel.
+  </div>
+
+  <h3>3.3 Build dan jalankan</h3>
+<pre><code>docker compose up -d --build</code></pre>
+  <p>Pada start pertama, kontainer <code>api</code> otomatis menjalankan:</p>
+  <ol>
+    <li><code>alembic upgrade head</code> — membuat seluruh tabel.</li>
+    <li><code>python seed.py</code> — mengisi pengguna contoh (idempoten).</li>
+    <li><code>uvicorn app.main:app --port 8000</code> — menjalankan API.</li>
+  </ol>
+  <p>Kontainer <code>worker</code> menyala setelah <code>api</code> dan Redis sehat.</p>
+  <p class="small">Build pertama memakan 3–10 menit. Build ulang hanya perlu setelah kode berubah.</p>
+
+  <h3>3.4 Pemeriksaan pasca-instalasi</h3>
+  <ol class="steps">
+    <li>Status kontainer:
+<pre><code>docker compose ps</code></pre>
+      Kelima service harus <code>running</code>; <code>postgres</code> dan <code>redis</code> berstatus <code>healthy</code>.</li>
+    <li>API hidup:
+<pre><code>curl.exe http://localhost:8000/api/v1/ai/status</code></pre>
+      Membalas JSON berisi <code>provider</code> dan <code>label</code>, mis. <code>{"provider":"mock","label":"AI: DEMO/MOCK"}</code>.</li>
+    <li>Web hidup: buka <code>http://localhost:3000</code> — halaman login muncul dengan bahasa Indonesia.</li>
+    <li>Login uji dengan akun admin (lihat 6.2). Bila gagal, lihat Bab 5.3.</li>
+  </ol>
+</section>
+
+<!-- ============ 4 ============ -->
+<section class="page">
+  <h2>4. Konfigurasi Lanjutan</h2>
+
+  <h3>4.1 Penyedia AI</h3>
+  <p><code>AI_PROVIDER</code> menentukan mesin tinjauan:</p>
+  <table>
+    <tr><th>Nilai</th><th>Perilaku</th></tr>
+    <tr><td><code>mock</code></td><td>Heuristik deterministik, tanpa jaringan. Setiap tinjauan diberi label <b>DEMO/MOCK</b>.</td></tr>
+    <tr><td><code>openai</code></td><td>Endpoint apa pun yang kompatibel <code>/chat/completions</code>: OpenAI, gateway proxy, Ollama (<code>http://host:11434/v1</code>), vLLM, LM Studio.</td></tr>
+  </table>
+  <p>Pengaturan untuk <code>openai</code>:</p>
+  <table>
+    <tr><th>Variabel</th><th>Contoh</th><th>Keterangan</th></tr>
+    <tr><td><code>AI_BASE_URL</code></td><td><code>https://api.openai.com/v1</code></td><td>Alamat penyedia, termasuk <code>/v1</code></td></tr>
+    <tr><td><code>AI_API_KEY</code></td><td><code>sk-...</code></td><td>Kunci API</td></tr>
+    <tr><td><code>AI_MODEL</code></td><td><code>gpt-4o-mini</code></td><td>Nama model persis seperti di penyedia</td></tr>
+    <tr><td><code>AI_TEMPERATURE</code></td><td><code>0.0</code></td><td>Biarkan 0 agar hasil stabil</td></tr>
+    <tr><td><code>AI_MAX_TOKENS</code></td><td><code>2000</code></td><td>Batas panjang jawaban</td></tr>
+    <tr><td><code>AI_TIMEOUT_SECONDS</code></td><td><code>60</code></td><td>Batas waktu permintaan; lewat batas = tinjauan gagal</td></tr>
+    <tr><td><code>AI_MAX_DOCUMENTS</code></td><td><code>10</code></td><td>Jumlah dokumen per tinjauan</td></tr>
+    <tr><td><code>AI_MAX_DOCUMENT_CHARS</code></td><td><code>12000</code></td><td>Potongan teks per dokumen</td></tr>
+  </table>
+  <p>Contoh blok <code>.env</code>:</p>
+<pre><code>AI_PROVIDER=openai
+AI_BASE_URL=https://api.openai.com/v1
+AI_API_KEY=sk-isi-kunci-anda
+AI_MODEL=gpt-4o-mini</code></pre>
+  <div class="warn">
+    <b>Penyedia yang berjalan di komputer host.</b>
+    Dari dalam kontainer, <code>localhost</code> menunjuk ke kontainer itu sendiri. Gunakan
+    <code>http://host.docker.internal:PORT/v1</code> (pemetaan <code>host-gateway</code> sudah ada di <code>docker-compose.yml</code>
+    untuk <code>api</code> dan <code>worker</code>).
+  </div>
+  <div class="danger">
+    <b>Kunci hilang tidak boleh jatuh ke mode mock secara diam-diam.</b>
+    Bila <code>AI_PROVIDER=openai</code> tetapi kunci/endpoint tidak valid, tinjauan <b>gagal</b> dengan pesan
+    “Konfigurasi kredensial AI ditolak” atau “Layanan AI sedang tidak tersedia…”. Perbaiki konfigurasi lalu jalankan
+    ulang tinjauan dari halaman perubahan.
+  </div>
+  <p class="small">Variabel <code>OPENAI_API_KEY</code> dan <code>OPENAI_MODEL</code> masih dibaca sebagai cadangan bila
+  <code>AI_API_KEY</code>/<code>AI_MODEL</code> kosong.</p>
+
+  <h3>4.2 Mode tinjauan</h3>
+  <table>
+    <tr><th><code>REVIEW_MODE</code></th><th>Perilaku</th><th>Dipakai untuk</th></tr>
+    <tr><td><code>queue</code></td><td>Tinjauan dikirim ke worker RQ; status <code>Tinjauan AI</code> diperbarui otomatis saat selesai</td><td>Normal, semua lingkungan produksi</td></tr>
+    <tr><td><code>inline</code></td><td>Tinjauan dijalankan di dalam request</td><td>Uji otomatis dan pengembangan cepat saja</td></tr>
+  </table>
+  <div class="note">
+    <b>Diagnosa cepat.</b> Status <code>Tinjauan AI</code> yang menggantung lama berarti worker mati atau tidak sehat.
+    Cek <code>docker compose ps worker</code> dan Bab 5.3.
+  </div>
+
+  <h3>4.3 Penyimpanan dokumen</h3>
+  <p>Bawaan: <code>STORAGE_BACKEND=local</code>, path di kontainer <code>/data/docs</code>, dipetakan ke volume
+  <code>docdata</code>. Volume ini <b>harus</b> di-backup bersama database. Adapter S3-compatible tersedia di kode,
+  tetapi tidak ada service S3 pada stack bawaan.</p>
+
+  <h3>4.4 Autentikasi</h3>
+  <ul>
+    <li><b>Pengembangan:</b> login lokal JWT. Token berlaku <code>JWT_EXPIRE_MINUTES</code> (bawaan 60 menit).</li>
+    <li><b>Produksi:</b> sambungkan OIDC (<code>OIDC_ISSUER</code>, <code>OIDC_CLIENT_ID</code>, <code>OIDC_CLIENT_SECRET</code>)
+      lalu matikan <code>ALLOW_LOCAL_LOGIN</code>.</li>
+    <li>Menutup tab atau memuat ulang setelah kode web dibangun ulang menghapus sesi — login kembali.</li>
+  </ul>
+
+  <h3>4.5 Database dan migrasi</h3>
+<pre><code># Terapkan migrasi terbaru secara manual
+docker compose exec -T api alembic upgrade head
+
+# Lihat revisi aktif
+docker compose exec -T api alembic current
+
+# Akses SQL langsung
+docker compose exec -T postgres psql -U aicms -d aicms</code></pre>
+  <p>Setiap perubahan skema selalu disertai satu migrasi Alembic. Jangan mengubah tabel secara manual di lingkungan
+  yang sudah berisi data.</p>
+</section>
+
+<!-- ============ 5 ============ -->
+<section class="page">
+  <h2>5. Pengelolaan Layanan</h2>
+
+  <h3>5.1 Start, stop, restart</h3>
+  <table>
+    <tr><th>Tujuan</th><th>Perintah</th></tr>
+    <tr><td>Menyalakan seluruh stack</td><td><code>docker compose up -d</code></td></tr>
+    <tr><td>Membangun ulang lalu menyalakan</td><td><code>docker compose up -d --build</code></td></tr>
+    <tr><td>Mematikan seluruh stack (data tetap)</td><td><code>docker compose stop</code></td></tr>
+    <tr><td>Mematikan dan menghapus kontainer (data tetap)</td><td><code>docker compose down</code></td></tr>
+    <tr><td>Menghapus kontainer <b>dan volume data</b></td><td><code>docker compose down -v</code></td></tr>
+    <tr><td>Restart satu service</td><td><code>docker compose restart api</code></td></tr>
+    <tr><td>Status semua service</td><td><code>docker compose ps</code></td></tr>
+  </table>
+  <div class="danger">
+    <b><code>docker compose down -v</code> menghapus database dan dokumen secara permanen.</b>
+    Hanya lakukan pada lingkungan pengembangan yang boleh di-reset, dan setelah memastikan tidak ada data yang perlu
+    dipertahankan.
+  </div>
+
+  <h3>5.2 Menerapkan perubahan</h3>
+  <table>
+    <tr><th>Jenis perubahan</th><th>Perintah</th></tr>
+    <tr><td>Kode API (Python)</td><td><code>docker compose restart api</code></td></tr>
+    <tr><td>Kode worker</td><td><code>docker compose restart worker</code></td></tr>
+    <tr><td>Nilai <code>.env</code> (termasuk <code>AI_*</code>)</td><td><code>docker compose up -d --force-recreate api worker</code></td></tr>
+    <tr><td>Kode web / gaya Tailwind</td><td><code>docker compose build web</code> lalu <code>docker compose up -d web</code></td></tr>
+    <tr><td>Skema database</td><td><code>docker compose exec -T api alembic upgrade head</code></td></tr>
+  </table>
+  <div class="note">
+    <b>Restart API memutus request yang sedang berjalan.</b>
+    Hindari saat ada tinjauan AI atau eksekusi berlangsung. Tinjauan yang terputus dapat dijalankan ulang dari halaman
+    perubahan; eksekusi tidak dirugikan karena statusnya tersimpan di database.
+  </div>
+
+  <h3>5.3 Log dan diagnosa</h3>
+<pre><code>docker compose logs -f api          # ikuti log API
+docker compose logs -f worker       # log pekerjaan AI
+docker compose logs -f web          # log Next.js
+docker compose logs --tail 100 api</code></pre>
+  <table>
+    <tr><th>Gejala</th><th>Penyebab umum</th><th>Tindakan</th></tr>
+    <tr><td>Web memuat tetapi semua daftar kosong/error</td><td>API belum siap atau mati</td><td><code>docker compose ps</code>, lalu <code>docker compose logs api</code></td></tr>
+    <tr><td>Tinjauan AI stuck di status Tinjauan AI</td><td>Worker mati atau Redis tidak sehat</td><td><code>docker compose restart worker</code></td></tr>
+    <tr><td>Tinjauan gagal terus</td><td>Kunci/endpoint AI salah, kuota habis, model tidak dikenal</td><td>Periksa <code>.env</code>, jalankan ulang tinjauan</td></tr>
+    <tr><td>Unggahan dokumen gagal</td><td>Format tidak didukung, &gt; 50 MB, atau status perubahan tidak mengizinkan</td><td>Konversi ke PDF berbasis teks; lihat Bab 7.3</td></tr>
+    <tr><td>Login selalu kembali ke halaman login</td><td><code>JWT_SECRET</code> berubah atau token kedaluwarsa</td><td>Login ulang; jangan ubah <code>JWT_SECRET</code> saat ada sesi aktif</td></tr>
+  </table>
+
+  <h3>5.4 Backup dan restore</h3>
+<pre><code># Backup database
+docker compose exec -T postgres pg_dump -U aicms -d aicms &gt; backup_aicms.sql
+
+# Backup dokumen (volume docdata)
+docker run --rm -v aicms_docdata:/data -v "${PWD}:/out" alpine tar czf /out/docdata.tgz -C /data .
+
+# Restore database (lingkungan kosong)
+Get-Content backup_aicms.sql -Raw | docker compose exec -T postgres psql -U aicms -d aicms</code></pre>
+  <p class="small">Cadangkan database <b>dan</b> volume dokumen sebagai satu pasangan — database menyimpan hash dokumen
+  yang harus cocok dengan berkasnya.</p>
+</section>
+
+<!-- ============ 6 ============ -->
+<section class="page">
+  <h2>6. Manajemen Pengguna dan Peran</h2>
+
+  <h3>6.1 Peran dan tanggung jawab</h3>
+  <table>
+    <tr><th>Peran</th><th>Kode</th><th>Tanggung jawab utama</th></tr>
+    <tr><td>Admin</td><td><code>ADMIN</code></td><td>Mengelola pengguna dan peran, menghapus RFC, akses penuh</td></tr>
+    <tr><td>Pemohon</td><td><code>REQUESTER</code></td><td>Membuat, mengunggah dokumen, mengajukan RFC</td></tr>
+    <tr><td>Manajer</td><td><code>MANAGER</code></td><td>Menyetujui langkah manajerial, menghapus RFC</td></tr>
+    <tr><td>Peninjau Teknis</td><td><code>TECH_REVIEWER</code></td><td>Persetujuan teknis pertama</td></tr>
+    <tr><td>Manajer Perubahan</td><td><code>CHANGE_MANAGER</code></td><td>Persetujuan proses perubahan, penjadwalan eksekusi</td></tr>
+    <tr><td>Anggota CAB</td><td><code>CAB_MEMBER</code></td><td>Persetujuan dewan penasihat perubahan</td></tr>
+    <tr><td>Penyetuju Akhir</td><td><code>FINAL_APPROVER</code></td><td>Persetujuan akhir perubahan berisiko tinggi</td></tr>
+    <tr><td>Peninjau / Insinyur</td><td><code>REVIEWER</code>, <code>ENGINEER</code></td><td>Tinjauan dan pelaksanaan teknis</td></tr>
+    <tr><td>Admin AI</td><td><code>AI_ADMIN</code></td><td>Mengawasi kualitas dan konfigurasi tinjauan AI</td></tr>
+    <tr><td>Auditor</td><td><code>AUDITOR</code></td><td>Melihat jejak audit dan RFC yang dihapus (baca saja)</td></tr>
+  </table>
+
+  <h3>6.2 Akun contoh bawaan (lingkungan pengembangan)</h3>
+  <table>
+    <tr><th>Peran</th><th>Username</th><th>Password</th></tr>
+    <tr><td>Admin</td><td><code>admin</code></td><td><code>Admin@123</code></td></tr>
+    <tr><td>Pemohon</td><td><code>requester1</code></td><td><code>Request@123</code></td></tr>
+    <tr><td>Peninjau Teknis</td><td><code>reviewer1</code></td><td><code>Reviewer@123</code></td></tr>
+    <tr><td>Manajer</td><td><code>manager1</code></td><td><code>Manager@123</code></td></tr>
+    <tr><td>Manajer Perubahan</td><td><code>cm1</code></td><td><code>CM@123</code></td></tr>
+    <tr><td>Auditor</td><td><code>auditor1</code></td><td><code>Auditor@123</code></td></tr>
+  </table>
+  <div class="danger">
+    <b>Ganti seluruh password contoh sebelum sistem dipakai di luar pengembangan.</b>
+    Akun ini hanya untuk data sintetis.
+  </div>
+
+  <h3>6.3 Membuat dan mengelola pengguna</h3>
+  <ol class="steps">
+    <li>Masuk sebagai Admin, buka menu <b>Pengguna</b> (hanya terlihat untuk Admin).</li>
+    <li>Isi <b>Nama pengguna</b>, <b>Username</b>, <b>Email</b>, lalu pilih <b>Peran</b>. Satu pengguna boleh memiliki lebih dari satu peran.</li>
+    <li>Simpan. Pengguna baru langsung dapat login.</li>
+    <li>Untuk mengubah peran: buka pengguna, ubah pilihan peran, simpan. Perubahan tercatat di jejak audit.</li>
+    <li>Untuk menonaktifkan: gunakan <b>Nonaktifkan</b>. Ini <b>soft delete</b> — riwayat tetap utuh dan akun tidak bisa login lagi.</li>
+  </ol>
+  <p class="small">Username dan email tidak dapat diubah setelah dibuat. Tidak ada fitur reset password mandiri; Admin
+  membuat ulang akun bila password hilang.</p>
+
+  <h3>6.4 Aturan pemisahan tugas (SoD)</h3>
+  <ul>
+    <li>Pemohon <b>tidak boleh</b> menyetujui RFC miliknya sendiri.</li>
+    <li>Setiap langkah persetujuan hanya diambil oleh pemegang peran langkah tersebut.</li>
+    <li>Langkah berjalan <b>berurutan</b>; langkah berikutnya terkunci sampai langkah sebelumnya selesai.</li>
+    <li>Keputusan bersifat permanen dan tercatat di audit; menolak atau meminta revisi wajib disertai komentar.</li>
+    <li>Persetujuan menempel pada satu revisi. Revisi baru membatalkan persetujuan lama.</li>
+  </ul>
+</section>
+
+<!-- ============ 7 ============ -->
+<section class="page">
+  <h2>7. Operasional: Siklus Penuh Pengisian Formulir</h2>
+  <p>Bab ini mengikuti satu RFC dari draf sampai ditutup. Setiap tahap menyebutkan siapa yang bertindak, menu yang
+  dipakai, dan apa yang diisi.</p>
+
+  <h3>Alur status</h3>
+  <div class="flow">
+    Draf → Diajukan → Validasi Dokumen → Tinjauan AI → (keputusan reviewer) Menunggu Persetujuan → Disetujui → Terjadwal →
+    Sedang Dieksekusi → Validasi Pasca-Eksekusi → Selesai → Ditutup
+  </div>
+  <div class="flow">
+    Cabang keluar: <b>Perlu Revisi</b>, <b>Ditolak</b>, <b>Tinjauan Gagal</b>, <b>Kedaluwarsa</b>, <b>Dibatalkan</b>
+  </div>
+
+  <h3>Urutan peran dalam satu siklus</h3>
+  <table>
+    <tr><th>Tahap</th><th>Status masuk</th><th>Pelaku</th><th>Menu</th></tr>
+    <tr><td>1</td><td>—</td><td>Semua pengguna</td><td>Login</td></tr>
+    <tr><td>2</td><td>—</td><td>Pemohon</td><td>Permohonan Perubahan → Buat RFC</td></tr>
+    <tr><td>3</td><td>Draf</td><td>Pemohon</td><td>Detail RFC → Dokumen</td></tr>
+    <tr><td>4</td><td>Draf</td><td>Pemohon, AI</td><td>Detail RFC → Ajukan untuk review</td></tr>
+    <tr><td>5</td><td>Tinjauan AI</td><td>Peninjau Teknis / Admin</td><td>Detail RFC → panel Tinjauan AI</td></tr>
+    <tr><td>6</td><td>Menunggu Persetujuan</td><td>Peninjau Teknis, Manajer, Manajer Perubahan, CAB, Penyetuju Akhir</td><td>Persetujuan</td></tr>
+    <tr><td>7</td><td>Disetujui</td><td>Manajer Perubahan / Admin</td><td>Detail RFC → Implementasi</td></tr>
+    <tr><td>8</td><td>Terjadwal</td><td>Insinyur / pelaksana</td><td>Detail RFC → Implementasi</td></tr>
+    <tr><td>9</td><td>Validasi Pasca-Eksekusi</td><td>Pemohon / pelaksana</td><td>Detail RFC → Implementasi</td></tr>
+    <tr><td>10</td><td>Selesai → Ditutup</td><td>Auditor, Change Manager</td><td>Audit, Kalender</td></tr>
+  </table>
+
+  <h3>7.1 Tahap 1 — Login</h3>
+  <ol class="steps">
+    <li>Buka <code>http://localhost:3000</code>. Halaman login tampil tanpa menu navigasi sisi.</li>
+    <li>Isi <b>Username</b> dan <b>Password</b>, lalu tekan <b>Masuk</b>.</li>
+    <li>Bila berhasil, sistem membuka <b>Ringkasan</b> dan menampilkan nama serta peran Anda di bagian bawah menu kiri.</li>
+  </ol>
+  <p><b>Bila gagal:</b> pesan kesalahan tampil di halaman login. Periksa huruf besar/kecil password dan pastikan akun
+  tidak dinonaktifkan Admin.</p>
+
+  <h3>7.2 Tahap 2 — Buat RFC (draf)</h3>
+  <p>Masuk sebagai Pemohon. Menu <b>Permohonan Perubahan</b> → tombol <b>Buat RFC</b>. Formulir terbagi tiga kartu.</p>
+
+  <h4>Kartu “Ringkasan perubahan”</h4>
+  <table>
+    <tr><th>Kolom</th><th>Wajib</th><th>Cara mengisi</th></tr>
+    <tr><td>Judul</td><td>Ya</td><td>Satu baris, menyebut objek dan tindakan. <i>Contoh: Upgrade IOS core switch gedung A</i></td></tr>
+    <tr><td>Kategori</td><td>Ya</td><td>Jaringan / Server / Aplikasi / Basis Data / Keamanan / Infrastruktur / Lainnya</td></tr>
+    <tr><td>Tipe perubahan</td><td>Ya</td><td><b>Standard</b> (pola dikenal, risiko rendah), <b>Normal</b> (perlu persetujuan penuh), <b>Emergency</b> (jalur cepat)</td></tr>
+    <tr><td>Lingkungan</td><td>Ya</td><td>Produksi / Staging / Test / Development / Disaster Recovery. Untuk perubahan Produksi, isi rencana rollback dengan lengkap.</td></tr>
+  </table>
+
+  <h4>Kartu “Detail teknis”</h4>
+  <table>
+    <tr><th>Kolom</th><th>Wajib</th><th>Cara mengisi</th></tr>
+    <tr><td>Justifikasi bisnis</td><td>Ya</td><td>Mengapa perubahan dibutuhkan; dampak bila tidak dilakukan. Dasar penilaian approver.</td></tr>
+    <tr><td>Dampak</td><td>Tidak</td><td>Layanan, pengguna, atau jendela operasi yang terdampak, termasuk potensi gangguan.</td></tr>
+    <tr><td>Rencana implementasi</td><td>Ya</td><td>Langkah berurutan bernomor. Tulis perintah yang akan dijalankan, <b>tanpa</b> password/community/API key.</td></tr>
+    <tr><td>Rencana uji</td><td>Tidak</td><td>Pemeriksaan pasca-eksekusi yang menyatakan perubahan berhasil (ping, monitoring, login uji).</td></tr>
+    <tr><td>Rencana rollback</td><td>Ya</td><td>Wajib. Cara kembali ke kondisi awal bila gagal, termasuk perkiraan durasi rollback.</td></tr>
+  </table>
+
+  <h4>Kartu “Cakupan”</h4>
+  <table>
+    <tr><th>Kolom</th><th>Cara mengisi</th></tr>
+    <tr><td>Perangkat terdampak</td><td>Pisahkan dengan koma. <i>Contoh: core-sw-01, fw-edge-02</i>. Dipakai kalender untuk deteksi bentrok — isi bila diketahui.</td></tr>
+    <tr><td>Layanan terdampak</td><td>Pisahkan dengan koma. <i>Contoh: VPN kantor pusat, e-mail</i></td></tr>
+  </table>
+
+  <p>Tekan <b>Simpan sebagai Draft</b>. Sistem membuka halaman detail RFC dengan nomor perubahan (mis.
+  <code>CHG-2026-000063</code>) dan status <b>Draf</b>.</p>
+  <div class="warn">
+    <b>Jangan menulis kredensial di kolom mana pun.</b>
+    Nilai seperti password/community tetap disamarkan sebelum dikirim ke AI, tetapi kolom RFC tidak melalui lapisan
+    penyamaran yang sama dengan dokumen. Simpan rahasia di dokumen konfigurasi berlabel agar tersamarkan.
+  </div>
+
+  <h3>7.3 Tahap 3 — Unggah dokumen</h3>
+  <p>Masih di halaman detail RFC, kartu <b>Dokumen</b>. Unggahan hanya diterima selama status mengizinkan revisi baru
+  (<b>Draf</b>, <b>Diajukan</b>, <b>Validasi Dokumen</b>, <b>Tinjauan AI</b>, <b>Perlu Revisi</b>).</p>
+  <ol class="steps">
+    <li>Pilih <b>Jenis dokumen</b>. Bawaan <b>CRF (Formulir Permohonan)</b>. Pilihan lain: MOP, Konfigurasi sebelum,
+      Konfigurasi yang diajukan, Rencana rollback, Rencana uji, Rencana komunikasi, Analisis dampak, Lainnya.</li>
+    <li>Pilih berkas: <code>.pdf</code>, <code>.docx</code>, <code>.xlsx</code>, <code>.txt</code>, <code>.cfg</code>,
+      <code>.yaml</code>, <code>.yml</code>, <code>.json</code>. Maksimum 50 MB.</li>
+    <li>Tekan <b>Unggah</b>. Pesan sukses menyebut nama berkas dan versi, mis. <code>MOP-core-a.pdf v1 terunggah.</code></li>
+    <li>Ulangi untuk setiap jenis. Minimum yang disarankan: <b>CRF</b>, <b>MOP</b>, <b>Konfigurasi sebelum</b>,
+      <b>Konfigurasi yang diajukan</b>.</li>
+  </ol>
+  <div class="note">
+    <b>Format yang bisa dibaca AI</b> (buka bagian “Format dokumen yang bisa dibaca AI” di kartu Dokumen):
+    PDF berbasis teks, DOCX, XLSX, TXT, CFG, YAML, JSON. PNG/JPG dan PDF hasil pindaian <b>tidak terbaca</b> — belum ada
+    OCR — dan AI menandainya “Tidak Dinilai”. Simpan dokumen sebagai PDF hasil ekspor, bukan foto.
+  </div>
+  <p>Kolom <b>Ekstraksi</b> per dokumen menunjukkan <b>Terbaca AI</b>, <b>Diproses</b>, atau <b>Gagal dibaca</b>. Perbaiki
+  dokumen “Gagal dibaca” sebelum mengajukan. Tombol <b>Lihat / unduh</b> membuka berkas asli untuk memeriksa isinya.</p>
+  <p class="small">Unggahan ulang berkas dengan jenis yang sama menaikkan versi; versi lama tetap tersimpan.</p>
+
+  <h3>7.4 Tahap 4 — Ajukan dan tinjauan AI</h3>
+  <ol class="steps">
+    <li>Pastikan dokumen wajib sudah terunggah dan form RFC lengkap.</li>
+    <li>Kartu <b>Aksi</b> → tekan <b>Ajukan untuk review</b>. Revisi dikunci permanen.</li>
+    <li>Status bergerak ke <b>Validasi Dokumen</b> lalu <b>Tinjauan AI</b>. Halaman memantau dan memperbarui hasil secara otomatis setiap beberapa detik.</li>
+    <li>Tunggu hingga muncul panel <b>Tinjauan AI</b> dengan rekomendasi, skor risiko, dan daftar temuan.</li>
+  </ol>
+  <p>Yang dibaca dari panel tinjauan:</p>
+  <table>
+    <tr><th>Bagian</th><th>Arti</th></tr>
+    <tr><td>Label penyedia</td><td><b>DEMO/MOCK</b> berarti heuristik tanpa model nyata. Tanpa label ini, tinjauan dijalankan model sungguhan.</td></tr>
+    <tr><td>Rekomendasi</td><td>Setuju / Setuju dengan syarat / Minta revisi / Tolak — <b>hanya saran</b> untuk approver.</td></tr>
+    <tr><td>Skor risiko</td><td>0–100. Dipetakan ke <b>Rendah</b>, <b>Sedang</b>, <b>Tinggi</b>, <b>Kritis</b> dan menentukan rute persetujuan.</td></tr>
+    <tr><td>Temuan</td><td>Setiap temuan menyebut status (Lulus / Gagal / Tidak Dinilai / Info) dan bukti: nama dokumen + baris/bagian, atau kolom RFC yang disitir.</td></tr>
+    <tr><td>Batasan</td><td>Apa yang tidak dapat diperiksa AI (mis. topologi, baseline resmi) dan ditandai “Tidak Dinilai”.</td></tr>
+  </table>
+  <ul>
+    <li><b>Keputusan reviewer</b> (panel tinjauan, peran Peninjau Teknis dan Admin) — berlaku untuk semua tingkat risiko, lihat 7.5.</li>
+    <li><b>Tinjauan Gagal:</b> pesan bahasa Indonesia menjelaskan sebabnya (“Layanan AI sedang tidak tersedia…”, “Konfigurasi kredensial AI ditolak”, “Respons AI tidak dapat dibaca sistem”). Tekan <b>Jalankan ulang tinjauan</b> setelah penyebabnya diperbaiki. Sistem tidak mencoba ulang otomatis agar gangguan tetap terlihat.</li>
+    <li><b>Perlu Revisi:</b> temuan berisiko menunggu keputusan reviewer, atau reviewer mengembalikan RFC. Reviewer dapat menerima (RFC lanjut ke persetujuan) atau mengembalikan ke pemohon. Pemohon menekan <b>Buka ulang ke Draf</b>, memperbaiki RFC/dokumen, lalu mengajukan lagi. Ini membuat revisi baru.</li>
+    <li><b>Menunggu Persetujuan:</b> alur persetujuan dibuat otomatis sesuai tipe perubahan dan tingkat risiko.</li>
+  </ul>
+  <p>Rute persetujuan bawaan:</p>
+  <table>
+    <tr><th>Risiko</th><th>Urutan persetujuan</th></tr>
+    <tr><td>Rendah</td><td>Peninjau Teknis → Manajer</td></tr>
+    <tr><td>Sedang</td><td>Peninjau Teknis → Manajer → Manajer Perubahan</td></tr>
+    <tr><td>Tinggi / Kritis</td><td>Peninjau Teknis → Manajer → Manajer Perubahan → Anggota CAB → Penyetuju Akhir</td></tr>
+    <tr><td>Tipe Emergency</td><td>Manajer Perubahan → Manajer (jalur cepat)</td></tr>
+  </table>
+  <p class="small">Risiko yang belum dinilai tidak pernah dirutekan sebagai Rendah; bawaannya Sedang.</p>
+
+  <h3>7.5 Tahap 5 — Keputusan reviewer atas hasil tinjauan AI</h3>
+  <p>Temuan AI <b>tidak pernah</b> menyetujui atau menolak RFC. Bila ada temuan <b>Gagal</b> berisiko tinggi/kritis, RFC berhenti di
+  <b>Perlu Revisi</b> sebagai status “menunggu keputusan reviewer” — bukan penolakan. Untuk semua tingkat risiko, peran
+  <b>Peninjau Teknis</b> (atau <b>Admin</b>) memeriksa temuan secara manual lalu memutuskan. Panel <b>Keputusan reviewer</b>
+  muncul di bawah daftar temuan selama status RFC <b>Tinjauan AI</b> atau <b>Perlu Revisi</b>.</p>
+  <table>
+    <tr><th>Tombol</th><th>Akibat</th></tr>
+    <tr><td><b>Terima hasil tinjauan</b></td><td>RFC diteruskan ke <b>Menunggu Persetujuan</b>, termasuk bila temuan tinggi/kritis masih terbuka — Anda yang menanggung keputusan itu. Rute persetujuan dibuat sesuai tipe dan risiko.</td></tr>
+    <tr><td><b>Kembalikan ke pemohon</b></td><td>RFC ke <b>Perlu Revisi</b> untuk diperbaiki pemohon; catatan tampil sebagai alasan perbaikan. Persetujuan yang belum diputuskan dibatalkan.</td></tr>
+  </table>
+  <ol class="steps">
+    <li>Buka RFC → baca setiap temuan beserta bukti dan batasannya.</li>
+    <li>Tulis <b>Alasan / catatan keputusan</b> — wajib untuk kedua pilihan (mis. “Risiko diterima: rollback sudah diuji,
+      eksekusi di luar jam sibuk”).</li>
+    <li>Tekan <b>Terima hasil tinjauan</b> atau <b>Kembalikan ke pemohon</b>, lalu konfirmasi (<b>Ya, terima</b> / <b>Ya, kembalikan</b>).</li>
+    <li>Keputusan tersimpan permanen: pelaku, waktu, dan alasan tampil di panel; tercatat di jejak audit (<code>review.decision</code>),
+      termasuk daftar temuan tinggi/kritis yang di-override.</li>
+  </ol>
+  <div class="warn">
+    <b>Batas kewenangan.</b> AI tidak pernah menyetujui atau menolak. Reviewer menentukan langkah berikutnya; persetujuan akhir
+    tetap lewat alur approval dengan pemisahan tugas, sehingga penerimaan reviewer bukan persetujuan perubahan. Temuan AI tidak
+    dapat diubah — yang dicatat adalah keputusan manusia di sampingnya, dan Approver melihat RFC di jejak audit.
+  </div>
+  <p class="small">Pemohon melihat tujuannya: status <b>Perlu Revisi</b> dengan catatan reviewer, lalu menekan
+  <b>Buka ulang ke Draf</b> untuk memperbaiki dan mengajukan ulang revisi baru.</p>
+
+  <h3>7.6 Tahap 6 - Persetujuan berjenjang</h3>
+  <p>Keluar dari akun pemohon, masuk sebagai pemegang peran langkah pertama.</p>
+  <ol class="steps">
+    <li>Buka menu <b>Persetujuan</b>. Inbox menampilkan tugas milik Anda, jumlah yang dapat diputuskan, dan yang menunggu langkah lain.</li>
+    <li>Buka tugas. Halaman menampilkan <b>Alur persetujuan</b> di kiri dan <b>Detail RFC</b> di kanan.</li>
+    <li>Baca bukti: justifikasi, dampak, rencana implementasi, rencana uji, rencana rollback, perangkat/layanan. Absennya
+      rencana rollback ditampilkan mencolok dengan warna bahaya.</li>
+    <li>Isi <b>Komentar</b>. Wajib untuk <b>Tolak</b> dan <b>Minta Revisi</b>; opsional untuk <b>Setujui</b>.</li>
+    <li>Pilih <b>Setujui</b> / <b>Minta Revisi</b> / <b>Tolak</b>, lalu konfirmasi pada panel yang muncul.</li>
+    <li>Lanjutkan dengan akun peran berikutnya sampai seluruh langkah selesai.</li>
+  </ol>
+  <table>
+    <tr><th>Keputusan</th><th>Akibat</th></tr>
+    <tr><td>Setujui</td><td>Langkah ditandai selesai; langkah berikutnya terbuka. Bila langkah terakhir, status menjadi <b>Disetujui</b>.</td></tr>
+    <tr><td>Minta Revisi</td><td>RFC kembali ke Pemohon sebagai <b>Perlu Revisi</b>; seluruh persetujuan dibatalkan.</td></tr>
+    <tr><td>Tolak</td><td>RFC menjadi <b>Ditolak</b>, final.</td></tr>
+  </table>
+  <ul>
+    <li>Tugas yang menunggu langkah sebelumnya menampilkan “Menunggu langkah persetujuan sebelumnya selesai”; tombol keputusan tidak aktif.</li>
+    <li>Tugas bertanda kedaluwarsa (revisi sudah diganti) tidak boleh diputuskan; minta pemohon mengirim ulang.</li>
+    <li>Approver tidak dapat menyetujui RFC miliknya sendiri.</li>
+  </ul>
+
+  <h3>7.7 Tahap 7 — Penjadwalan</h3>
+  <p>Setelah status <b>Disetujui</b>, kartu <b>Implementasi &amp; tinjauan pasca-implementasi</b> menampilkan formulir
+  jadwal.</p>
+  <ol class="steps">
+    <li>Isi <b>Mulai (WIB)</b> dan <b>Selesai (WIB)</b>. Keduanya dalam waktu Indonesia Barat (UTC+7).</li>
+    <li>Tekan <b>Jadwalkan</b>. Status menjadi <b>Terjadwal</b> dan jendela muncul di <b>Kalender</b>.</li>
+  </ol>
+  <p><b>Periksa bentrok lebih dulu:</b> buka menu <b>Kalender</b>, atur rentang tanggal, dan baca hasil deteksi konflik.</p>
+  <table>
+    <tr><th>Verdict kalender</th><th>Arti</th><th>Tindakan</th></tr>
+    <tr><td>▲ Jadwal bentrok terdeteksi</td><td>Ada perubahan lain yang berbagi perangkat/layanan pada jendela yang sama</td><td>Geser jadwal atau koordinasikan sebelum eksekusi</td></tr>
+    <tr><td>◑ Konflik tidak dapat dipastikan</td><td>Sebagian perubahan tidak mencantumkan perangkat/layanan</td><td>Lengkapi cakupan atau verifikasi manual; jangan anggap aman</td></tr>
+    <tr><td>● Tidak ada bentrok pada data yang tersedia</td><td>Semua perubahan dalam rentang mencantumkan dependensi</td><td>Lanjutkan</td></tr>
+  </table>
+
+  <h3>7.8 Tahap 8 — Eksekusi dan catat hasil</h3>
+  <ol class="steps">
+    <li>Buka halaman detail RFC. Panel <b>Siap dieksekusi</b> harus hijau dengan keterangan “Semua prasyarat terpenuhi”.
+      Bila belum, daftar penyebab ditampilkan (mis. revisi disetujui bukan revisi terkini).</li>
+    <li>Laksanakan perubahan secara manual sesuai MOP. AICMS tidak menjalankan perintah apa pun.</li>
+    <li>Tekan <b>Mulai implementasi</b>. Status menjadi <b>Sedang Dieksekusi</b> dan waktu mulai aktual tercatat.</li>
+    <li>Setelah selesai, isi formulir hasil:
+      <ul>
+        <li><b>Hasil</b> — Sukses / Sukses dengan deviasi / Gagal / Rollback.</li>
+        <li><b>Catatan eksekusi</b> — apa yang benar-benar terjadi, termasuk penyimpangan dari rencana.</li>
+        <li><b>Post-check lulus</b> — centang bila pemeriksaan dari rencana uji lolos.</li>
+        <li><b>Bukti validasi layanan</b> — mis. “monitoring hijau, ping 0% loss”.</li>
+      </ul>
+    </li>
+    <li>Tekan <b>Catat hasil</b>. Status menjadi <b>Validasi Pasca-Eksekusi</b>.</li>
+  </ol>
+  <p class="small">Bila hasil adalah Gagal atau Rollback, jangan menutup RFC pada tahap berikutnya sebelum PIR dan tindak
+  lanjut dicatat.</p>
+
+  <h3>7.9 Tahap 9 — PIR dan penutupan</h3>
+  <ol class="steps">
+    <li>Isi <b>Catatan PIR</b> (wajib): hasil validasi layanan setelah perubahan, gejala tersisa, dan rekomendasi.</li>
+    <li>Centang <b>Post-check lulus</b> hanya bila benar. Bila gagal, sistem menampilkan “Post-check gagal: tandai rollback, bukan selesai” dan tombol simpan tetap nonaktif.</li>
+    <li>Tekan <b>Simpan PIR &amp; selesaikan</b>. Status menjadi <b>Selesai</b>.</li>
+    <li>Tekan <b>Tutup perubahan</b>. Status menjadi <b>Ditutup</b> dan RFC keluar dari daftar aktif.</li>
+  </ol>
+
+  <h3>7.10 Tahap 10 — Audit dan pemantauan</h3>
+  <ul>
+    <li><b>Ringkasan</b> menampilkan perubahan aktif, menunggu persetujuan, tinjauan AI tertunda/bertanda, jadwal mendatang, dan hasil eksekusi.</li>
+    <li><b>Audit</b> mencatat setiap aksi sensitif: pembuatan RFC, unggahan dokumen, tinjauan AI, keputusan persetujuan, transisi status, perubahan pengguna, dan penghapusan RFC. Kolom waktu dalam WIB, 50 baris per halaman, dapat disaring berdasarkan aksi.</li>
+    <li><b>Riwayat status</b> di halaman detail RFC menampilkan kronologi transisi beserta pelaku dan alasan. Pelaku ditampilkan
+      sebagai nama pengguna (mis. <code>requester1</code>, <code>manager1</code>), sehingga jelas siapa yang mengajukan, meninjau,
+      menyetujui, dan mengeksekusi; transisi otomatis sistem ditandai <b>otomatis</b>.</li>
+    <li><b>Kalender</b> memperlihatkan jendela implementasi yang disetujui/terjadwal/dieksekusi/divalidasi.</li>
+  </ul>
+
+  <h3>7.11 Siklus alternatif</h3>
+  <table>
+    <tr><th>Situasi</th><th>Langkah</th></tr>
+    <tr><td>Minta revisi dari persetujuan</td><td>Approver pilih <b>Minta Revisi</b> + komentar → RFC <b>Perlu Revisi</b> → Pemohon <b>Buka ulang ke Draf</b> → perbaiki → ajukan lagi (revisi baru, seluruh persetujuan diulang).</td></tr>
+    <tr><td>Tinjauan AI gagal</td><td>Perbaiki konfigurasi/koneksi AI → <b>Jalankan ulang tinjauan</b> pada panel tinjauan.</td></tr>
+    <tr><td>Perubahan darurat</td><td>Buat RFC dengan tipe <b>Emergency</b>; rute persetujuan menjadi Manajer Perubahan → Manajer. Isi justifikasi darurat dan nomor insiden pada RFC.</td></tr>
+    <tr><td>Membatalkan perubahan</td><td>Kartu <b>Aksi</b> → isi <b>Alasan pembatalan</b> (wajib) → <b>Batalkan perubahan</b> → konfirmasi. Status menjadi <b>Dibatalkan</b> dan tercatat di audit.</td></tr>
+    <tr><td>Eksekusi gagal / rollback</td><td>Catat hasil <b>Gagal</b> atau <b>Rollback</b>, centang post-check sesuai fakta, tuliskan PIR dengan tindakan pemulihan, lalu tutup.</td></tr>
+  </table>
+</section>
+
+<!-- ============ 8, 9 ============ -->
+<section class="page">
+  <h2>8. Kalender Perubahan</h2>
+  <ul>
+    <li>Menu <b>Kalender</b> menampilkan perubahan berstatus Disetujui, Terjadwal, Sedang Dieksekusi, dan Validasi Pasca-Eksekusi.</li>
+    <li>Filter: rentang tanggal (<b>Dari</b>/<b>Sampai</b>, hari kalender WIB), status, kategori, lingkungan.</li>
+    <li>Panel verdict di atas daftar menjelaskan apakah konflik dapat dipastikan. Sistem <b>tidak pernah</b> menyatakan aman bila data dependensi belum lengkap — hasilnya “Konflik tidak dapat dipastikan”.</li>
+    <li>Klik kartu perubahan untuk membuka detail RFC.</li>
+  </ul>
+  <p class="small">Semua waktu pada antarmuka ditampilkan dalam WIB (UTC+7). Nilai tanggal/jam yang Anda isi juga
+  diperlakukan sebagai WIB.</p>
+
+  <h2 style="margin-top:2em">9. Penghapusan Data Perubahan</h2>
+  <p>Menu <b>Permohonan Perubahan</b> menyediakan penghapusan untuk peran <b>Admin</b> dan <b>Manajer</b>.</p>
+  <table>
+    <tr><th>Cara</th><th>Perilaku</th></tr>
+    <tr><td>Tombol <b>Hapus</b> per baris</td><td>Menghapus satu RFC yang statusnya mengizinkan</td></tr>
+    <tr><td>Centang beberapa baris → <b>Hapus terpilih</b></td><td>Bulk delete; hasil laporan menyebut yang berhasil dan yang ditolak beserta alasannya</td></tr>
+    <tr><td><b>Hapus semua</b></td><td>Menghapus seluruh RFC yang dapat dihapus pada halaman yang sedang ditampilkan</td></tr>
+  </table>
+  <ul>
+    <li><b>Soft delete:</b> data tidak dimusnahkan. RFC hilang dari daftar untuk semua orang, tetapi tetap terlihat oleh
+      Admin/Auditor dengan opsi termasuk-dihapus, dan seluruh jejak auditnya tetap utuh.</li>
+    <li>Penghapusan <b>ditolak</b> (409) untuk status Disetujui, Terjadwal, Sedang Dieksekusi, Validasi Pasca-Eksekusi,
+      Selesai, dan Ditutup — RFC yang sudah berjalan tidak boleh hilang dari rekam jejak.</li>
+    <li><b>Hapus permanen</b> (purge) hanya tersedia bagi Admin melalui API dan tidak diekspos di antarmuka.</li>
+    <li>Nomor perubahan RFC yang di-soft-delete tetap terpakai sampai di-purge.</li>
+  </ul>
+
+  <h2 style="margin-top:2em">10. Pemecahan Masalah</h2>
+  <table>
+    <tr><th>Gejala di antarmuka</th><th>Penyebab</th><th>Tindakan</th></tr>
+    <tr><td>“Konfigurasi kredensial AI ditolak”</td><td>Kunci API salah/kadaluarsa</td><td>Perbarui <code>AI_API_KEY</code>, <code>docker compose up -d --force-recreate api worker</code>, jalankan ulang tinjauan</td></tr>
+    <tr><td>“Layanan AI sedang tidak tersedia…”</td><td>Penyedia 5xx atau jaringan</td><td>Cek <code>AI_BASE_URL</code> dan konektivitas kontainer; jalankan ulang setelah pulih</td></tr>
+    <tr><td>“Layanan AI sibuk (batas permintaan)”</td><td>Rate limit penyedia</td><td>Tunggu, turunkan frekuensi tinjauan, atau naikkan kuota</td></tr>
+    <tr><td>“Tinjauan AI melewati batas waktu”</td><td>Model lambat</td><td>Naikkan <code>AI_TIMEOUT_SECONDS</code> atau pakai model lebih cepat</td></tr>
+    <tr><td>“Respons AI tidak dapat dibaca sistem”</td><td>Model tidak mematuhi skema keluaran</td><td>Pakai model yang mengikuti instruksi JSON, atau ganti model</td></tr>
+    <tr><td>Dokumen “Gagal dibaca”</td><td>PDF hasil pindai, format tidak didukung, berkas rusak</td><td>Ekspor ulang sebagai PDF berbasis teks/DOCX, unggah ulang</td></tr>
+    <tr><td>Tombol <b>Unggah</b> / <b>Ajukan</b> tidak ada</td><td>Status RFC tidak mengizinkan, atau peran Anda tidak berhak</td><td>Periksa badge status; hubungi Pemohon/Pemegang peran terkait</td></tr>
+    <tr><td>Tombol <b>Jadwalkan</b> tidak ada</td><td>RFC belum berstatus Disetujui</td><td>Selesaikan seluruh langkah persetujuan</td></tr>
+    <tr><td>“Belum siap dieksekusi”</td><td>Revisi disetujui bukan revisi terkini</td><td>Perubahan setelah persetujuan memerlukan persetujuan ulang</td></tr>
+    <tr><td>Menu <b>Pengguna</b> tidak terlihat</td><td>Bukan Admin</td><td>Memang by design</td></tr>
+    <tr><td>Hapus RFC ditolak</td><td>Status dilindungi atau bukan Admin/Manajer</td><td>Lihat alasan pada laporan; batalkan RFC, bukan hapus</td></tr>
+  </table>
+</section>
+
+<!-- ============ 11 ============ -->
+<section class="page">
+  <h2>11. Lampiran</h2>
+
+  <h3>11.1 Daftar periksa pemohon sebelum mengajukan</h3>
+  <ul>
+    <li>Judul menyebut objek dan tindakan.</li>
+    <li>Kategori, tipe, dan lingkungan sudah benar.</li>
+    <li>Justifikasi bisnis menjelaskan alasan dan risiko bila tidak dilakukan.</li>
+    <li>Rencana implementasi berisi langkah bernomor, tanpa kredensial.</li>
+    <li>Rencana rollback lengkap dengan perkiraan durasi.</li>
+    <li>Rencana uji menyebut kriteria keberhasilan yang dapat diperiksa.</li>
+    <li>Perangkat dan layanan terdampak diisi.</li>
+    <li>Dokumen CRF, MOP, konfigurasi sebelum, dan konfigurasi yang diajukan terunggah.</li>
+    <li>Tidak ada dokumen berstatus <b>Gagal dibaca</b>.</li>
+  </ul>
+
+  <h3>11.2 Daftar periksa approver</h3>
+  <ul>
+    <li>Rencana rollback ada dan realistis.</li>
+    <li>Tinjauan AI dibaca, termasuk temuan “Tidak Dinilai” dan alasannya.</li>
+    <li>Skor risiko cocok dengan rute persetujuan yang berjalan.</li>
+    <li>Tidak ada bentrok di kalender, atau bentrok sudah dikoordinasikan.</li>
+    <li>Komentar menyebut dasar keputusan.</li>
+  </ul>
+
+  <h3>11.3 Daftar periksa pelaksana</h3>
+  <ul>
+    <li>Panel <b>Siap dieksekusi</b> hijau.</li>
+    <li>Jadwal sesuai jendela yang disetujui.</li>
+    <li>Hasil dan bukti validasi dicatat apa adanya.</li>
+    <li>PIR disimpan; post-check tidak dicentang bila gagal.</li>
+  </ul>
+
+  <h3>11.4 Contoh isian RFC lengkap</h3>
+  <table>
+    <tr><th>Kolom</th><th>Contoh</th></tr>
+    <tr><td>Judul</td><td>Upgrade IOS core switch gedung A</td></tr>
+    <tr><td>Kategori</td><td>Jaringan</td></tr>
+    <tr><td>Tipe perubahan</td><td>Normal</td></tr>
+    <tr><td>Lingkungan</td><td>Produksi</td></tr>
+    <tr><td>Justifikasi bisnis</td><td>Celah keamanan pada versi IOS saat ini berisiko memutus segmentasi VLAN; upgrade menutup kerentanan dan menyiapkan dukungan VLAN dinamis.</td></tr>
+    <tr><td>Dampak</td><td>Gedung A kehilangan akses jaringan selama ±15 menit perangkat. Layanan lain tidak terdampak.</td></tr>
+    <tr><td>Rencana implementasi</td><td>1) Simpan konfigurasi aktif ke berkas cadangan. 2) Unggah image baru ke flash. 3) Atur boot variable. 4) Reload pada jendela yang disetujui. 5) Pasang ulang konfigurasi dan verifikasi uplink.</td></tr>
+    <tr><td>Rencana uji</td><td>Ping gateway 0% loss, VLAN 10/20/30 aktif, monitoring tidak memunculkan alarm, login SSH admin berhasil.</td></tr>
+    <tr><td>Rencana rollback</td><td>Atur boot variable ke image lama, reload, pulihkan konfigurasi cadangan. Estimasi 20 menit.</td></tr>
+    <tr><td>Perangkat terdampak</td><td>core-sw-01, akses-sw-11, akses-sw-12</td></tr>
+    <tr><td>Layanan terdampak</td><td>LAN gedung A, VPN kantor pusat</td></tr>
+    <tr><td>Dokumen</td><td>CRF-2026-011.pdf (CRF), MOP-core-sw-01.pdf (MOP), before-core-sw-01.cfg (Konfigurasi sebelum), after-core-sw-01.cfg (Konfigurasi yang diajukan)</td></tr>
+  </table>
+
+  <h3>11.5 Ringkasan perintah harian</h3>
+<pre><code>docker compose ps                                  # status
+docker compose up -d                               # nyalakan
+docker compose stop                                # matikan
+docker compose restart api worker                  # restart API + worker
+docker compose logs -f api                         # log API
+docker compose exec -T api alembic upgrade head    # migrasi
+curl.exe http://localhost:8000/api/v1/ai/status    # status penyedia AI</code></pre>
+
+  <footer class="end">
+    AICMS — Panduan Implementasi &amp; Operasional, versi 1.0 · data pada contoh bersifat sintetis ·
+    AI bersifat saran, eksekusi selalu oleh manusia.
+  </footer>
+</section>
+
+</body>
+</html>

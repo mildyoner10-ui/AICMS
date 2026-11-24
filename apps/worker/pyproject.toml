@@ -1,0 +1,13 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "aicms-worker"
+version = "0.1.0"
+requires-python = ">=3.12"
+dependencies = [
+    "rq>=1.16.0",
+    "redis[hiredis]>=5.0",
+    "pydantic-settings>=2.0",
+]
