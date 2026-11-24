@@ -26,7 +26,7 @@ export function RiskBadge({ risk, className = "" }: { risk: string | null | unde
 
 export function EnvTag({ env }: { env: string }) {
   return (
-    <span className="chip bg-surface-muted text-foreground ring-1 ring-inset ring-border-strong">
+    <span className="chip bg-surface-muted text-text ring-1 ring-inset border border-border">
       <span aria-hidden>⌂</span>
       {env}
     </span>
@@ -48,21 +48,21 @@ export function PageHeader({
 }) {
   const router = useRouter();
   return (
-    <header className="border-b border-border bg-surface">
+    <header className="border-b-2 border-dashed border-teal/30 bg-surface">
       <div className="mx-auto max-w-[1280px] px-6 py-5 md:px-8">
         {back && (
           <button
             onClick={() => router.push(back.href)}
-            className="mb-2 -ml-1 inline-flex items-center gap-1 rounded px-1 py-0.5 text-sm text-foreground-muted hover:text-foreground"
+            className="mb-2 -ml-1 inline-flex items-center gap-1 rounded px-2 py-1 text-sm font-bold text-teal-dark hover:bg-teal-bg"
           >
             <span aria-hidden>←</span> {back.label}
           </button>
         )}
-        {breadcrumb && <nav className="mb-1 text-meta text-foreground-muted">{breadcrumb}</nav>}
+        {breadcrumb && <nav className="mb-1 text-meta text-text-muted">{breadcrumb}</nav>}
         <div className="flex flex-wrap items-start justify-between gap-x-6 gap-y-3">
           <div className="min-w-0">
-            <h1 className="text-[26px] font-bold leading-tight tracking-tight text-foreground md:text-page-title">{title}</h1>
-            {description && <p className="mt-1 max-w-3xl text-sm text-foreground-muted">{description}</p>}
+            <h1 className="page-title text-text">{title}</h1>
+            {description && <p className="mt-1 max-w-3xl text-sm text-text-muted">{description}</p>}
           </div>
           {actions && <div className="flex flex-wrap items-center gap-2">{actions}</div>}
         </div>
@@ -87,10 +87,10 @@ export function Card({ title, description, actions, children, className = "" }: 
   return (
     <section className={`card ${className}`}>
       {(title || actions) && (
-        <div className="flex flex-wrap items-start justify-between gap-3 border-b border-border px-5 py-4 md:px-6">
+        <div className="flex flex-wrap items-start justify-between gap-3 px-5 py-4 md:px-6 section-divider">
           <div>
-            {title && <h2 className="text-card-title text-foreground">{title}</h2>}
-            {description && <p className="mt-0.5 text-meta text-foreground-muted">{description}</p>}
+            {title && <h2 className="card-title text-text">{title}</h2>}
+            {description && <p className="mt-0.5 text-meta text-text-muted">{description}</p>}
           </div>
           {actions && <div className="flex flex-wrap items-center gap-2">{actions}</div>}
         </div>
@@ -106,15 +106,15 @@ export function Notice({ kind = "info", children, onDismiss }: {
   onDismiss?: () => void;
 }) {
   const cls = {
-    info: "bg-info-soft text-info",
-    success: "bg-success-soft text-success",
-    danger: "bg-danger-soft text-danger",
-    warning: "bg-warning-soft text-warning",
+    info: "bg-sky bg-opacity-15 text-sky border border-sky/30",
+    success: "bg-success bg-opacity-10 text-success border border-success/30",
+    danger: "bg-coral bg-opacity-10 text-coral-dark border border-coral/30",
+    warning: "bg-coral bg-opacity-10 text-coral-dark border border-coral/30",
   }[kind];
   const mark = { info: "i", success: "✓", danger: "!", warning: "!" }[kind];
   return (
-    <div className={`mb-4 flex items-start gap-3 rounded-sm px-4 py-3 text-sm ${cls}`} role={kind === "danger" ? "alert" : "status"}>
-      <span aria-hidden className="mt-0.5 font-bold">{mark}</span>
+    <div className={`mb-4 flex items-start gap-3 rounded-md px-4 py-3 text-sm font-bold ${cls}`} role={kind === "danger" ? "alert" : "status"}>
+      <span aria-hidden className="mt-0.5">{mark}</span>
       <div className="flex-1">{children}</div>
       {onDismiss && (
         <button onClick={onDismiss} aria-label="Tutup pemberitahuan" className="opacity-70 hover:opacity-100">
@@ -128,11 +128,11 @@ export function Notice({ kind = "info", children, onDismiss }: {
 export function EmptyState({ title, description, action }: { title: string; description: string; action?: ReactNode }) {
   return (
     <div className="px-6 py-14 text-center">
-      <div aria-hidden className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-surface-muted text-foreground-muted">
+      <div aria-hidden className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-teal-bg text-teal-dark text-xl">
         ◌
       </div>
-      <p className="font-semibold text-foreground">{title}</p>
-      <p className="mx-auto mt-1 max-w-sm text-sm text-foreground-muted">{description}</p>
+      <p className="font-extrabold text-text">{title}</p>
+      <p className="mx-auto mt-1 max-w-sm text-sm text-text-muted">{description}</p>
       {action && <div className="mt-4 flex justify-center">{action}</div>}
     </div>
   );
@@ -140,9 +140,9 @@ export function EmptyState({ title, description, action }: { title: string; desc
 
 export function ErrorState({ message, onRetry }: { message: string; onRetry?: () => void }) {
   return (
-    <div className="card border-danger px-6 py-10 text-center" role="alert">
-      <p className="font-semibold text-danger">Gagal memuat data</p>
-      <p className="mt-1 text-sm text-foreground-muted">{message}</p>
+    <div className="card card-coral px-6 py-10 text-center" role="alert">
+      <p className="font-extrabold text-coral-dark">Gagal memuat data</p>
+      <p className="mt-1 text-sm text-text-muted">{message}</p>
       {onRetry && (
         <button onClick={onRetry} className="btn-secondary btn-sm mt-4">
           Coba lagi
@@ -156,7 +156,7 @@ export function Skeleton({ rows = 4 }: { rows?: number }) {
   return (
     <div className="space-y-3" role="status" aria-label="Memuat data">
       {Array.from({ length: rows }).map((_, i) => (
-        <div key={i} className="h-9 animate-pulse rounded-control bg-surface-muted" />
+        <div key={i} className="h-9 animate-pulse rounded-md bg-teal-bg" />
       ))}
       <span className="sr-only">Memuat…</span>
     </div>
@@ -165,9 +165,9 @@ export function Skeleton({ rows = 4 }: { rows?: number }) {
 
 export function Spinner({ label = "Memuat…" }: { label?: string }) {
   return (
-    <div className="flex items-center justify-center gap-3 py-16 text-foreground-muted" role="status">
-      <span className="h-5 w-5 animate-spin rounded-full border-2 border-border-strong border-t-brand" aria-hidden />
-      <span className="text-sm">{label}</span>
+    <div className="flex items-center justify-center gap-3 py-16 text-text-muted" role="status">
+      <span className="h-5 w-5 animate-spin rounded-full border-2 border-border-strong border-t-teal" aria-hidden />
+      <span className="text-sm font-bold">{label}</span>
     </div>
   );
 }

@@ -2,78 +2,77 @@
 @tailwind components;
 @tailwind utilities;
 
-/* DESIGN.md §14 — CSS tokens for AICMS design system */
+/* Flip7 Design System — teal/coral/gold, colored glows, pill buttons */
 :root {
-  /* Brand */
-  --color-primary-navy: #16324f;
-  --color-primary: #2563eb;
-  --color-primary-hover: #1d4ed8;
-  --color-primary-soft: #dbeafe;
-  --color-teal: #0f766e;
-  --color-teal-soft: #ccfbf1;
+  /* Brand teal */
+  --color-teal: #2ba8a2;
+  --color-teal-light: #3cc4bd;
+  --color-teal-dark: #1e8c86;
+  --color-teal-bg: #e8f6f5;
 
-  /* Neutral surfaces */
-  --color-bg: #f5f7fa;
-  --color-surface: #ffffff;
-  --color-surface-subtle: #f8fafc;
-  --color-border: #e2e8f0;
-  --color-border-strong: #cbd5e1;
-  --color-text: #0f172a;
-  --color-text-secondary: #475569;
-  --color-text-muted: #64748b;
-  --color-disabled: #94a3b8;
+  /* Accent */
+  --color-gold: #ffd23f;
+  --color-gold-light: #ffe47a;
+  --color-gold-dark: #e6b800;
 
-  /* Semantic */
-  --color-success: #15803d;
-  --color-success-bg: #dcfce7;
-  --color-warning: #b45309;
-  --color-warning-bg: #fef3c7;
-  --color-danger: #b91c1c;
-  --color-danger-bg: #fee2e2;
-  --color-info: #0369a1;
-  --color-info-bg: #e0f2fe;
-  --color-neutral: #475569;
-  --color-neutral-bg: #f1f5f9;
+  /* Coral */
+  --color-coral: #ef6c4a;
+  --color-coral-light: #ff8a6a;
+  --color-coral-dark: #d45233;
+
+  /* Surface */
+  --color-surface-base: #eff8f7;
+  --color-surface-card: #ffffff;
+  --color-cream: #fff8e7;
+
+  /* Info / success */
+  --color-sky: #5dade2;
+  --color-success: #27ae60;
+  --color-error: #e74c3c;
+
+  /* Neutral text */
+  --color-text: #1e3a4a;
+  --color-text-muted: #5a7a8a;
+  --color-border: #c8dce0;
+  --color-border-strong: #a0b8c0;
 
   /* Typography */
-  --font-sans: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-sans: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", "Segoe UI", sans-serif;
 
-  /* Spacing (4px base) */
-  --space-2xs: 4px;
+  /* Spacing (8px base) */
   --space-xs: 8px;
-  --space-sm: 12px;
-  --space-md: 16px;
-  --space-lg: 24px;
-  --space-xl: 32px;
-  --space-2xl: 40px;
-  --space-3xl: 48px;
+  --space-sm: 16px;
+  --space-md: 24px;
+  --space-lg: 32px;
+  --space-xl: 48px;
 
   /* Radius */
-  --radius-xs: 4px;
-  --radius-sm: 6px;
-  --radius-md: 8px;
-  --radius-lg: 12px;
-  --radius-xl: 16px;
+  --radius-sm: 8px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --radius-xl: 32px;
   --radius-pill: 999px;
 
-  /* Elevation */
-  --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.06);
-  --shadow-md: 0 4px 12px rgba(15, 23, 42, 0.08);
-  --shadow-lg: 0 12px 28px rgba(15, 23, 42, 0.12);
-  --shadow-dialog: 0 20px 48px rgba(15, 23, 42, 0.18);
-  --focus-ring: 0 0 0 3px rgba(37, 99, 235, 0.20);
+  /* Colored glow shadows */
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.08);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.12);
+  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.16);
+  --shadow-card: 0 4px 20px rgba(43, 168, 162, 0.10);
+  --shadow-coral-glow: 0 4px 20px rgba(239, 108, 74, 0.35);
+  --shadow-teal-glow: 0 4px 20px rgba(43, 168, 162, 0.30);
+  --shadow-gold-glow: 0 4px 20px rgba(255, 210, 63, 0.40);
+  --shadow-sky-glow: 0 4px 16px rgba(93, 173, 226, 0.30);
+  --shadow-focus: 0 0 0 4px rgba(43, 168, 162, 0.15);
 }
 
 @layer base {
   body {
-    @apply bg-[var(--color-bg)] text-[var(--color-text)] font-sans antialiased;
-    font-feature-settings: "rlig" 1, "calt" 1;
+    @apply bg-[var(--color-surface-base)] text-[var(--color-text)] font-sans antialiased;
   }
 
-  /* WCAG 2.1 AA: visible focus ring per DESIGN.md §6 */
   :focus-visible {
     outline: none;
-    box-shadow: var(--focus-ring);
+    box-shadow: var(--shadow-focus);
     border-radius: var(--radius-sm);
   }
 
@@ -88,47 +87,105 @@
 }
 
 @layer components {
+  /* Cards with colored left accent */
   .card {
-    @apply bg-surface border border-border rounded-card shadow-sm;
+    @apply bg-surface border border-border rounded-lg shadow-card;
+    @apply border-l-[6px] border-l-[var(--color-teal-light)];
   }
 
+  .card-gold {
+    @apply bg-cream border-2 border-gold rounded-lg;
+    @apply border-l-[6px] border-l-[var(--color-gold)];
+    box-shadow: var(--shadow-gold-glow);
+  }
+
+  .card-coral {
+    @apply bg-surface border border-border rounded-lg;
+    @apply border-l-[6px] border-l-[var(--color-coral)];
+    box-shadow: var(--shadow-coral-glow);
+  }
+
+  /* Pill buttons */
   .btn {
-    @apply inline-flex items-center justify-center gap-2 h-control px-4 rounded-control text-sm font-semibold
-           transition-colors duration-ui disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap;
+    @apply inline-flex items-center justify-center gap-2 px-6 rounded-pill
+           text-sm font-extrabold uppercase tracking-wide
+           transition-all duration-150 ease-out
+           disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap;
+    min-height: 48px;
   }
+
   .btn-primary {
-    @apply btn bg-brand text-white hover:bg-brand-hover;
+    @apply btn relative overflow-hidden;
+    @apply bg-gold text-teal-dark;
+    box-shadow: var(--shadow-gold-glow);
   }
+  .btn-primary::before {
+    content: "";
+    @apply absolute inset-0;
+    @apply bg-gradient-to-b from-white/25 to-transparent;
+    pointer-events: none;
+  }
+  .btn-primary:hover { transform: scale(0.97); }
+  .btn-primary:active { transform: scale(0.95); }
+
   .btn-secondary {
-    @apply btn bg-surface border border-border-strong text-foreground hover:bg-surface-muted;
+    @apply btn bg-surface border-2 border-teal text-teal-dark hover:bg-teal-bg;
   }
+
   .btn-ghost {
-    @apply btn text-foreground-muted hover:bg-surface-muted hover:text-foreground;
+    @apply btn text-foreground-muted hover:bg-teal-bg hover:text-foreground bg-transparent border-2 border-transparent;
   }
+
   .btn-danger {
-    @apply btn bg-surface border border-danger text-danger hover:bg-danger-soft;
+    @apply btn border-2 border-coral text-coral-dark hover:bg-coral-light hover:border-coral;
+    box-shadow: var(--shadow-coral-glow);
   }
+
   .btn-sm {
-    @apply h-control-sm px-3 text-[13px] rounded-control;
+    @apply px-4 text-xs h-8 rounded-pill;
   }
 
+  /* Inputs on cream */
   .field {
-    @apply w-full h-control px-3 rounded-control border border-border-strong bg-surface text-sm
-           placeholder:text-foreground-muted/70 hover:border-foreground-muted/50
-           focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/25;
+    @apply w-full h-10 px-3 rounded-md border border-border-strong bg-cream text-sm
+           placeholder:text-foreground-muted/60 hover:border-teal/60
+           focus:border-teal focus:outline-none focus:ring-2 focus:ring-teal/20;
   }
+
   .label {
-    @apply block text-sm font-medium text-foreground mb-1.5;
+    @apply block text-sm font-bold text-foreground mb-1.5 uppercase tracking-wide;
   }
 
+  /* Chips / tags */
   .chip {
-    @apply inline-flex items-center gap-1.5 px-2 py-0.5 text-xs font-semibold whitespace-nowrap rounded-pill;
+    @apply inline-flex items-center gap-1.5 px-3 py-1 text-xs font-extrabold uppercase tracking-wide rounded-pill;
   }
 
+  /* Section dividers (dashed playful) */
+  .section-divider {
+    @apply border-b-2 border-dashed border-teal/30;
+  }
+
+  /* Table */
   .th {
-    @apply text-left px-4 py-3 text-meta font-semibold uppercase tracking-wide text-foreground-muted;
+    @apply text-left px-4 py-3 text-xs font-extrabold uppercase tracking-widest text-foreground-muted;
   }
   .td {
-    @apply px-4 py-3 text-table-body;
+    @apply px-4 py-3 text-sm;
+  }
+
+  /* KPI numbers */
+  .kpi {
+    @apply text-4xl font-extrabold tracking-tight;
+  }
+
+  /* Page header */
+  .page-title {
+    @apply text-2xl font-extrabold tracking-wide text-foreground;
+  }
+
+  /* Card titles */
+  .card-title {
+    @apply text-base font-extrabold uppercase tracking-wider text-foreground;
   }
 }

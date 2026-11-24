@@ -8,16 +8,16 @@ import { categoryLabel, statusLabel } from "@/lib/labels";
 
 // ── SVG Donut Pie Chart (inline) ────────────────────────────────────────────
 
-/* DESIGN.md §2 semantic colors, brightened for chart contrast on white surface. */
+/* Flip7 palette — teal, gold, coral, sky on cream surface. */
 const CHART_COLORS = {
-  success:    "#16a34a", // bright green — approved, successful
-  danger:     "#dc2626", // bright red — rejected, cancelled, critical
-  warning:    "#eab308", // bright yellow — pending, requires review
-  brand:      "#2563eb", // bright blue — scheduled, in progress
-  info:       "#0891b2", // bright cyan — submitted, document validation
-  purple:     "#9333ea", // bright purple — validation phase
-  neutral:    "#6b7280", // gray — closed, cancelled
-  teal:       "#0d9488", // bright teal — AI review, operational
+  success:   "#2ba8a2", // teal — approved
+  danger:    "#ef6c4a", // coral — rejected, cancelled
+  warning:   "#ffd23f", // gold — pending, needs review
+  brand:     "#5dade2", // sky — scheduled, in progress
+  info:      "#3cc4bd", // teal light — submitted
+  purple:    "#d45233", // coral dark
+  neutral:   "#a0b8c0", // muted gray
+  teal:      "#1e8c86", // teal dark — AI review
 };
 
 const PIE_COLORS = [
@@ -221,7 +221,7 @@ function KpiCard({
   tone?: string;
 }) {
   const wrap = href ? (
-    <Link href={href} className="card group p-4 transition-colors duration-ui hover:border-brand">
+    <Link href={href} className="card group p-4 transition-colors duration-ui hover:border-teal">
       <p className={`text-kpi tabular-nums ${tone}`}>{value}</p>
       <p className="mt-1 text-[13px] font-semibold text-foreground">{label}</p>
       <p className="mt-0.5 text-meta text-foreground-muted">{help}</p>

@@ -216,7 +216,7 @@ export default function ApprovalDetailPage() {
         <div className="space-y-6">
           <Card title={`Keputusan Anda — langkah ${task.step_order} (${task.role_name ?? task.step_code})`}>
             {decided ? (
-              <div className="rounded-control bg-surface-muted px-4 py-3 text-sm">
+              <div className="rounded-md bg-cream px-4 py-3 text-sm font-bold text-text-muted border border-border">
                 <p className="font-semibold text-foreground">Keputusan tercatat</p>
                 <p className="mt-1 text-foreground">
                   {DECISION_LABEL[task.decision ?? task.status] ?? task.decision ?? task.status}
@@ -230,7 +230,7 @@ export default function ApprovalDetailPage() {
                 </p>
               </div>
             ) : !task.actionable ? (
-              <p className="rounded-control bg-warning-soft px-4 py-3 text-sm text-warning">
+              <p className="rounded-md bg-warning/10 px-4 py-3 text-sm text-coral-dark font-bold border border-coral/30">
                 Menunggu langkah persetujuan sebelumnya selesai. Anda belum dapat memutuskan.
               </p>
             ) : (

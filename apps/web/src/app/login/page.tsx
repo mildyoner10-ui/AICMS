@@ -38,21 +38,25 @@ export default function Login() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center px-4">
+    <div className="flex min-h-screen items-center justify-center px-4 bg-canvas">
       <div className="w-full max-w-[400px]">
+        {/* Logo parallelogram */}
         <div className="mb-6 flex items-center gap-3">
-          <span aria-hidden className="flex h-10 w-10 items-center justify-center rounded-card bg-nav text-sm font-bold text-white">
-            AI
-          </span>
+          <div
+            className="relative flex h-12 w-20 items-center justify-center overflow-hidden rounded-sm bg-cream border-2 border-teal-dark"
+            style={{ transform: "skewX(-6deg)" }}
+          >
+            <span className="text-sm font-extrabold text-teal-dark tracking-wider" style={{ transform: "skewX(6deg)" }}>AICMS</span>
+          </div>
           <div>
-            <h1 className="text-xl font-bold tracking-tight">AICMS</h1>
-            <p className="text-meta text-foreground-muted">AI Change Management System</p>
+            <h1 className="text-xl font-extrabold tracking-wide text-text">Manajemen Perubahan</h1>
+            <p className="text-meta text-text-muted">AI Change Management System</p>
           </div>
         </div>
 
         <div className="card p-6">
-          <h2 className="text-section">Masuk</h2>
-          <p className="mt-1 text-sm text-foreground-muted">Gunakan kredensial organisasi Anda.</p>
+          <h2 className="text-section font-extrabold text-text">Masuk</h2>
+          <p className="mt-1 text-sm text-text-muted">Gunakan kredensial organisasi Anda.</p>
 
           <form onSubmit={handleSubmit} className="mt-5 space-y-4">
             <div>
@@ -88,7 +92,7 @@ export default function Login() {
             </div>
 
             {error && (
-              <div className="rounded-control bg-danger-soft px-3 py-2 text-sm text-danger" role="alert">
+              <div className="rounded-md bg-coral/10 px-3 py-2 text-sm text-coral-dark font-bold border border-coral/30" role="alert">
                 {error}
               </div>
             )}
@@ -99,7 +103,7 @@ export default function Login() {
           </form>
         </div>
 
-        <p className="mt-4 flex items-start gap-2 rounded-control bg-warning-soft px-3 py-2 text-meta text-warning">
+        <p className="mt-4 flex items-start gap-2 rounded-md bg-warning/10 px-3 py-2 text-meta text-coral-dark border border-coral/20">
           <span aria-hidden className="font-bold">
             !
           </span>

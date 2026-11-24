@@ -1,6 +1,6 @@
 import type { Config } from "tailwindcss";
 
-/* DESIGN.md §14 tokens — use these, never raw gray/blue. */
+/* Flip7 Design System tokens */
 const config: Config = {
   content: [
     "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
@@ -10,98 +10,114 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // Brand
-        "primary-navy": "#16324f",
-        "primary-navy-hover": "#1e4566",
-        brand: { DEFAULT: "#2563eb", hover: "#1d4ed8", soft: "#dbeafe" },
-        primary: { DEFAULT: "#2563eb", foreground: "#ffffff" },
-
-        // Neutral surfaces per DESIGN.md
-        canvas: "#f5f7fa",
-        surface: { DEFAULT: "#ffffff", muted: "#f8fafc" },
-        border: { DEFAULT: "#e2e8f0", strong: "#cbd5e1" },
-        foreground: { DEFAULT: "#0f172a", muted: "#64748b" },
-        "on-dark": { DEFAULT: "#f8fafc", muted: "#94a3b8" },
-
-        // Accent
-        teal: { DEFAULT: "#0f766e", soft: "#ccfbf1" },
-
-        // Semantic
-        success: { DEFAULT: "#15803d", soft: "#dcfce7" },
-        warning: { DEFAULT: "#b45309", soft: "#fef3c7" },
-        danger: { DEFAULT: "#b91c1c", soft: "#fee2e2" },
-        info: { DEFAULT: "#0369a1", soft: "#e0f2fe" },
-        disabled: "#94a3b8",
-
-        // Nav sidebar
-        nav: "#16324f",
-        "nav-hover": "#1e4566",
-        "nav-active": "#2563eb",
+        // Brand teal
+        teal: {
+          DEFAULT: "#2ba8a2",
+          light: "#3cc4bd",
+          dark: "#1e8c86",
+          bg: "#e8f6f5",
+        },
+        // Gold accent
+        gold: {
+          DEFAULT: "#ffd23f",
+          light: "#ffe47a",
+          dark: "#e6b800",
+        },
+        // Coral
+        coral: {
+          DEFAULT: "#ef6c4a",
+          light: "#ff8a6a",
+          dark: "#d45233",
+        },
+        // Surface
+        canvas: "#eff8f7",
+        surface: { DEFAULT: "#ffffff", muted: "#fff8e7" },
+        cream: "#fff8e7",
+        border: { DEFAULT: "#c8dce0", strong: "#a0b8c0" },
+        foreground: { DEFAULT: "#1e3a4a", muted: "#5a7a8a" },
+        // Info / semantic
+        sky: "#5dade2",
+        success: { DEFAULT: "#27ae60", soft: "#d4efda" },
+        warning: { DEFAULT: "#ef6c4a", soft: "#fde8e0" },
+        danger: { DEFAULT: "#e74c3c", soft: "#fde8e8" },
+        info: { DEFAULT: "#5dade2", soft: "#d6eaf8" },
       },
       borderRadius: {
-        // DESIGN.md §5
-        xs: "4px",
-        sm: "6px",
-        md: "8px",
-        lg: "12px",
-        xl: "16px",
+        sm: "8px",
+        md: "16px",
+        lg: "24px",
+        xl: "32px",
         pill: "999px",
-        /* Aliases for existing CSS classes */
-        card: "8px",
-        control: "6px",
-        dialog: "12px",
+        card: "16px",
+        control: "8px",
       },
       fontFamily: {
-        // DESIGN.md §3
         sans: [
-          "Inter",
-          "ui-sans-serif",
-          "system-ui",
           "-apple-system",
           "BlinkMacSystemFont",
-          '"Segoe UI"',
+          "PingFang SC",
+          "Microsoft YaHei",
+          "Segoe UI",
           "sans-serif",
         ],
         mono: ["ui-monospace", "SFMono-Regular", "Menlo", "Consolas", "monospace"],
       },
       fontSize: {
-        // DESIGN.md §3
-        display: ["34px", { lineHeight: "1.2", fontWeight: "700" }],
-        h1: ["28px", { lineHeight: "1.2", fontWeight: "700" }],
-        h2: ["22px", { lineHeight: "1.3", fontWeight: "650" }],
-        h3: ["18px", { lineHeight: "1.35", fontWeight: "600" }],
-        body: ["14px", { lineHeight: "1.55" }],
-        "body-strong": ["14px", { lineHeight: "1.55", fontWeight: "600" }],
-        small: ["12px", { lineHeight: "1.45" }],
-        meta: ["11px", { lineHeight: "1.45", fontWeight: "500" }],
-        /* Aliases for existing CSS classes */
-        "page-title": ["28px", { lineHeight: "1.2", fontWeight: "700" }],
-        section: ["18px", { lineHeight: "1.35", fontWeight: "600" }],
-        "card-title": ["14px", { lineHeight: "1.4", fontWeight: "600" }],
-        "table-body": ["13px", { lineHeight: "1.5" }],
-        kpi: ["34px", { lineHeight: "1.1", fontWeight: "700" }],
+        display: ["48px", { fontWeight: "800", letterSpacing: "0.03em" }],
+        h1: ["36px", { fontWeight: "800", letterSpacing: "0.02em" }],
+        h2: ["32px", { fontWeight: "800", letterSpacing: "0.02em" }],
+        h3: ["28px", { fontWeight: "700" }],
+        body: ["16px", { fontWeight: "500" }],
+        small: ["14px", { fontWeight: "500" }],
+        meta: ["12px", { fontWeight: "600", letterSpacing: "0.06em" }],
+        "page-title": ["36px", { fontWeight: "800", letterSpacing: "0.02em" }],
+        section: ["28px", { fontWeight: "700" }],
+        "card-title": ["16px", { fontWeight: "800", letterSpacing: "0.05em" }],
+        "table-body": ["14px", { fontWeight: "500" }],
+        kpi: ["48px", { fontWeight: "800", letterSpacing: "-0.02em" }],
       },
       spacing: {
-        "control": "40px",
-        "control-sm": "32px",
-        /* DESIGN.md §4 */
-        "2xs": "4px",
-        "xs": "8px",
-        "sm": "12px",
-        "md": "16px",
-        "lg": "24px",
-        "xl": "32px",
-        "2xl": "40px",
-        "3xl": "48px",
+        control: "48px",
+        "control-sm": "40px",
+        xs: "8px",
+        sm: "16px",
+        md: "24px",
+        lg: "32px",
+        xl: "48px",
       },
       boxShadow: {
-        "sm": "0 1px 2px rgba(15, 23, 42, 0.06)",
-        "md": "0 4px 12px rgba(15, 23, 42, 0.08)",
-        "lg": "0 12px 28px rgba(15, 23, 42, 0.12)",
-        "dialog": "0 20px 48px rgba(15, 23, 42, 0.18)",
+        sm: "0 2px 8px rgba(0, 0, 0, 0.08)",
+        md: "0 4px 16px rgba(0, 0, 0, 0.12)",
+        lg: "0 8px 32px rgba(0, 0, 0, 0.16)",
+        "card": "0 4px 20px rgba(43, 168, 162, 0.10)",
+        "coral-glow": "0 4px 20px rgba(239, 108, 74, 0.35)",
+        "teal-glow": "0 4px 20px rgba(43, 168, 162, 0.30)",
+        "accent-glow": "0 4px 20px rgba(255, 210, 63, 0.40)",
+        "sky-glow": "0 4px 16px rgba(93, 173, 226, 0.30)",
+      },
+      animation: {
+        "glow-pulse": "glowPulse 2s ease-in-out infinite",
+        "crown-bounce": "crownBounce 1.5s ease-in-out infinite",
+        "boom-pulse": "boomPulse 2s ease-in-out infinite",
+      },
+      keyframes: {
+        glowPulse: {
+          "0%, 100%": { opacity: "0.5", transform: "scale(1)" },
+          "50%": { opacity: "1", transform: "scale(1.03)" },
+        },
+        crownBounce: {
+          "0%, 100%": { transform: "rotate(-4deg)" },
+          "25%": { transform: "rotate(4deg)" },
+          "50%": { transform: "rotate(-2deg)" },
+          "75%": { transform: "rotate(2deg)" },
+        },
+        boomPulse: {
+          "0%, 100%": { boxShadow: "0 4px 20px rgba(239, 108, 74, 0.35)" },
+          "50%": { boxShadow: "0 4px 30px rgba(239, 108, 74, 0.55)" },
+        },
       },
       transitionDuration: {
-        ui: "160ms",
+        ui: "150ms",
       },
     },
   },

@@ -45,9 +45,9 @@ interface Conflicts {
 const STATUSES = ["APPROVED", "SCHEDULED", "IN_PROGRESS", "VALIDATION"];
 
 const VERDICT_UI: Record<Conflicts["verdict"], { mark: string; label: string; cls: string }> = {
-  CONFLICT: { mark: "▲", label: "Jadwal bentrok terdeteksi", cls: "bg-danger-soft text-danger" },
-  INDETERMINATE: { mark: "◑", label: "Konflik tidak dapat dipastikan", cls: "bg-warning-soft text-warning" },
-  NO_CONFLICT: { mark: "●", label: "Tidak ada bentrok pada data yang tersedia", cls: "bg-success-soft text-success" },
+  CONFLICT: { mark: "▲", label: "Jadwal bentrok terdeteksi", cls: "bg-coral bg-opacity-10 text-coral-dark" },
+  INDETERMINATE: { mark: "◑", label: "Konflik tidak dapat dipastikan", cls: "bg-gold bg-opacity-20 text-gold-dark" },
+  NO_CONFLICT: { mark: "●", label: "Tidak ada bentrok pada data yang tersedia", cls: "bg-teal bg-opacity-15 text-teal-dark" },
 };
 
 function toDateInput(d: Date): string {

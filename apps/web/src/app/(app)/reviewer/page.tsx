@@ -115,7 +115,7 @@ export default function ReviewerPage() {
           <Card className="overflow-hidden [&>div]:p-0">
             <div className="overflow-x-auto">
               <table className="w-full min-w-[800px]">
-                <thead className="border-b border-border bg-surface-muted">
+                <thead className="border-b border-border bg-cream">
                   <tr>
                     <th className="th">Change ID</th>
                     <th className="th">Judul</th>
@@ -131,7 +131,7 @@ export default function ReviewerPage() {
                     <tr
                       key={item.id}
                       onClick={() => router.push(`/changes/${item.id}`)}
-                      className="cursor-pointer border-b border-border last:border-0 hover:bg-surface-muted"
+                      className="cursor-pointer border-b border-border last:border-0 hover:bg-cream"
                     >
                       <td className="td whitespace-nowrap font-mono text-brand">{item.change_number}</td>
                       <td className="td max-w-[300px] truncate font-medium">{item.title}</td>

@@ -147,10 +147,10 @@ interface Review {
 }
 
 const FINDING_TONE: Record<string, string> = {
-  PASS: "bg-success-soft text-success ring-1 ring-inset ring-success/25",
-  WARN: "bg-warning-soft text-warning ring-1 ring-inset ring-warning/25",
-  FAIL: "bg-danger-soft text-danger ring-1 ring-inset ring-danger/25",
-  NOT_ASSESSED: "bg-surface-muted text-foreground-muted ring-1 ring-inset ring-border-strong",
+  PASS: "bg-teal bg-opacity-15 text-teal-dark ring-1 ring-inset ring-teal/30",
+  WARN: "bg-gold bg-opacity-20 text-gold-dark ring-1 ring-inset ring-gold/30",
+  FAIL: "bg-coral bg-opacity-10 text-coral-dark ring-1 ring-inset ring-coral/30",
+  NOT_ASSESSED: "bg-cream text-text-muted ring-1 ring-inset ring-border",
 };
 const FINDING_LABEL: Record<string, string> = {
   PASS: "Lolos",
@@ -159,11 +159,11 @@ const FINDING_LABEL: Record<string, string> = {
   NOT_ASSESSED: "Tidak dinilai",
 };
 const SEVERITY_TONE: Record<string, string> = {
-  CRITICAL: "bg-danger-soft text-danger",
-  HIGH: "bg-danger-soft text-danger",
-  MEDIUM: "bg-warning-soft text-warning",
-  LOW: "bg-surface-muted text-foreground-muted",
-  INFORMATIONAL: "bg-info-soft text-info",
+  CRITICAL: "bg-coral text-coral-dark",
+  HIGH: "bg-coral text-coral-dark",
+  MEDIUM: "bg-gold bg-opacity-20 text-gold-dark",
+  LOW: "bg-cream text-text-muted",
+  INFORMATIONAL: "bg-sky bg-opacity-15 text-sky",
 };
 const SEVERITY_LABEL: Record<string, string> = {
   CRITICAL: "Kritis",
@@ -176,22 +176,22 @@ const RECOMMENDATION: Record<string, { label: string; note: string; tone: string
   RECOMMEND_APPROVE: {
     label: "Rekomendasi: setujui",
     note: "Tidak ada temuan penghalang. Persetujuan manusia tetap wajib.",
-    tone: "bg-success-soft text-success",
+    tone: "bg-teal bg-opacity-15 text-teal-dark",
   },
   RECOMMEND_APPROVE_WITH_CONDITIONS: {
     label: "Rekomendasi: setujui dengan syarat",
     note: "Selesaikan syarat di bawah sebelum persetujuan manusia.",
-    tone: "bg-warning-soft text-warning",
+    tone: "bg-gold bg-opacity-20 text-gold-dark",
   },
   RECOMMEND_REJECT: {
     label: "Rekomendasi: tolak",
     note: "Terdapat risiko penghalang atau pelanggaran kebijakan.",
-    tone: "bg-danger-soft text-danger",
+    tone: "bg-coral bg-opacity-10 text-coral-dark",
   },
   UNABLE_TO_CONCLUDE: {
     label: "Tidak dapat menyimpulkan",
     note: "Konteks kurang atau berkas tidak terbaca. Tinjauan manusia diperlukan.",
-    tone: "bg-surface-muted text-foreground-muted",
+    tone: "bg-cream text-text-muted",
   },
 };
 
@@ -242,7 +242,7 @@ function ReviewPanel({
       actions={
         <>
           {result?.result_json?.provider_label && (
-            <span className="chip bg-info-soft text-info ring-1 ring-inset ring-info/25">{result.result_json.provider_label}</span>
+            <span className="chip bg-sky text-sky ring-1 ring-inset ring-info/25">{result.result_json.provider_label}</span>
           )}
           <StatusBadge status={running ? "AI_REVIEW" : review.status === "FAILED" ? "REVIEW_FAILED" : "COMPLETED"} />
           {canRerun && (review.status === "FAILED" || !running) && (
@@ -254,20 +254,20 @@ function ReviewPanel({
       }
     >
       {running ? (
-        <div className="flex items-center gap-3 text-sm text-foreground-muted" role="status">
+        <div className="flex items-center gap-3 text-sm text-text-muted" role="status">
           <span className="h-4 w-4 animate-spin rounded-full border-2 border-border-strong border-t-brand" aria-hidden />
           Tinjauan sedang diproses oleh worker. Hasil muncul otomatis.
         </div>
       ) : review.status === "FAILED" ? (
-        <div role="alert" className="rounded-control bg-danger-soft p-4 text-sm text-danger">
+        <div role="alert" className="rounded-md bg-coral p-4 text-sm text-coral-dark">
           {review.review_error || "Tinjauan AI gagal diproses. Silakan jalankan ulang."}
         </div>
       ) : !result ? (
-        <p className="text-sm text-foreground-muted">Belum ada hasil tinjauan.</p>
+        <p className="text-sm text-text-muted">Belum ada hasil tinjauan.</p>
       ) : (
         <div className="space-y-5">
           {rec && (
-            <div className={`rounded-control p-4 ${rec.tone}`}>
+            <div className={`rounded-md p-4 ${rec.tone}`}>
               <p className="text-sm font-bold">{rec.label}</p>
               <p className="mt-0.5 text-sm opacity-90">{rec.note}</p>
             </div>
@@ -280,8 +280,8 @@ function ReviewPanel({
               ["Model", review.model_name ?? "—"],
               ["Selesai", fmtDateTime(review.completed_at)],
             ].map(([k, v]) => (
-              <div key={k} className="rounded-control bg-surface-muted p-3">
-                <dt className="text-meta text-foreground-muted">{k}</dt>
+              <div key={k} className="rounded-md bg-cream p-3">
+                <dt className="text-meta text-text-muted">{k}</dt>
                 <dd className="mt-0.5 font-medium tabular-nums">{v}</dd>
               </div>
             ))}
@@ -297,16 +297,16 @@ function ReviewPanel({
               ))}
           </div>
 
-          {result.summary && <p className="text-sm leading-relaxed text-foreground">{result.summary}</p>}
+          {result.summary && <p className="text-sm leading-relaxed text-text">{result.summary}</p>}
 
           <div>
-            <h3 className="mb-2 text-meta font-semibold uppercase tracking-wide text-foreground-muted">Temuan</h3>
+            <h3 className="mb-2 text-meta font-semibold uppercase tracking-wide text-text-muted">Temuan</h3>
             {findings.length === 0 ? (
-              <p className="text-sm text-foreground-muted">Tidak ada temuan. Ini bukan jaminan perubahan aman.</p>
+              <p className="text-sm text-text-muted">Tidak ada temuan. Ini bukan jaminan perubahan aman.</p>
             ) : (
               <ul className="space-y-3">
                 {findings.map((f) => (
-                  <li key={f.id} className="rounded-control border border-border p-4">
+                  <li key={f.id} className="rounded-md border border-border p-4">
                     <div className="flex flex-wrap items-center gap-2">
                       <span className={`chip ${FINDING_TONE[f.status] ?? FINDING_TONE.NOT_ASSESSED}`}>
                         {FINDING_LABEL[f.status] ?? f.status}
@@ -314,19 +314,19 @@ function ReviewPanel({
                       <span className={`chip ${SEVERITY_TONE[f.severity] ?? SEVERITY_TONE.LOW}`}>
                         {SEVERITY_LABEL[f.severity] ?? f.severity}
                       </span>
-                      <span className="text-sm font-semibold text-foreground">{f.title}</span>
+                      <span className="text-sm font-semibold text-text">{f.title}</span>
                       {f.human_validation_required && (
-                        <span className="chip bg-info-soft text-info">perlu validasi manusia</span>
+                        <span className="chip bg-sky text-sky">perlu validasi manusia</span>
                       )}
                     </div>
-                    {f.description && <p className="mt-2 text-sm text-foreground">{f.description}</p>}
+                    {f.description && <p className="mt-2 text-sm text-text">{f.description}</p>}
                     {f.evidence.length > 0 ? (
                       <ul className="mt-2 space-y-1.5">
                         {f.evidence.map((e, i) => (
-                          <li key={i} className="text-meta text-foreground-muted">
-                            <span className="font-semibold text-foreground">Bukti:</span> {evidenceLabel(e)}
+                          <li key={i} className="text-meta text-text-muted">
+                            <span className="font-semibold text-text">Bukti:</span> {evidenceLabel(e)}
                             {e.snippet && (
-                              <code className="mt-1 block overflow-x-auto whitespace-pre-wrap break-all rounded-control bg-surface-muted px-2.5 py-1.5 font-mono text-[12px] text-foreground">
+                              <code className="mt-1 block overflow-x-auto whitespace-pre-wrap break-all rounded-md bg-cream px-2.5 py-1.5 font-mono text-[12px] text-text">
                                 {e.snippet}
                               </code>
                             )}
@@ -334,10 +334,10 @@ function ReviewPanel({
                         ))}
                       </ul>
                     ) : (
-                      <p className="mt-2 text-meta italic text-warning">Tanpa bukti rujukan — verifikasi manual.</p>
+                      <p className="mt-2 text-meta italic text-gold-dark">Tanpa bukti rujukan — verifikasi manual.</p>
                     )}
                     {f.remediation && (
-                      <p className="mt-2 rounded-control bg-warning-soft px-2.5 py-1.5 text-meta text-warning">
+                      <p className="mt-2 rounded-md bg-gold px-2.5 py-1.5 text-meta text-gold-dark">
                         Saran: {f.remediation}
                       </p>
                     )}
@@ -348,9 +348,9 @@ function ReviewPanel({
           </div>
 
           {result.limitations.length > 0 && (
-            <div className="rounded-control bg-surface-muted p-3">
-              <h3 className="text-meta font-semibold uppercase tracking-wide text-foreground-muted">Keterbatasan</h3>
-              <ul className="mt-1 list-disc space-y-0.5 pl-4 text-meta text-foreground-muted">
+            <div className="rounded-md bg-cream p-3">
+              <h3 className="text-meta font-semibold uppercase tracking-wide text-text-muted">Keterbatasan</h3>
+              <ul className="mt-1 list-disc space-y-0.5 pl-4 text-meta text-text-muted">
                 {result.limitations.map((l) => (
                   <li key={l}>{l}</li>
                 ))}
@@ -358,32 +358,32 @@ function ReviewPanel({
             </div>
           )}
 
-          <p className="text-meta text-foreground-muted">
+          <p className="text-meta text-text-muted">
             Prompt {review.prompt_version ?? "—"} · Ruleset {review.ruleset_version ?? "—"}. Skor tinggi tidak menjamin
             perubahan aman.
           </p>
 
           {result.decision ? (
-            <div className="rounded-control bg-surface-muted p-4 text-sm">
-              <p className="font-semibold text-foreground">
+            <div className="rounded-md bg-cream p-4 text-sm">
+              <p className="font-semibold text-text">
                 Keputusan reviewer: {result.decision === "ACCEPT" ? "Hasil tinjauan diterima" : "Dikembalikan untuk perbaikan"}
               </p>
-              <p className="mt-1 text-foreground-muted">
+              <p className="mt-1 text-text-muted">
                 {result.decided_by ?? "—"} · {fmtDateTime(result.decided_at)}
               </p>
               {result.decision_comment && (
-                <p className="mt-2 text-foreground">“{result.decision_comment}”</p>
+                <p className="mt-2 text-text">“{result.decision_comment}”</p>
               )}
             </div>
           ) : showDecision ? (
-            <div className="rounded-control border border-border p-4">
-              <h3 className="text-sm font-semibold text-foreground">Keputusan reviewer</h3>
-              <p className="mt-1 text-meta text-foreground-muted">
+            <div className="rounded-md border border-border p-4">
+              <h3 className="text-sm font-semibold text-text">Keputusan reviewer</h3>
+              <p className="mt-1 text-meta text-text-muted">
                 Periksa bukti tiap temuan. Menerima hasil tinjauan meneruskan CRF ke persetujuan; mengembalikannya membuat
                 pemohon memperbaiki dokumen lalu mengirim ulang. Alasan keputusan wajib diisi dan tercatat di audit.
               </p>
               {blockers > 0 && (
-                <p className="mt-2 rounded-control bg-warning-soft px-2.5 py-1.5 text-meta text-warning">
+                <p className="mt-2 rounded-md bg-gold px-2.5 py-1.5 text-meta text-gold-dark">
                   {blockers} temuan risiko tinggi/kritis masih terbuka. Anda tetap boleh menerima bila setelah tinjauan
                   manual risikonya dapat diterima — sebutkan alasannya. Temuan AI tidak berubah; persetujuan tetap lewat alur
                   approval.
@@ -391,7 +391,7 @@ function ReviewPanel({
               )}
               <div className="mt-3">
                 <label htmlFor="review-comment" className="label">
-                  Alasan / catatan keputusan <span className="text-danger">*</span>
+                  Alasan / catatan keputusan <span className="text-coral-dark">*</span>
                 </label>
                 <textarea
                   id="review-comment"
@@ -403,8 +403,8 @@ function ReviewPanel({
                 />
               </div>
               {deciding ? (
-                <div className="mt-3 rounded-control bg-surface-muted p-3" role="alertdialog" aria-label="Konfirmasi keputusan">
-                  <p className="text-sm text-foreground">
+                <div className="mt-3 rounded-md bg-cream p-3" role="alertdialog" aria-label="Konfirmasi keputusan">
+                  <p className="text-sm text-text">
                     {deciding === "ACCEPT"
                       ? "Terima hasil tinjauan ini? CRF diteruskan ke persetujuan dan keputusan tercatat di audit."
                       : "Kembalikan CRF untuk perbaikan? Pemohon harus memperbaiki dokumen dan mengirim ulang."}
@@ -495,10 +495,10 @@ const DOC_TYPE_LABEL: Record<string, string> = {
 const UPLOADABLE_STATUSES = ["DRAFT", "SUBMITTED", "DOCUMENT_VALIDATION", "AI_REVIEW", "REVISION_REQUIRED"];
 const MAX_UPLOAD_BYTES = 50 * 1024 * 1024;
 const EXTRACT_TONE: Record<string, string> = {
-  COMPLETED: "bg-success-soft text-success ring-1 ring-inset ring-success/25",
-  PENDING: "bg-warning-soft text-warning ring-1 ring-inset ring-warning/25",
-  FAILED: "bg-danger-soft text-danger ring-1 ring-inset ring-danger/25",
-  ERROR: "bg-danger-soft text-danger ring-1 ring-inset ring-danger/25",
+  COMPLETED: "bg-teal text-teal-dark ring-1 ring-inset ring-success/25",
+  PENDING: "bg-gold text-gold-dark ring-1 ring-inset ring-warning/25",
+  FAILED: "bg-coral text-coral-dark ring-1 ring-inset ring-danger/25",
+  ERROR: "bg-coral text-coral-dark ring-1 ring-inset ring-danger/25",
 };
 const EXTRACT_LABEL: Record<string, string> = {
   COMPLETED: "Terbaca AI",
@@ -587,14 +587,14 @@ function DocumentsPanel({
     <Card
       title="Dokumen"
       description="Berkas diperlakukan sebagai input tidak tepercaya; rahasia disamarkan sebelum dikirim ke AI."
-      actions={unreadable > 0 ? <span className="chip bg-danger-soft text-danger">{unreadable} gagal dibaca AI</span> : undefined}
+      actions={unreadable > 0 ? <span className="chip bg-coral text-coral-dark">{unreadable} gagal dibaca AI</span> : undefined}
     >
       {documents.length === 0 ? (
-        <p className="text-sm text-foreground-muted">Belum ada dokumen.</p>
+        <p className="text-sm text-text-muted">Belum ada dokumen.</p>
       ) : (
         <div className="-mx-5 mb-4 overflow-x-auto md:-mx-6">
           <table className="w-full min-w-[720px]">
-            <thead className="border-b border-border bg-surface-muted">
+            <thead className="border-b border-border bg-cream">
               <tr>
                 <th className="th">Nama</th>
                 <th className="th">Jenis</th>
@@ -609,15 +609,15 @@ function DocumentsPanel({
               {documents.map((d) => (
                 <tr key={d.id} className="border-b border-border last:border-0">
                   <td className="td font-medium">{d.original_filename}</td>
-                  <td className="td text-foreground-muted">{d.document_type ? (DOC_TYPE_LABEL[d.document_type] ?? d.document_type) : "—"}</td>
+                  <td className="td text-text-muted">{d.document_type ? (DOC_TYPE_LABEL[d.document_type] ?? d.document_type) : "—"}</td>
                   <td className="td font-mono">v{d.version_number}</td>
-                  <td className="td text-foreground-muted">{humanSize(d.size_bytes)}</td>
+                  <td className="td text-text-muted">{humanSize(d.size_bytes)}</td>
                   <td className="td">
-                    <span className={`chip ${EXTRACT_TONE[d.extraction_status ?? ""] ?? "bg-surface-muted text-foreground-muted"}`}>
+                    <span className={`chip ${EXTRACT_TONE[d.extraction_status ?? ""] ?? "bg-cream text-text-muted"}`}>
                       {EXTRACT_LABEL[d.extraction_status ?? ""] ?? d.extraction_status ?? "—"}
                     </span>
                   </td>
-                  <td className="td font-mono text-meta text-foreground-muted">{d.sha256.slice(0, 12)}</td>
+                  <td className="td font-mono text-meta text-text-muted">{d.sha256.slice(0, 12)}</td>
                   <td className="td">
                     <button onClick={() => void openDocument(changeId, d.id)} className="btn-ghost btn-sm">
                       Lihat / unduh
@@ -630,12 +630,12 @@ function DocumentsPanel({
         </div>
       )}
 
-      <details className="mb-4 rounded-control bg-surface-muted p-3 text-meta text-foreground-muted">
-        <summary className="cursor-pointer font-semibold text-foreground">Format dokumen yang bisa dibaca AI</summary>
+      <details className="mb-4 rounded-md bg-cream p-3 text-meta text-text-muted">
+        <summary className="cursor-pointer font-semibold text-text">Format dokumen yang bisa dibaca AI</summary>
         <ul className="mt-2 list-disc space-y-1 pl-4">
           <li>PDF berbasis teks, DOCX, XLSX, TXT, CFG, YAML, JSON — diekstrak jadi teks lalu dibaca AI.</li>
           <li>
-            PNG/JPG dan PDF hasil scan <span className="font-semibold text-foreground">tidak terbaca</span> (belum ada
+            PNG/JPG dan PDF hasil scan <span className="font-semibold text-text">tidak terbaca</span> (belum ada
             OCR) — AI menandainya “Tidak dinilai”.
           </li>
           <li>Simpan sebagai PDF hasil ekspor, bukan scan/foto.</li>
@@ -662,27 +662,27 @@ function DocumentsPanel({
           </div>
           <div className="min-w-[240px] flex-1">
             <label htmlFor="doc-file" className="label">
-              Berkas <span className="text-foreground-muted">(PDF, DOCX, XLSX, TXT, CFG, YAML, JSON · maks 50 MB)</span>
+              Berkas <span className="text-text-muted">(PDF, DOCX, XLSX, TXT, CFG, YAML, JSON · maks 50 MB)</span>
             </label>
             <input
               id="doc-file"
               type="file"
               accept=".pdf,.docx,.xlsx,.txt,.cfg,.yaml,.yml,.json"
               onChange={(e) => setFile(e.target.files?.[0] ?? null)}
-              className="block w-full text-sm text-foreground-muted file:mr-3 file:h-control file:cursor-pointer file:rounded-control file:border-0 file:bg-surface-muted file:px-3 file:text-sm file:font-medium file:text-foreground"
+              className="block w-full text-sm text-text-muted file:mr-3 file:h-control file:cursor-pointer file:rounded-md file:border-0 file:bg-cream file:px-3 file:text-sm file:font-medium file:text-text"
             />
           </div>
           <button disabled={busy || !file} onClick={upload} className="btn-primary">
             {busy ? "Mengunggah…" : "Unggah"}
           </button>
           {message && (
-            <p className={`text-sm ${isError ? "text-danger" : "text-success"}`} role={isError ? "alert" : "status"}>
+            <p className={`text-sm ${isError ? "text-coral-dark" : "text-teal-dark"}`} role={isError ? "alert" : "status"}>
               {message}
             </p>
           )}
         </div>
       ) : (
-        <p className="border-t border-border pt-4 text-meta text-foreground-muted">
+        <p className="border-t border-border pt-4 text-meta text-text-muted">
           Unggahan hanya dapat dilakukan sebelum perubahan disetujui (status saat ini: {statusLabel(status)}).
         </p>
       )}
@@ -728,28 +728,28 @@ function ImplementationPanel({
     <Card title="Implementasi & tinjauan pasca-implementasi" description="Catat eksekusi aktual, hasil, dan bukti validasi">
       {record && (
         <dl className="mb-4 grid grid-cols-1 gap-3 text-sm md:grid-cols-3">
-          <div className="rounded-control bg-surface-muted p-3">
-            <dt className="text-meta text-foreground-muted">Mulai aktual</dt>
+          <div className="rounded-md bg-cream p-3">
+            <dt className="text-meta text-text-muted">Mulai aktual</dt>
             <dd className="mt-0.5 font-medium">{fmtDateTime(record.actual_start)}</dd>
           </div>
-          <div className="rounded-control bg-surface-muted p-3">
-            <dt className="text-meta text-foreground-muted">Selesai aktual</dt>
+          <div className="rounded-md bg-cream p-3">
+            <dt className="text-meta text-text-muted">Selesai aktual</dt>
             <dd className="mt-0.5 font-medium">{fmtDateTime(record.actual_end)}</dd>
           </div>
-          <div className="rounded-control bg-surface-muted p-3">
-            <dt className="text-meta text-foreground-muted">Hasil</dt>
+          <div className="rounded-md bg-cream p-3">
+            <dt className="text-meta text-text-muted">Hasil</dt>
             <dd className="mt-0.5 font-medium">
               {record.outcome ? (OUTCOME_LABEL[record.outcome] ?? record.outcome) : "—"}
             </dd>
           </div>
           {record.rollback_performed && (
-            <p className="rounded-control bg-warning-soft p-3 text-sm text-warning md:col-span-3">
+            <p className="rounded-md bg-gold p-3 text-sm text-gold-dark md:col-span-3">
               Rollback tercatat untuk perubahan ini.
             </p>
           )}
           {Boolean(record.postcheck?.pir_notes) && (
             <div className="md:col-span-3">
-              <dt className="text-meta text-foreground-muted">Catatan PIR</dt>
+              <dt className="text-meta text-text-muted">Catatan PIR</dt>
               <dd className="whitespace-pre-wrap">{String(record.postcheck?.pir_notes)}</dd>
             </div>
           )}
@@ -843,7 +843,7 @@ function ImplementationPanel({
         <div className="space-y-3 border-t border-border pt-4">
           <div>
             <label htmlFor="pir" className="label">
-              Catatan PIR <span className="text-danger">*</span>
+              Catatan PIR <span className="text-coral-dark">*</span>
             </label>
             <textarea
               id="pir"
@@ -862,7 +862,7 @@ function ImplementationPanel({
             >
               Simpan PIR & selesaikan
             </button>
-            {!postOk && <p className="text-sm text-danger">Post-check gagal: tandai rollback, bukan selesai.</p>}
+            {!postOk && <p className="text-sm text-coral-dark">Post-check gagal: tandai rollback, bukan selesai.</p>}
           </div>
         </div>
       )}
@@ -1174,7 +1174,7 @@ export default function ChangeDetailPage() {
                   <>
                     <div>
                       <label htmlFor="cancel-reason" className="label">
-                        Alasan pembatalan <span className="text-danger">*</span>
+                        Alasan pembatalan <span className="text-coral-dark">*</span>
                       </label>
                       <input
                         id="cancel-reason"
@@ -1204,17 +1204,17 @@ export default function ChangeDetailPage() {
           {gate && !TERMINAL_STATUSES.includes(change.status) && (
             <div
               className={`rounded-card border p-5 ${
-                gate.ready ? "border-success bg-success-soft" : "border-warning bg-warning-soft"
+                gate.ready ? "border-success bg-teal" : "border-warning bg-gold"
               }`}
               aria-live="polite"
             >
-              <p className={`text-card-title ${gate.ready ? "text-success" : "text-warning"}`}>
+              <p className={`text-card-title ${gate.ready ? "text-teal-dark" : "text-gold-dark"}`}>
                 {gate.ready ? "● Siap dieksekusi" : "◑ Belum siap dieksekusi"}
               </p>
               {gate.ready ? (
-                <p className="mt-1 text-sm text-foreground">Semua prasyarat terpenuhi. Eksekusi tetap dilakukan manusia.</p>
+                <p className="mt-1 text-sm text-text">Semua prasyarat terpenuhi. Eksekusi tetap dilakukan manusia.</p>
               ) : (
-                <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-foreground">
+                <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-text">
                   {gate.blocking_reasons.map((r) => (
                     <li key={r}>{gateReasonText(r)}</li>
                   ))}
@@ -1242,7 +1242,7 @@ export default function ChangeDetailPage() {
                 </button>
               }
             >
-              <p className="text-sm text-foreground-muted">
+              <p className="text-sm text-text-muted">
                 AI akan membaca dokumen revisi ini dan memberi rekomendasi beserta bukti. AI tidak menyetujui.
               </p>
             </Card>
@@ -1258,7 +1258,7 @@ export default function ChangeDetailPage() {
                 <div className="space-y-4">
                   <div>
                     <label htmlFor="edit-title" className="label">
-                      Judul <span className="text-danger">*</span>
+                      Judul <span className="text-coral-dark">*</span>
                     </label>
                     <input id="edit-title" value={String(editDraft.title ?? "")} onChange={(e) => setEditDraft({ ...editDraft, title: e.target.value })} className="field" />
                   </div>
@@ -1303,7 +1303,7 @@ export default function ChangeDetailPage() {
                     <textarea id="edit-impact" rows={2} value={String(editDraft.impact_description ?? "")} onChange={(e) => setEditDraft({ ...editDraft, impact_description: e.target.value })} className="field h-auto py-2" placeholder="Layanan, pengguna, atau jendela operasi yang terdampak." />
                   </div>
                   <div>
-                    <label htmlFor="edit-implementation" className="label">Rencana implementasi <span className="text-danger">*</span></label>
+                    <label htmlFor="edit-implementation" className="label">Rencana implementasi <span className="text-coral-dark">*</span></label>
                     <textarea id="edit-implementation" rows={4} value={String(editDraft.implementation_plan ?? "")} onChange={(e) => setEditDraft({ ...editDraft, implementation_plan: e.target.value })} className="field h-auto py-2" placeholder="Langkah eksekusi berurutan. Jangan sertakan kredensial." />
                   </div>
                   <div>
@@ -1311,7 +1311,7 @@ export default function ChangeDetailPage() {
                     <textarea id="edit-test" rows={3} value={String(editDraft.test_plan ?? "")} onChange={(e) => setEditDraft({ ...editDraft, test_plan: e.target.value })} className="field h-auto py-2" />
                   </div>
                   <div>
-                    <label htmlFor="edit-rollback" className="label">Rencana rollback <span className="text-danger">*</span></label>
+                    <label htmlFor="edit-rollback" className="label">Rencana rollback <span className="text-coral-dark">*</span></label>
                     <textarea id="edit-rollback" rows={3} value={String(editDraft.rollback_plan ?? "")} onChange={(e) => setEditDraft({ ...editDraft, rollback_plan: e.target.value })} className="field h-auto py-2" placeholder="Langkah mengembalikan ke kondisi awal jika terjadi kegagalan." />
                   </div>
                   <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -1345,10 +1345,10 @@ export default function ChangeDetailPage() {
                     ["Rencana rollback", change.rollback_plan],
                   ].map(([label, value]) => (
                     <div key={label as string}>
-                      <dt className="text-meta font-semibold uppercase tracking-wide text-foreground-muted">{label}</dt>
+                      <dt className="text-meta font-semibold uppercase tracking-wide text-text-muted">{label}</dt>
                       <dd
                         className={`mt-0.5 whitespace-pre-wrap ${
-                          label === "Rencana rollback" && !value ? "font-medium text-danger" : "text-foreground"
+                          label === "Rencana rollback" && !value ? "font-medium text-coral-dark" : "text-text"
                         }`}
                       >
                         {value || (label === "Rencana rollback" ? "Tidak ada — rollback belum siap" : "—")}
@@ -1356,11 +1356,11 @@ export default function ChangeDetailPage() {
                     </div>
                   ))}
                   <div>
-                    <dt className="text-meta font-semibold uppercase tracking-wide text-foreground-muted">Perangkat terdampak</dt>
+                    <dt className="text-meta font-semibold uppercase tracking-wide text-text-muted">Perangkat terdampak</dt>
                     <dd className="mt-0.5 font-mono text-xs">{(change.affected_devices || []).join(", ") || "—"}</dd>
                   </div>
                   <div>
-                    <dt className="text-meta font-semibold uppercase tracking-wide text-foreground-muted">Layanan terdampak</dt>
+                    <dt className="text-meta font-semibold uppercase tracking-wide text-text-muted">Layanan terdampak</dt>
                     <dd className="mt-0.5">{(change.affected_services || []).join(", ") || "—"}</dd>
                   </div>
                 </dl>
@@ -1369,18 +1369,18 @@ export default function ChangeDetailPage() {
 
             <Card title="Riwayat status" description="Kronologis perubahan state" className="lg:col-span-2">
               {!history || history.status_history.length === 0 ? (
-                <p className="text-sm text-foreground-muted">Belum ada riwayat.</p>
+                <p className="text-sm text-text-muted">Belum ada riwayat.</p>
               ) : (
                 <ol className="space-y-3">
                   {history.status_history.map((t) => (
                     <li key={t.id} className="flex items-start gap-3 text-sm">
                       <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-brand" aria-hidden />
                       <div className="min-w-0">
-                        <p className="text-foreground">
-                          {t.from_status && <span className="text-foreground-muted">{statusLabel(t.from_status)} → </span>}
+                        <p className="text-text">
+                          {t.from_status && <span className="text-text-muted">{statusLabel(t.from_status)} → </span>}
                           <span className="font-medium">{statusLabel(t.to_status)}</span>
                         </p>
-                        <p className="text-meta text-foreground-muted">
+                        <p className="text-meta text-text-muted">
                           {fmtDateTime(t.occurred_at)} ·{" "}
                           {t.actor_name
                             ? `oleh ${t.actor_name}`
@@ -1399,11 +1399,11 @@ export default function ChangeDetailPage() {
 
           <Card title="Revisi" description="Setiap revisi terkunci setelah disetujui; tinjauan terikat ke hash dokumen">
             {!history || history.revisions.length === 0 ? (
-              <p className="text-sm text-foreground-muted">Belum ada revisi.</p>
+              <p className="text-sm text-text-muted">Belum ada revisi.</p>
             ) : (
               <div className="-mx-5 overflow-x-auto md:-mx-6">
                 <table className="w-full min-w-[520px]">
-                  <thead className="border-b border-border bg-surface-muted">
+                  <thead className="border-b border-border bg-cream">
                     <tr>
                       <th className="th">Revisi</th>
                       <th className="th">Hash</th>
@@ -1415,12 +1415,12 @@ export default function ChangeDetailPage() {
                     {history.revisions.map((r) => (
                       <tr key={r.id} className="border-b border-border last:border-0">
                         <td className="td font-mono">rev{r.revision_number}</td>
-                        <td className="td font-mono text-meta text-foreground-muted">{r.content_hash?.slice(0, 12) ?? "—"}</td>
+                        <td className="td font-mono text-meta text-text-muted">{r.content_hash?.slice(0, 12) ?? "—"}</td>
                         <td className="td text-meta">
                           {r.is_current ? <span className="font-semibold text-brand">Aktif</span> : "Lampau"}
                           {r.locked ? " · terkunci" : ""}
                         </td>
-                        <td className="td text-foreground-muted">{fmtDateTime(r.created_at)}</td>
+                        <td className="td text-text-muted">{fmtDateTime(r.created_at)}</td>
                       </tr>
                     ))}
                   </tbody>

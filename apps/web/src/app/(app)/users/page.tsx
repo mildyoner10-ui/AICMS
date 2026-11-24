@@ -173,7 +173,7 @@ export default function UsersPage() {
             ) : (
               <div className="overflow-x-auto">
                 <table className="w-full min-w-[860px]">
-                  <thead className="border-b border-border bg-surface-muted">
+                  <thead className="border-b border-border bg-cream">
                     <tr>
                       <th className="th">Nama</th>
                       <th className="th">Username</th>
@@ -185,7 +185,7 @@ export default function UsersPage() {
                   </thead>
                   <tbody>
                     {users.map((u) => (
-                      <tr key={u.id} className={`border-b border-border last:border-0 ${u.is_active ? "" : "bg-surface-muted/60 text-foreground-muted"}`}>
+                      <tr key={u.id} className={`border-b border-border last:border-0 ${u.is_active ? "" : "bg-cream/60 text-text-muted"}`}>
                         <td className="td font-medium">{u.display_name || u.username}</td>
                         <td className="td font-mono text-meta">{u.username}</td>
                         <td className="td text-meta text-foreground-muted">{u.email}</td>
@@ -212,7 +212,7 @@ export default function UsersPage() {
                                 <span className="text-meta text-foreground-muted">—</span>
                               ) : (
                                 u.roles.map((r) => (
-                                  <span key={r} className="chip whitespace-nowrap bg-brand-soft text-brand" title={r}>
+                                  <span key={r} className="chip whitespace-nowrap bg-teal bg-opacity-15 text-teal-dark" title={r}>
                                     {roleLabel(r)}
                                   </span>
                                 ))
@@ -225,7 +225,7 @@ export default function UsersPage() {
                             className={`chip ${
                               u.is_active
                                 ? "bg-success-soft text-success ring-1 ring-inset ring-success/25"
-                                : "bg-surface-muted text-foreground-muted ring-1 ring-inset ring-border-strong"
+                                : "bg-cream text-text-muted ring-1 ring-inset ring-border-strong"
                             }`}
                           >
                             <span aria-hidden>{u.is_active ? "●" : "○"}</span>
@@ -359,7 +359,7 @@ export default function UsersPage() {
               <ul className="flex flex-wrap gap-2">
                 {roles.map((r) => (
                   <li key={r.code}>
-                    <span className="chip bg-surface-muted text-foreground ring-1 ring-inset ring-border-strong">{roleLabel(r.code)}</span>
+                    <span className="chip bg-cream text-text-muted ring-1 ring-inset ring-border-strong">{roleLabel(r.code)}</span>
                   </li>
                 ))}
               </ul>

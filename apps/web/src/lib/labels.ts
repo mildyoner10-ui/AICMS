@@ -4,12 +4,12 @@
 type Tone = "neutral" | "info" | "pending" | "success" | "danger" | "done";
 
 const TONE_CLASS: Record<Tone, string> = {
-  neutral: "bg-surface-muted text-foreground-muted ring-1 ring-inset ring-border-strong",
-  info: "bg-info-soft text-info ring-1 ring-inset ring-info/25",
-  pending: "bg-warning-soft text-warning ring-1 ring-inset ring-warning/25",
-  success: "bg-success-soft text-success ring-1 ring-inset ring-success/25",
-  danger: "bg-danger-soft text-danger ring-1 ring-inset ring-danger/25",
-  done: "bg-nav text-on-dark ring-1 ring-inset ring-white/10",
+  neutral: "bg-cream text-text-muted ring-1 ring-inset ring-border",
+  info: "bg-sky bg-opacity-15 text-sky ring-1 ring-inset ring-sky/30",
+  pending: "bg-gold bg-opacity-20 text-gold-dark ring-1 ring-inset ring-gold/30",
+  success: "bg-teal bg-opacity-15 text-teal-dark ring-1 ring-inset ring-teal/30",
+  danger: "bg-coral bg-opacity-10 text-coral-dark ring-1 ring-inset ring-coral/30",
+  done: "bg-teal-dark text-white ring-1 ring-inset ring-white/10",
 };
 
 // Small leading glyph keeps state legible without relying on color alone.

@@ -19,10 +19,10 @@ interface AuditEvent {
 }
 
 const ACTOR_UI: Record<string, { label: string; cls: string }> = {
-  USER: { label: "Manusia", cls: "bg-brand-soft text-brand ring-1 ring-inset ring-brand/20" },
-  HUMAN: { label: "Manusia", cls: "bg-brand-soft text-brand ring-1 ring-inset ring-brand/20" },
-  AI: { label: "AI", cls: "bg-warning-soft text-warning ring-1 ring-inset ring-warning/25" },
-  SYSTEM: { label: "Sistem", cls: "bg-surface-muted text-foreground-muted ring-1 ring-inset ring-border-strong" },
+  USER: { label: "Manusia", cls: "bg-teal bg-opacity-15 text-teal-dark ring-1 ring-inset ring-teal/30" },
+  HUMAN: { label: "Manusia", cls: "bg-teal bg-opacity-15 text-teal-dark ring-1 ring-inset ring-teal/30" },
+  AI: { label: "AI", cls: "bg-gold bg-opacity-20 text-gold-dark ring-1 ring-inset ring-gold/30" },
+  SYSTEM: { label: "Sistem", cls: "bg-cream text-text-muted ring-1 ring-inset ring-border" },
 };
 
 const OBJECT_LABEL: Record<string, string> = {
@@ -145,7 +145,7 @@ export default function AuditPage() {
           <Card className="overflow-hidden [&>div]:p-0">
             <div className="overflow-x-auto">
               <table className="w-full min-w-[820px]">
-                <thead className="border-b border-border bg-surface-muted">
+                <thead className="border-b border-border bg-cream">
                   <tr>
                     <th className="th">Waktu (WIB)</th>
                     <th className="th">Pelaku</th>
@@ -179,7 +179,7 @@ export default function AuditPage() {
                                 {isOpen ? "Sembunyikan" : "Lihat"}
                               </button>
                               {isOpen && (
-                                <pre className="mt-2 max-w-[380px] overflow-x-auto rounded-control bg-surface-muted p-2.5 font-mono text-[11px] text-foreground">
+                                <pre className="mt-2 max-w-[380px] overflow-x-auto rounded-md bg-cream p-2.5 font-mono text-[11px] text-text-muted">
                                   {JSON.stringify(e.event_data, null, 2)}
                                 </pre>
                               )}
@@ -194,7 +194,7 @@ export default function AuditPage() {
                 </tbody>
               </table>
             </div>
-            <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border bg-surface-muted px-4 py-3 text-meta text-foreground-muted">
+            <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border bg-cream px-4 py-3 text-meta text-text-muted">
               <span>
                 {total === 0
                   ? "Tidak ada peristiwa."
