@@ -62,57 +62,54 @@ def _fetch_filter(session, status, category, change_type, environment, search, f
     return where, params
 
 
-def _get_data(session, where, params):
-    total = session.execute(
+async def _get_data(session, where, params):
+    total = (await session.execute(
         text(f"SELECT count(*) FROM changes WHERE {where}"), params
-    ).scalar()
+    )).scalar()
 
-    by_status = {}
-    r = session.execute(
+    r = await session.execute(
         text(f"SELECT status, count(*) FROM changes WHERE {where} GROUP BY status"), params
     )
     by_status = {row[0]: int(row[1]) for row in r.fetchall()}
 
-    by_category = {}
-    r = session.execute(
+    r = await session.execute(
         text(f"SELECT category, count(*) FROM changes WHERE {where} GROUP BY category"), params
     )
     by_category = {row[0]: int(row[1]) for row in r.fetchall()}
 
-    by_type = {}
-    r = session.execute(
+    r = await session.execute(
         text(f"SELECT change_type, count(*) FROM changes WHERE {where} GROUP BY change_type"), params
     )
     by_type = {row[0]: int(row[1]) for row in r.fetchall()}
 
-    by_env = {}
-    r = session.execute(
-        text(f"SELECT COALESCE(environment, 'Tidak diatur'), count(*) FROM changes WHERE {where} GROUP BY environment"), params
+    r = await session.execute(
+        text(f"SELECT environment, count(*) FROM changes WHERE {where} GROUP BY environment"), params
     )
-    by_env = {row[0]: int(row[1]) for row in r.fetchall()}
+    by_env = {row[0] or "Tidak diatur": int(row[1]) for row in r.fetchall()}
 
-    items = []
-    r = session.execute(
+    r = await session.execute(
         text(
-            f"""SELECT change_number, title, status, risk_level, category, change_type,
-                      environment, requester_name, created_at, updated_at,
-                      implementation_start, implementation_end
-               FROM changes WHERE {where} ORDER BY created_at DESC"""
+            f"""SELECT c.change_number, c.title, c.status,
+                      (SELECT ra.risk_level FROM risk_assessments ra
+                       WHERE ra.change_id = c.id ORDER BY ra.calculated_at DESC LIMIT 1) as risk_level,
+                      c.category, c.change_type, c.environment,
+                      u.display_name as requester_name, c.created_at, c.updated_at,
+                      c.implementation_start, c.implementation_end
+               FROM changes c LEFT JOIN users u ON u.id = c.requester_id
+               WHERE {where} ORDER BY c.created_at DESC"""
         ), params
     )
-    for row in r.fetchall():
-        items.append({
-            "change_number": row[0], "title": row[1], "status": row[2],
-            "risk_level": row[3], "category": row[4], "change_type": row[5],
-            "environment": row[6], "requester_name": row[7],
-            "created_at": row[8].isoformat() if row[8] else None,
-            "updated_at": row[9].isoformat() if row[9] else None,
-            "implementation_start": row[10].isoformat() if row[10] else None,
-            "implementation_end": row[11].isoformat() if row[11] else None,
-        })
+    items = [{
+        "change_number": row[0], "title": row[1], "status": row[2],
+        "risk_level": row[3], "category": row[4], "change_type": row[5],
+        "environment": row[6], "requester_name": row[7],
+        "created_at": row[8].isoformat() if row[8] else None,
+        "updated_at": row[9].isoformat() if row[9] else None,
+        "implementation_start": row[10].isoformat() if row[10] else None,
+        "implementation_end": row[11].isoformat() if row[11] else None,
+    } for row in r.fetchall()]
 
-    durations = []
-    r = session.execute(
+    r = await session.execute(
         text(
             "SELECT t.occurred_at - (SELECT min(t2.occurred_at) FROM change_status_transitions t2 "
             "WHERE t2.change_id = t.change_id AND t2.to_status = 'SUBMITTED') AS delta "
@@ -120,9 +117,9 @@ def _get_data(session, where, params):
             "WHERE t.to_status = 'APPROVED' AND t.occurred_at IS NOT NULL"
         )
     )
-    for row in r.fetchall():
-        if row[0] is not None:
-            durations.append(row[0].total_seconds() / 3600)
+    durations = [
+        row[0].total_seconds() / 3600 for row in r.fetchall() if row[0] is not None
+    ]
     avg_hours = round(sum(durations) / len(durations), 1) if durations else None
 
     return {
