@@ -20,6 +20,7 @@ const LINKS: NavLink[] = [
   { href: "/approvals", label: "Persetujuan", icon: "✓", group: "Persetujuan" },
   { href: "/calendar", label: "Kalender", icon: "▤", group: "Operasional" },
   { href: "/audit", label: "Audit", icon: "◉", group: "Tata Kelola" },
+  { href: "/reports", label: "Laporan", icon: "◫", group: "Tata Kelola" },
   { href: "/users", label: "Pengguna", icon: "◍", group: "Tata Kelola", adminOnly: true },
   { href: "/profile", label: "Profil", icon: "◉", group: "Akun" },
 ];

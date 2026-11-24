@@ -8,7 +8,7 @@ from fastapi.responses import JSONResponse
 from app.core.config import settings
 from app.core.logging_config import log
 from app.db.session import engine
-from app.routes import auth, users, changes, documents, reviews, reviews_list, approvals, calendar, implementation, audit, dashboard
+from app.routes import auth, users, changes, documents, reviews, reviews_list, approvals, calendar, implementation, audit, dashboard, reports
 
 
 @asynccontextmanager
@@ -76,3 +76,4 @@ app.include_router(calendar.router, prefix="/api/v1")
 app.include_router(implementation.router, prefix="/api/v1")
 app.include_router(audit.router, prefix="/api/v1")
 app.include_router(dashboard.router, prefix="/api/v1")
+app.include_router(reports.router, prefix="/api/v1")
