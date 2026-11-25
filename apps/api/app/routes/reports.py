@@ -94,7 +94,15 @@ async def _get_data(session, where, params):
                        WHERE ra.change_id = c.id ORDER BY ra.calculated_at DESC LIMIT 1) as risk_level,
                       c.category, c.change_type, c.environment,
                       u.display_name as requester_name, c.created_at, c.updated_at,
-                      c.implementation_start, c.implementation_end
+                      c.implementation_start, c.implementation_end,
+                      (SELECT ur.display_name FROM review_results rr
+                       JOIN review_jobs rj ON rr.review_job_id = rj.id
+                       LEFT JOIN users ur ON ur.id = rr.decided_by_id
+                       WHERE rj.change_id = c.id ORDER BY rr.created_at DESC LIMIT 1) as reviewer_name,
+                      (SELECT ua.display_name FROM change_status_transitions t
+                       LEFT JOIN users ua ON ua.id = t.actor_user_id
+                       WHERE t.change_id = c.id AND t.to_status = 'APPROVED'
+                       ORDER BY t.occurred_at DESC LIMIT 1) as approved_by_name
                FROM changes c LEFT JOIN users u ON u.id = c.requester_id
                WHERE {where} ORDER BY c.created_at DESC"""
         ), params
@@ -107,6 +115,8 @@ async def _get_data(session, where, params):
         "updated_at": row[9].isoformat() if row[9] else None,
         "implementation_start": row[10].isoformat() if row[10] else None,
         "implementation_end": row[11].isoformat() if row[11] else None,
+        "reviewer_name": row[12],
+        "approved_by_name": row[13],
     } for row in r.fetchall()]
 
     r = await session.execute(
@@ -171,7 +181,7 @@ async def export_report_csv(
     writer = csv.writer(output)
     writer.writerow([
         "No. CRF", "Judul", "Status", "Risiko", "Kategori", "Tipe",
-        "Lingkungan", "Pemohon", "Tgl Dibuat",
+        "Lingkungan", "Pemohon", "Reviewer", "Disetujui Oleh", "Tgl Dibuat",
     ])
     for it in data["items"]:
         writer.writerow([
@@ -183,6 +193,8 @@ async def export_report_csv(
             it.get("change_type") or "",
             it.get("environment") or "",
             it.get("requester_name") or "",
+            it.get("reviewer_name") or "",
+            it.get("approved_by_name") or "",
             (it.get("created_at") or "")[:19].replace("T", " "),
         ])
     return Response(
@@ -309,14 +321,14 @@ async def generate_report_pdf(
 
     # Detail table
     story.append(Paragraph("Daftar Lengkap Perubahan", h2_style))
-    detail_header = ["No. CRF", "Judul", "Status", "Risiko", "Kategori", "Tipe", "Lingkungan", "Pemohon", "Tgl"]
+    detail_header = ["No. CRF", "Judul", "Status", "Risiko", "Kategori", "Tipe", "Lingkungan", "Pemohon", "Reviewer", "Disetujui Oleh", "Tgl"]
     detail_rows = [detail_header]
     for item in summary.get("items", [])[:100]:
         cat = CAT_LABELS.get(item.get("category", ""), item.get("category", ""))
         st = STATUS_LABELS.get(item.get("status", ""), item.get("status", ""))
         title = (item.get("title", "") or "")
-        if len(title) > 25:
-            title = title[:25] + "…"
+        if len(title) > 22:
+            title = title[:22] + "…"
         detail_rows.append([
             item.get("change_number", ""),
             title,
@@ -326,23 +338,25 @@ async def generate_report_pdf(
             item.get("change_type") or "-",
             item.get("environment") or "-",
             item.get("requester_name") or "-",
+            item.get("reviewer_name") or "-",
+            item.get("approved_by_name") or "-",
             (item.get("created_at") or "")[:10],
         ])
 
-    col_w = [55, 120, 65, 45, 60, 45, 50, 65, 45]
+    col_w = [45, 95, 55, 38, 48, 38, 38, 55, 55, 55, 38]
     dt = Table(detail_rows, colWidths=col_w[:len(detail_rows[0])])
     dt.setStyle(TableStyle([
         ("BACKGROUND", (0, 0), (-1, 0), TEAL),
         ("TEXTCOLOR", (0, 0), (-1, 0), colors.white),
         ("ROWBACKGROUNDS", (0, 1), (-1, -1), [colors.white, BG_ALTERNATE]),
         ("GRID", (0, 0), (-1, -1), 0.3, BORDER),
-        ("FONTSIZE", (0, 0), (-1, -1), 7),
+        ("FONTSIZE", (0, 0), (-1, -1), 6.5),
         ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
-        ("TOPPADDING", (0, 0), (-1, -1), 3),
-        ("BOTTOMPADDING", (0, 0), (-1, -1), 3),
+        ("TOPPADDING", (0, 0), (-1, -1), 2),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 2),
         ("ALIGN", (0, 0), (-1, -1), "LEFT"),
-        ("ALIGN", (0, 8), (0, -1), "CENTER"),
-        ("ALIGN", (7, 0), (7, -1), "LEFT"),
+        ("ALIGN", (0, 0), (0, -1), "CENTER"),
+        ("ALIGN", (10, 0), (10, -1), "CENTER"),
     ]))
     story.append(dt)
     if len(summary.get("items", [])) > 100:

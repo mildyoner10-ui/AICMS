@@ -366,6 +366,8 @@ export default function ReportsPage() {
                       <th className="th">Tipe</th>
                       <th className="th">Lingkungan</th>
                       <th className="th">Pemohon</th>
+                      <th className="th">Reviewer</th>
+                      <th className="th">Disetujui Oleh</th>
                       <th className="th">Tgl Dibuat</th>
                     </tr>
                   </thead>
@@ -380,6 +382,8 @@ export default function ReportsPage() {
                         <td className="td">{item.change_type || "-"}</td>
                         <td className="td">{item.environment || "-"}</td>
                         <td className="td">{item.requester_name || "-"}</td>
+                        <td className="td">{item.reviewer_name || "-"}</td>
+                        <td className="td">{item.approved_by_name || "-"}</td>
                         <td className="td">{item.created_at ? new Date(item.created_at).toISOString().slice(0, 10) : "-"}</td>
                       </tr>
                     ))}
