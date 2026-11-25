@@ -366,7 +366,7 @@ export default function Dashboard() {
             </div>
 
             <div className="row g-3 mt-4">
-              <div className="col-12 col-xl-8">
+              <div className="col-12 col-xl-4">
                 <Card title="Perubahan per Status" description="Distribusi seluruh CRF aktif dan arsip">
                   {statusEntries.length === 0 ? (
                     <p className="small text-muted">Belum ada perubahan tercatat.</p>
@@ -389,28 +389,29 @@ export default function Dashboard() {
                           CANCELLED: CHART_COLORS.danger,
                         }[status],
                       }))}
+                      size={180}
                     />
                   )}
                 </Card>
               </div>
 
               <div className="col-12 col-xl-4">
-                <div className="mb-4">
-                  <Card title="Perubahan per Kategori" description="Sumber daya yang terdampak">
-                    {categoryEntries.length === 0 ? (
-                      <p className="small text-muted">Belum ada data kategori.</p>
-                    ) : (
-                      <DonutChart
-                        data={categoryEntries.map(([cat, count], i) => ({
-                          label: categoryLabel(cat),
-                          value: count,
-                        }))}
-                        size={180}
-                      />
-                    )}
-                  </Card>
-                </div>
+                <Card title="Perubahan per Kategori" description="Sumber daya yang terdampak">
+                  {categoryEntries.length === 0 ? (
+                    <p className="small text-muted">Belum ada data kategori.</p>
+                  ) : (
+                    <DonutChart
+                      data={categoryEntries.map(([cat, count], i) => ({
+                        label: categoryLabel(cat),
+                        value: count,
+                      }))}
+                      size={180}
+                    />
+                  )}
+                </Card>
+              </div>
 
+              <div className="col-12 col-xl-4">
                 <Card title="Tinjauan AI" description="AI memberi rekomendasi; keputusan tetap pada manusia">
                   <dl className="row g-3 text-sm">
                     <div className="col-6 rounded p-3 bg-body-secondary">
