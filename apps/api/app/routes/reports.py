@@ -314,9 +314,12 @@ async def generate_report_pdf(
     for item in summary.get("items", [])[:100]:
         cat = CAT_LABELS.get(item.get("category", ""), item.get("category", ""))
         st = STATUS_LABELS.get(item.get("status", ""), item.get("status", ""))
+        title = (item.get("title", "") or "")
+        if len(title) > 25:
+            title = title[:25] + "…"
         detail_rows.append([
             item.get("change_number", ""),
-            (item.get("title", "") or "")[:35],
+            title,
             st,
             item.get("risk_level") or "-",
             cat,
@@ -326,7 +329,7 @@ async def generate_report_pdf(
             (item.get("created_at") or "")[:10],
         ])
 
-    col_w = [45, 85, 50, 30, 50, 35, 35, 50, 35]
+    col_w = [55, 120, 65, 45, 60, 45, 50, 65, 45]
     dt = Table(detail_rows, colWidths=col_w[:len(detail_rows[0])])
     dt.setStyle(TableStyle([
         ("BACKGROUND", (0, 0), (-1, 0), TEAL),
@@ -334,9 +337,12 @@ async def generate_report_pdf(
         ("ROWBACKGROUNDS", (0, 1), (-1, -1), [colors.white, BG_ALTERNATE]),
         ("GRID", (0, 0), (-1, -1), 0.3, BORDER),
         ("FONTSIZE", (0, 0), (-1, -1), 7),
-        ("VALIGN", (0, 0), (-1, -1), "TOP"),
-        ("TOPPADDING", (0, 0), (-1, -1), 2),
-        ("BOTTOMPADDING", (0, 0), (-1, -1), 2),
+        ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
+        ("TOPPADDING", (0, 0), (-1, -1), 3),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 3),
+        ("ALIGN", (0, 0), (-1, -1), "LEFT"),
+        ("ALIGN", (0, 8), (0, -1), "CENTER"),
+        ("ALIGN", (7, 0), (7, -1), "LEFT"),
     ]))
     story.append(dt)
     if len(summary.get("items", [])) > 100:
