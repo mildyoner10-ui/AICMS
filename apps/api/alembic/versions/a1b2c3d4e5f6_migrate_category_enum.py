@@ -40,8 +40,8 @@ def upgrade() -> None:
     for old, new in CAT_MAP.items():
         op.execute(f"UPDATE changes SET category = '{new}' WHERE category = '{old}'")
 
-    # 3. Set any remaining/unknown values to OTHER
-    op.execute("UPDATE changes SET category = 'OTHER' WHERE category NOT IN ('HEAD_OFFICE', 'CHANNEL', 'BRANCH_OFFICE', 'OTHER')")
+    # 3. Map old enum values → OTHER (safe: cast to text to avoid referencing non-existent enum values)
+    op.execute("UPDATE changes SET category = 'OTHER' WHERE category::text != 'OTHER'")
 
     # 4. Rename enum type
     op.execute(f"ALTER TYPE {OLD_ENUM} RENAME TO {OLD_ENUM}_old")
