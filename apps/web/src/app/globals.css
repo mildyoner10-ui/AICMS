@@ -3,25 +3,30 @@
 @import "bootstrap/dist/css/bootstrap.min.css";
 @import "bootstrap-icons/font/bootstrap-icons.min.css";
 
-/* Design Tokens — WattVision Monitoring Dashboard */
+/* Design Tokens — WattVision Dark Monitoring */
 :root,
 [data-bs-theme="dark"] {
   color-scheme: dark;
-  --app-bg: #121212;
-  --app-surface: #1E1E1E;
-  --app-surface-secondary: #252525;
-  --app-border: #2C2C2E;
-  --app-text: #FFFFFF;
-  --app-text-muted: #98989D;
-  --app-primary: #00E5FF;       /* cyan/neon untuk data & KPI */
-  --app-success: #32D74B;       /* hijau untuk status normal/aktif */
-  --app-danger: #FF453A;        /* merah untuk alert */
-  --app-warning: #FFD60A;       /* kuning untuk warning */
-  --app-info: #00E5FF;          /* info = cyan */
-  --app-sidebar-bg: #121212;
-  --app-sidebar-text: #FFFFFF;
-  --app-sidebar-text-muted: #98989D;
-  --app-header-bg: #1E1E1E;
+  --app-bg: #0D0D0F;
+  --app-surface: #16161A;
+  --app-surface-hover: #1C1C22;
+  --app-border: #2A2A30;
+  --app-border-bright: #3A3A42;
+  --app-text: #EDEDED;
+  --app-text-muted: #8E8E93;
+  --app-primary: #00D4FF;       /* cyan lebih vibrant */
+  --app-primary-glow: rgba(0, 212, 255, 0.35);
+  --app-success: #30D158;       /* green */
+  --app-danger: #FF453A;        /* red */
+  --app-warning: #FFD60A;       /* yellow */
+  --app-info: #00D4FF;          /* cyan */
+  --app-secondary: #BF5AF2;     /* purple accent */
+  --app-gradient-start: #00D4FF;
+  --app-gradient-end: #7B61FF;
+  --app-sidebar-bg: #111114;
+  --app-sidebar-text: #EDEDED;
+  --app-sidebar-text-muted: #8E8E93;
+  --app-header-bg: #141418;
   --app-radius: 16px;
   --app-card-padding: 20px;
 }
@@ -30,15 +35,20 @@
   color-scheme: light;
   --app-bg: #F5F5F7;
   --app-surface: #FFFFFF;
-  --app-surface-secondary: #F0F0F2;
+  --app-surface-hover: #F8F8FA;
   --app-border: #E5E5EA;
+  --app-border-bright: #D0D0D6;
   --app-text: #1C1C1E;
   --app-text-muted: #8E8E93;
   --app-primary: #00B4D8;
+  --app-primary-glow: rgba(0, 180, 216, 0.2);
   --app-success: #30D158;
   --app-danger: #FF453A;
   --app-warning: #FF9F0A;
   --app-info: #00B4D8;
+  --app-secondary: #BF5AF2;
+  --app-gradient-start: #00B4D8;
+  --app-gradient-end: #6C5CE7;
   --app-sidebar-bg: #FFFFFF;
   --app-sidebar-text: #1C1C1E;
   --app-sidebar-text-muted: #8E8E93;
@@ -55,19 +65,33 @@ body {
   transition: background-color .25s ease, color .25s ease;
 }
 
+[data-bs-theme="dark"] body {
+  background:
+    radial-gradient(ellipse 80% 50% at 20% -10%, rgba(0, 212, 255, 0.06), transparent 70%),
+    radial-gradient(ellipse 60% 40% at 100% 100%, rgba(123, 97, 255, 0.05), transparent 70%),
+    var(--app-bg);
+  background-attachment: fixed;
+}
+
 /* Number font for KPIs */
 .font-mono, .kpi-value {
   font-family: "JetBrains Mono", "Fira Code", "SF Mono", monospace !important;
   font-weight: 700;
 }
 
-/* Cards — dark surface, 16px radius, 20px padding, subtle border */
+/* Cards — gradient surface, visible border, subtle shadow */
 .card {
-  background-color: var(--app-surface) !important;
-  border: 1px solid var(--app-border) !important;
+  background: linear-gradient(135deg, var(--app-surface) 0%, color-mix(in srgb, var(--app-surface) 95%, var(--app-border)) 100%) !important;
+  border: 1px solid var(--app-border-bright) !important;
   border-radius: var(--app-radius) !important;
-  box-shadow: none !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.03) !important;
   color: var(--app-text) !important;
+  transition: box-shadow .2s ease, border-color .2s ease;
+}
+
+.card:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.05) !important;
+  border-color: var(--app-primary) !important;
 }
 
 .card-body {
@@ -76,7 +100,7 @@ body {
 }
 
 .card-header {
-  background-color: transparent !important;
+  background: transparent !important;
   border-bottom: 1px solid var(--app-border) !important;
   padding: 16px var(--app-card-padding) !important;
   color: var(--app-text) !important;
@@ -87,54 +111,71 @@ body {
   color: var(--app-text-muted) !important;
 }
 
-/* Buttons — cyan/neon primary */
+/* Buttons — neon glow effect */
 .btn-primary {
-  background-color: var(--app-primary) !important;
-  border-color: var(--app-primary) !important;
+  background: linear-gradient(135deg, var(--app-gradient-start) 0%, var(--app-gradient-end) 100%) !important;
+  border: none !important;
   color: #000000 !important;
-  font-weight: 500;
+  font-weight: 600;
   border-radius: 10px;
+  box-shadow: 0 2px 12px var(--app-primary-glow), 0 0 24px rgba(0, 212, 255, 0.15) !important;
+  transition: all .2s ease;
 }
 
 .btn-primary:hover {
-  opacity: 0.85 !important;
-  background-color: var(--app-primary) !important;
-  border-color: var(--app-primary) !important;
+  opacity: 1 !important;
+  box-shadow: 0 4px 20px var(--app-primary-glow), 0 0 32px rgba(0, 212, 255, 0.25) !important;
+  transform: translateY(-1px);
+  background: linear-gradient(135deg, var(--app-gradient-start) 0%, var(--app-gradient-end) 100%) !important;
   color: #000000 !important;
 }
 
 .btn-outline-primary {
   color: var(--app-primary) !important;
-  border-color: var(--app-primary) !important;
+  border: 1.5px solid var(--app-primary) !important;
+  background: transparent !important;
+  font-weight: 500;
 }
 
 .btn-outline-primary:hover {
-  background-color: var(--app-primary) !important;
+  background: var(--app-primary) !important;
   color: #000000 !important;
+  box-shadow: 0 0 16px var(--app-primary-glow) !important;
+  border-color: var(--app-primary) !important;
 }
 
-/* Badges — semantic colors */
+/* Badges — vibrant with glow */
 .badge.bg-primary {
   background-color: var(--app-primary) !important;
   color: #000000 !important;
+  box-shadow: 0 0 8px var(--app-primary-glow) !important;
 }
 
 .badge.bg-success {
   background-color: var(--app-success) !important;
+  box-shadow: 0 0 8px rgba(48, 209, 88, 0.3) !important;
 }
 
 .badge.bg-danger {
   background-color: var(--app-danger) !important;
+  box-shadow: 0 0 8px rgba(255, 69, 58, 0.3) !important;
 }
 
 .badge.bg-warning {
   background-color: var(--app-warning) !important;
   color: #000000 !important;
+  box-shadow: 0 0 8px rgba(255, 214, 10, 0.3) !important;
 }
 
 .badge.bg-info {
   background-color: var(--app-info) !important;
   color: #000000 !important;
+  box-shadow: 0 0 8px var(--app-primary-glow) !important;
+}
+
+.badge {
+  font-weight: 600;
+  padding: 0.4em 0.7em;
 }
 
 /* Tables — dark rows, hover effect */
@@ -147,7 +188,7 @@ body {
 }
 
 .table-hover > tbody > tr:hover > * {
-  background-color: var(--app-surface-secondary) !important;
+  background-color: var(--app-surface-hover) !important;
   color: var(--app-text) !important;
 }
 
@@ -162,44 +203,45 @@ body {
 
 .alert-danger {
   border-left-color: var(--app-danger) !important;
-  background-color: rgba(255, 69, 58, 0.08) !important;
+  background-color: rgba(255, 69, 58, 0.1) !important;
   color: var(--app-danger) !important;
 }
 
 .alert-success {
   border-left-color: var(--app-success) !important;
-  background-color: rgba(50, 215, 75, 0.08) !important;
+  background-color: rgba(48, 209, 88, 0.1) !important;
   color: var(--app-success) !important;
 }
 
 .alert-warning {
   border-left-color: var(--app-warning) !important;
-  background-color: rgba(255, 214, 10, 0.08) !important;
+  background-color: rgba(255, 214, 10, 0.1) !important;
   color: var(--app-warning) !important;
 }
 
 .alert-info {
   border-left-color: var(--app-primary) !important;
-  background-color: rgba(0, 229, 255, 0.08) !important;
+  background-color: rgba(0, 212, 255, 0.1) !important;
   color: var(--app-primary) !important;
 }
 
-/* Form controls */
+/* Form controls — neon focus */
 .form-control {
   background-color: var(--app-surface) !important;
-  border: 1px solid var(--app-border) !important;
+  border: 1.5px solid var(--app-border) !important;
   border-radius: 10px !important;
   color: var(--app-text) !important;
+  transition: border-color .2s ease, box-shadow .2s ease;
 }
 
 .form-control:focus {
   border-color: var(--app-primary) !important;
-  box-shadow: 0 0 0 3px rgba(0, 229, 255, 0.15) !important;
+  box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.2), 0 0 12px rgba(0, 212, 255, 0.1) !important;
 }
 
 .form-select {
   background-color: var(--app-surface) !important;
-  border: 1px solid var(--app-border) !important;
+  border: 1.5px solid var(--app-border) !important;
   border-radius: 10px !important;
   color: var(--app-text) !important;
 }
@@ -246,16 +288,25 @@ body.sidebar-collapsed .app-content {
   padding-left: 64px !important;
 }
 
-/* Nav links */
+/* Nav links — active with left indicator */
 .nav-link {
   color: var(--app-sidebar-text) !important;
   transition: all .15s ease;
+  border-left: 3px solid transparent;
+  padding-left: 12px !important;
+}
+
+.nav-link:hover {
+  background-color: rgba(0, 212, 255, 0.05) !important;
+  color: var(--app-text) !important;
 }
 
 .nav-link.active {
   font-weight: 600;
-  background-color: rgba(0, 229, 255, 0.08) !important;
+  background: linear-gradient(90deg, rgba(0, 212, 255, 0.12) 0%, rgba(123, 97, 255, 0.08) 100%, transparent 100%) !important;
   color: var(--app-primary) !important;
+  border-left-color: var(--app-primary) !important;
+  text-shadow: 0 0 12px var(--app-primary-glow) !important;
 }
 
 /* Smooth transitions */

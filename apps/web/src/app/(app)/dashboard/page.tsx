@@ -8,16 +8,16 @@ import { categoryLabel, statusLabel } from "@/lib/labels";
 
 // ── SVG Donut Pie Chart (inline) ────────────────────────────────────────────
 
-/* WattVision palette — cyan/neon primary, red alerts, green live. */
+/* Vibrant monitoring palette — high contrast, neon feel. */
 const CHART_COLORS = {
-  success:   "#32D74B", // green — approved
+  success:   "#30D158", // green — approved
   danger:    "#FF453A", // red — rejected, cancelled
-  warning:   "#FFD60A", // yellow — pending, needs review
-  brand:     "#00E5FF", // cyan — scheduled, in progress
-  info:      "#00E5FF", // cyan — submitted
+  warning:   "#FFD60A", // yellow — pending
+  brand:     "#00D4FF", // cyan — scheduled
+  info:      "#00D4FF", // cyan — submitted
   purple:    "#BF5AF2", // purple — AI review
   neutral:   "#636366", // muted gray
-  teal:      "#00E5FF", // cyan — AI review
+  teal:      "#5AC8FA", // bright cyan — AI review
 };
 
 const PIE_COLORS = [
@@ -222,14 +222,28 @@ function KpiCard({
 }) {
   const wrap = href ? (
     <Link href={href} className="card p-4" style={{ textDecoration: "none", color: "inherit" }}>
-      <p className={`display-6 fw-bold font-mono kpi-value ${tone}`}>{value}</p>
+      <p className={`display-6 fw-bold font-mono kpi-value`} style={{ 
+        background: "linear-gradient(135deg, var(--app-gradient-start) 0%, var(--app-gradient-end) 100%)",
+        WebkitBackgroundClip: "text",
+        WebkitTextFillColor: "transparent",
+        filter: "drop-shadow(0 0 10px rgba(0, 212, 255, 0.25))"
+      }}>
+        {value}
+      </p>
       <p className="mt-1 text-[13px] fw-semibold text-body">{label}</p>
       <p className="mt-0.5 small text-muted">{help}</p>
       {sub && <p className="mt-0.5 small text-muted">{sub}</p>}
     </Link>
   ) : (
     <div className="card p-4">
-      <p className={`display-6 fw-bold font-mono kpi-value ${tone}`}>{value}</p>
+      <p className={`display-6 fw-bold font-mono kpi-value`} style={{
+        background: "linear-gradient(135deg, var(--app-gradient-start) 0%, var(--app-gradient-end) 100%)",
+        WebkitBackgroundClip: "text",
+        WebkitTextFillColor: "transparent",
+        filter: "drop-shadow(0 0 10px rgba(0, 212, 255, 0.25))"
+      }}>
+        {value}
+      </p>
       <p className="mt-1 text-[13px] fw-semibold text-body">{label}</p>
       <p className="mt-0.5 small text-muted">{help}</p>
       {sub && <p className="mt-0.5 small text-muted">{sub}</p>}
