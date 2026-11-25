@@ -1,44 +1,50 @@
-/* DESIGN.md Design Tokens — Light/Dark Mode */
-:root,
-[data-bs-theme="light"] {
-  color-scheme: light;
-  --app-bg: #F8FAFC;
-  --app-surface: #FFFFFF;
-  --app-surface-secondary: #F1F5F9;
-  --app-text: #0F172A;
-  --app-text-muted: #64748B;
-  --app-border: #E2E8F0;
-  --app-primary: #2563EB;
-  --app-success: #16A34A;
-  --app-warning: #D97706;
-  --app-danger: #DC2626;
-  --app-info: #0284C7;
-  --app-sidebar-bg: #FFFFFF;
-  --app-sidebar-text: #0F172A;
-  --app-sidebar-text-muted: #64748B;
-  --app-header-bg: #FFFFFF;
-  --app-radius: 10px;
-  --app-card-shadow: 0 1px 3px rgba(15,23,42,.05);
-}
+/* Fonts — Inter (body) + JetBrains Mono (numbers/KPIs) */
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap");
+@import "bootstrap/dist/css/bootstrap.min.css";
+@import "bootstrap-icons/font/bootstrap-icons.min.css";
 
+/* Design Tokens — WattVision Monitoring Dashboard */
+:root,
 [data-bs-theme="dark"] {
   color-scheme: dark;
-  --app-bg: #0B1120;
-  --app-surface: #111827;
-  --app-surface-secondary: #1E293B;
-  --app-text: #F8FAFC;
-  --app-text-muted: #94A3B8;
-  --app-border: #334155;
-  --app-primary: #60A5FA;
-  --app-success: #4ADE80;
-  --app-warning: #FBBF24;
-  --app-danger: #F87171;
-  --app-info: #38BDF8;
-  --app-sidebar-bg: #111827;
-  --app-sidebar-text: #F8FAFC;
-  --app-sidebar-text-muted: #94A3B8;
-  --app-header-bg: #111827;
-  --app-card-shadow: none;
+  --app-bg: #121212;
+  --app-surface: #1E1E1E;
+  --app-surface-secondary: #252525;
+  --app-border: #2C2C2E;
+  --app-text: #FFFFFF;
+  --app-text-muted: #98989D;
+  --app-primary: #00E5FF;       /* cyan/neon untuk data & KPI */
+  --app-success: #32D74B;       /* hijau untuk status normal/aktif */
+  --app-danger: #FF453A;        /* merah untuk alert */
+  --app-warning: #FFD60A;       /* kuning untuk warning */
+  --app-info: #00E5FF;          /* info = cyan */
+  --app-sidebar-bg: #121212;
+  --app-sidebar-text: #FFFFFF;
+  --app-sidebar-text-muted: #98989D;
+  --app-header-bg: #1E1E1E;
+  --app-radius: 16px;
+  --app-card-padding: 20px;
+}
+
+[data-bs-theme="light"] {
+  color-scheme: light;
+  --app-bg: #F5F5F7;
+  --app-surface: #FFFFFF;
+  --app-surface-secondary: #F0F0F2;
+  --app-border: #E5E5EA;
+  --app-text: #1C1C1E;
+  --app-text-muted: #8E8E93;
+  --app-primary: #00B4D8;
+  --app-success: #30D158;
+  --app-danger: #FF453A;
+  --app-warning: #FF9F0A;
+  --app-info: #00B4D8;
+  --app-sidebar-bg: #FFFFFF;
+  --app-sidebar-text: #1C1C1E;
+  --app-sidebar-text-muted: #8E8E93;
+  --app-header-bg: #FFFFFF;
+  --app-radius: 16px;
+  --app-card-padding: 20px;
 }
 
 body {
@@ -46,23 +52,34 @@ body {
   color: var(--app-text);
   font-family: Inter, system-ui, -apple-system, sans-serif;
   font-size: 14px;
-  transition: background-color .2s ease, color .2s ease;
+  transition: background-color .25s ease, color .25s ease;
+}
+
+/* Number font for KPIs */
+.font-mono, .kpi-value {
+  font-family: "JetBrains Mono", "Fira Code", "SF Mono", monospace !important;
+  font-weight: 700;
+}
+
+/* Cards — dark surface, 16px radius, 20px padding, subtle border */
+.card {
+  background-color: var(--app-surface) !important;
+  border: 1px solid var(--app-border) !important;
+  border-radius: var(--app-radius) !important;
+  box-shadow: none !important;
+  color: var(--app-text) !important;
 }
 
 .card-body {
+  padding: var(--app-card-padding) !important;
   color: var(--app-text) !important;
 }
 
-.card {
+.card-header {
+  background-color: transparent !important;
+  border-bottom: 1px solid var(--app-border) !important;
+  padding: 16px var(--app-card-padding) !important;
   color: var(--app-text) !important;
-}
-
-/* Card override */
-.card {
-  background-color: var(--app-surface) !important;
-  border-color: var(--app-border) !important;
-  box-shadow: var(--app-card-shadow);
-  border-radius: var(--app-radius);
 }
 
 /* Text muted */
@@ -70,7 +87,130 @@ body {
   color: var(--app-text-muted) !important;
 }
 
-/* Topbar — fixed at top, full width, right of sidebar on desktop */
+/* Buttons — cyan/neon primary */
+.btn-primary {
+  background-color: var(--app-primary) !important;
+  border-color: var(--app-primary) !important;
+  color: #000000 !important;
+  font-weight: 500;
+  border-radius: 10px;
+}
+
+.btn-primary:hover {
+  opacity: 0.85 !important;
+  background-color: var(--app-primary) !important;
+  border-color: var(--app-primary) !important;
+  color: #000000 !important;
+}
+
+.btn-outline-primary {
+  color: var(--app-primary) !important;
+  border-color: var(--app-primary) !important;
+}
+
+.btn-outline-primary:hover {
+  background-color: var(--app-primary) !important;
+  color: #000000 !important;
+}
+
+/* Badges — semantic colors */
+.badge.bg-primary {
+  background-color: var(--app-primary) !important;
+  color: #000000 !important;
+}
+
+.badge.bg-success {
+  background-color: var(--app-success) !important;
+}
+
+.badge.bg-danger {
+  background-color: var(--app-danger) !important;
+}
+
+.badge.bg-warning {
+  background-color: var(--app-warning) !important;
+  color: #000000 !important;
+}
+
+.badge.bg-info {
+  background-color: var(--app-info) !important;
+  color: #000000 !important;
+}
+
+/* Tables — dark rows, hover effect */
+.table {
+  color: var(--app-text) !important;
+}
+
+.table > :not(caption) > * > * {
+  border-bottom-color: var(--app-border) !important;
+}
+
+.table-hover > tbody > tr:hover > * {
+  background-color: var(--app-surface-secondary) !important;
+  color: var(--app-text) !important;
+}
+
+/* Alerts — left border accent */
+.alert {
+  border: none !important;
+  border-left: 4px solid var(--app-primary) !important;
+  border-radius: 8px !important;
+  background-color: var(--app-surface) !important;
+  color: var(--app-text) !important;
+}
+
+.alert-danger {
+  border-left-color: var(--app-danger) !important;
+  background-color: rgba(255, 69, 58, 0.08) !important;
+  color: var(--app-danger) !important;
+}
+
+.alert-success {
+  border-left-color: var(--app-success) !important;
+  background-color: rgba(50, 215, 75, 0.08) !important;
+  color: var(--app-success) !important;
+}
+
+.alert-warning {
+  border-left-color: var(--app-warning) !important;
+  background-color: rgba(255, 214, 10, 0.08) !important;
+  color: var(--app-warning) !important;
+}
+
+.alert-info {
+  border-left-color: var(--app-primary) !important;
+  background-color: rgba(0, 229, 255, 0.08) !important;
+  color: var(--app-primary) !important;
+}
+
+/* Form controls */
+.form-control {
+  background-color: var(--app-surface) !important;
+  border: 1px solid var(--app-border) !important;
+  border-radius: 10px !important;
+  color: var(--app-text) !important;
+}
+
+.form-control:focus {
+  border-color: var(--app-primary) !important;
+  box-shadow: 0 0 0 3px rgba(0, 229, 255, 0.15) !important;
+}
+
+.form-select {
+  background-color: var(--app-surface) !important;
+  border: 1px solid var(--app-border) !important;
+  border-radius: 10px !important;
+  color: var(--app-text) !important;
+}
+
+.form-label {
+  color: var(--app-text-muted) !important;
+  font-weight: 500;
+  font-size: 13px;
+}
+
+/* Topbar — fixed at top */
 .app-topbar {
   position: fixed;
   top: 0;
@@ -106,12 +246,19 @@ body.sidebar-collapsed .app-content {
   padding-left: 64px !important;
 }
 
-/* Active nav link */
-.nav-link.active {
-  font-weight: 600;
+/* Nav links */
+.nav-link {
+  color: var(--app-sidebar-text) !important;
+  transition: all .15s ease;
 }
 
-/* Smooth transitions for theme toggle */
+.nav-link.active {
+  font-weight: 600;
+  background-color: rgba(0, 229, 255, 0.08) !important;
+  color: var(--app-primary) !important;
+}
+
+/* Smooth transitions */
 *, *::before, *::after {
-  transition: background-color .2s ease, border-color .2s ease, color .2s ease;
+  transition: background-color .25s ease, border-color .25s ease, color .25s ease;
 }

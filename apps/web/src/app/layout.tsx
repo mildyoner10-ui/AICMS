@@ -23,16 +23,12 @@ export default function RootLayout({
               (function() {
                 try {
                   var t = localStorage.getItem("app-theme");
-                  var theme = (t === "light" || t === "dark") ? t : (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+                  var theme = (t === "light" || t === "dark") ? t : "dark";
                   document.documentElement.setAttribute("data-bs-theme", theme);
                 } catch(e) {}
               })();
             `,
           }}
-        />
-        <link
-          rel="stylesheet"
-          href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
         />
       </head>
       <body>{children}</body>

@@ -8,16 +8,16 @@ import { categoryLabel, statusLabel } from "@/lib/labels";
 
 // ── SVG Donut Pie Chart (inline) ────────────────────────────────────────────
 
-/* Flip7 palette — teal, gold, coral, sky on cream surface. */
+/* WattVision palette — cyan/neon primary, red alerts, green live. */
 const CHART_COLORS = {
-  success:   "#2ba8a2", // teal — approved
-  danger:    "#ef6c4a", // coral — rejected, cancelled
-  warning:   "#ffd23f", // gold — pending, needs review
-  brand:     "#5dade2", // sky — scheduled, in progress
-  info:      "#3cc4bd", // teal light — submitted
-  purple:    "#d45233", // coral dark
-  neutral:   "#a0b8c0", // muted gray
-  teal:      "#1e8c86", // teal dark — AI review
+  success:   "#32D74B", // green — approved
+  danger:    "#FF453A", // red — rejected, cancelled
+  warning:   "#FFD60A", // yellow — pending, needs review
+  brand:     "#00E5FF", // cyan — scheduled, in progress
+  info:      "#00E5FF", // cyan — submitted
+  purple:    "#BF5AF2", // purple — AI review
+  neutral:   "#636366", // muted gray
+  teal:      "#00E5FF", // cyan — AI review
 };
 
 const PIE_COLORS = [
@@ -82,7 +82,7 @@ function DonutChart({ data, size = 200, cx = 100, cy = 100, r = 70, thickness = 
             key={i}
             d={s.path}
             fill={s.color}
-            stroke="#ffffff"
+            stroke="var(--app-surface)"
             strokeWidth={2}
             style={{ opacity: 0.85 }}
           />
@@ -222,14 +222,14 @@ function KpiCard({
 }) {
   const wrap = href ? (
     <Link href={href} className="card p-4" style={{ textDecoration: "none", color: "inherit" }}>
-      <p className={`display-6 fw-bold ${tone}`}>{value}</p>
+      <p className={`display-6 fw-bold font-mono kpi-value ${tone}`}>{value}</p>
       <p className="mt-1 text-[13px] fw-semibold text-body">{label}</p>
       <p className="mt-0.5 small text-muted">{help}</p>
       {sub && <p className="mt-0.5 small text-muted">{sub}</p>}
     </Link>
   ) : (
     <div className="card p-4">
-      <p className={`display-6 fw-bold ${tone}`}>{value}</p>
+      <p className={`display-6 fw-bold font-mono kpi-value ${tone}`}>{value}</p>
       <p className="mt-1 text-[13px] fw-semibold text-body">{label}</p>
       <p className="mt-0.5 small text-muted">{help}</p>
       {sub && <p className="mt-0.5 small text-muted">{sub}</p>}

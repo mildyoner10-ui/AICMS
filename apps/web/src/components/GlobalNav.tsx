@@ -61,13 +61,13 @@ function NavBody({
       {/* Brand */}
       <Link
         href="/dashboard"
-        className="d-flex align-items-center gap-2 px-3 py-3 brand-logo"
-        style={{ minHeight: "56px" }}
+        className="d-flex align-items-center gap-2 px-3 py-3"
+        style={{ minHeight: "56px", borderBottom: "1px solid var(--app-border)" }}
       >
         {!isCollapsed && (
           <span
             className="fw-bold text-truncate brand-text"
-            style={{ color: "var(--app-text)", fontSize: "18px", letterSpacing: "-0.02em", whiteSpace: "nowrap" }}
+            style={{ color: "var(--app-primary)", fontSize: "18px", letterSpacing: "-0.02em", whiteSpace: "nowrap" }}
           >
             AICMS
           </span>
@@ -75,15 +75,15 @@ function NavBody({
         {isCollapsed && (
           <span
             className="fw-bold d-flex align-items-center justify-content-center"
-            style={{ color: "var(--app-primary)", fontSize: "16px" }}
+            style={{ color: "var(--app-primary)", fontSize: "18px" }}
           >
-            A
+            ⚡
           </span>
         )}
       </Link>
 
       {/* Nav body */}
-      <nav className="flex-1 sidebar-body overflow-auto px-2 py-1" style={{ flex: 1 }}>
+      <nav className="flex-1 sidebar-body overflow-auto px-2 py-2" style={{ flex: 1, borderTop: "1px solid var(--app-border)" }}>
         {isCollapsed
           ? visible.map((link) => (
               <Link
@@ -94,9 +94,10 @@ function NavBody({
                   width: "36px",
                   height: "36px",
                   margin: "0 auto 4px",
-                  color: isActive(link.href) ? "var(--app-primary)" : "var(--app-text)",
-                  background: isActive(link.href) ? "color-mix(in srgb, var(--app-primary) 12%, transparent)" : "transparent",
-                  opacity: isActive(link.href) ? 1 : 0.7,
+                  color: isActive(link.href) ? "var(--app-primary)" : "var(--app-text-muted)",
+                  background: isActive(link.href) ? "rgba(0, 229, 255, 0.1)" : "transparent",
+                  opacity: 1,
+                  fontSize: "15px",
                 }}
                 title={link.label}
               >
@@ -105,7 +106,7 @@ function NavBody({
             ))
           : groups.map((group) => (
               <div key={group} className="mb-3">
-                <p className="group-header mb-2 px-2 text-[10px] fw-bold text-uppercase opacity-50" style={{ color: "var(--app-text-muted)" }}>
+                <p className="group-header mb-2 px-2 text-[10px] fw-bold text-uppercase" style={{ color: "var(--app-text-muted)", letterSpacing: "0.08em" }}>
                   {group}
                 </p>
                 <ul className="list-unstyled d-flex flex-column gap-1">
@@ -117,17 +118,18 @@ function NavBody({
                           href={link.href}
                           className={`nav-link d-flex align-items-center rounded px-3 py-2 text-sm ${isActive(link.href) ? "active" : ""}`}
                           style={{
-                            color: isActive(link.href) ? "var(--app-primary)" : "var(--app-text)",
-                            background: isActive(link.href) ? "color-mix(in srgb, var(--app-primary) 12%, transparent)" : "transparent",
-                            fontWeight: 600,
+                            color: isActive(link.href) ? "var(--app-primary)" : "var(--app-text-muted)",
+                            background: isActive(link.href) ? "rgba(0, 229, 255, 0.08)" : "transparent",
+                            fontWeight: isActive(link.href) ? 600 : 400,
                             fontSize: "14px",
                             cursor: "pointer",
                             border: "none",
                             width: "100%",
                             textAlign: "left",
+                            padding: "8px 12px",
                           }}
                         >
-                          <i className={`${link.icon} me-2`} style={{ fontSize: "16px", opacity: 0.7, width: "16px" }}></i>
+                          <i className={`${link.icon} me-2`} style={{ fontSize: "16px", width: "16px" }}></i>
                           <span className="text-truncate">{link.label}</span>
                         </Link>
                       </li>
@@ -138,9 +140,9 @@ function NavBody({
       </nav>
 
       {/* Footer */}
-      <div className="pt-3 mt-auto" style={{ borderTop: "1px solid var(--app-text-muted)", opacity: 0.15 }}>
+      <div className="pt-3 mt-auto" style={{ borderTop: "1px solid var(--app-border)", padding: "12px 0" }}>
         {aiLabel && !isCollapsed && (
-          <p className="mb-2 px-2 py-1 rounded d-flex align-items-center gap-2 text-[10px] fw-bold text-uppercase" style={{ color: aiMock ? "var(--app-danger)" : "var(--app-text-muted)" }} title="AI hanya rekomendasi">
+          <p className="mb-2 px-2 py-1 rounded d-flex align-items-center gap-2 text-[10px] fw-bold text-uppercase" style={{ color: aiMock ? "var(--app-danger)" : "var(--app-text-muted)", background: "rgba(0,229,255,0.04)" }} title="AI hanya rekomendasi">
             <i className="bi bi-stars"></i>
             <span className="text-truncate">{aiLabel}</span>
           </p>
@@ -148,7 +150,7 @@ function NavBody({
         {who && !isCollapsed && (
           <div className="px-2 mb-1" style={{ color: "var(--app-text-muted)", fontSize: "12px" }}>
             Masuk sebagai{" "}
-            <span className="fw-bold" style={{ color: "var(--app-text)", opacity: 0.8 }}>
+            <span className="fw-bold" style={{ color: "var(--app-text)", opacity: 0.9 }}>
               {who}
             </span>
           </div>
@@ -162,19 +164,19 @@ function NavBody({
           onClick={onLogout}
           className="nav-link w-100 d-flex align-items-center rounded px-3 py-2 text-sm"
           style={{
-            color: "var(--app-text)",
-            opacity: 0.55,
+            color: "var(--app-text-muted)",
             background: "transparent",
-            fontWeight: 600,
+            fontWeight: 400,
             fontSize: "14px",
             cursor: "pointer",
             border: "none",
             width: "100%",
             textAlign: "left",
+            padding: "8px 12px",
           }}
         >
           <i className="bi bi-box-arrow-left me-2"></i>
-          <span className="text-truncate">{isCollapsed ? "Keluar" : "Keluar"}</span>
+          <span className="text-truncate">Keluar</span>
         </button>
       </div>
     </div>
@@ -272,11 +274,11 @@ function MobileNav({
           flexDirection: "column",
         }}
       >
-        <div className="d-flex align-items-center justify-content-between px-3 py-3 border-bottom">
+      <div className="d-flex align-items-center justify-content-between px-3 py-3 d-md-none" style={{ borderBottom: "1px solid var(--app-border)" }}>
           <h5 className="fw-bold m-0" style={{ color: "var(--app-text)", fontSize: "18px" }}>
             Menu
           </h5>
-          <button type="button" className="btn-close" aria-label="Tutup" onClick={onClose}></button>
+          <button type="button" className="btn-close btn-close-white" aria-label="Tutup" onClick={onClose}></button>
         </div>
         <div className="flex-grow-1 overflow-auto p-0">
           <NavBody who={who} roles={roles} isAdmin={isAdmin} aiLabel={aiLabel} aiMock={aiMock} onLogout={onLogout} />
