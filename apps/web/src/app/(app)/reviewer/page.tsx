@@ -112,10 +112,10 @@ export default function ReviewerPage() {
         )}
 
         {!loading && !error && data && data.items.length > 0 && (
-          <Card className="overflow-hidden [&>div]:p-0">
+          <Card className="overflow-hidden p-0">
             <div className="overflow-x-auto">
-              <table className="w-full min-w-[800px]">
-                <thead className="border-b border-border bg-cream">
+              <table className="w-100" style={{ minWidth: "800px" }}>
+                <thead className="border-bottom" style={{ backgroundColor: "var(--app-surface-secondary)" }}>
                   <tr>
                     <th className="th">Change ID</th>
                     <th className="th">Judul</th>
@@ -131,19 +131,27 @@ export default function ReviewerPage() {
                     <tr
                       key={item.id}
                       onClick={() => router.push(`/changes/${item.id}`)}
-                      className="cursor-pointer border-b border-border last:border-0 hover:bg-cream"
+                      className="border-bottom"
+                      style={{
+                        cursor: "pointer",
+                        borderBottomColor: "var(--app-border)",
+                        borderBottomWidth: "1px",
+                        borderBottomStyle: "solid",
+                      }}
+                      onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "var(--app-surface-secondary)")}
+                      onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "")}
                     >
-                      <td className="td whitespace-nowrap font-mono text-brand">{item.change_number}</td>
-                      <td className="td max-w-[300px] truncate font-medium">{item.title}</td>
+                      <td className="td text-nowrap font-monospace text-brand">{item.change_number}</td>
+                      <td className="td" style={{ maxWidth: "300px" }}><span className="text-truncate" style={{ display: "inline-block", fontWeight: 500 }}>{item.title}</span></td>
                       <td className="td">
                         <StatusBadge status={item.status} />
                       </td>
                       <td className="td">
                         <RiskBadge risk={item.risk_level ?? null} />
                       </td>
-                      <td className="td text-foreground-muted">{categoryLabel(item.category)}</td>
-                      <td className="td text-foreground-muted">{item.reviewer_name ?? "—"}</td>
-                      <td className="td whitespace-nowrap text-foreground-muted">{fmtDateTime(item.updated_at)}</td>
+                      <td className="td text-muted">{categoryLabel(item.category)}</td>
+                      <td className="td text-muted">{item.reviewer_name ?? "—"}</td>
+                      <td className="td text-nowrap text-muted">{fmtDateTime(item.updated_at)}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -152,7 +160,7 @@ export default function ReviewerPage() {
           </Card>
         )}
 
-        <p className="mt-3 text-meta text-foreground-muted">
+        <p className="mt-3 text-meta text-muted mb-0">
           Ditampilkan {data?.items.length ?? 0} dari {data?.total ?? 0} perubahan.
         </p>
       </Page>

@@ -147,10 +147,10 @@ interface Review {
 }
 
 const FINDING_TONE: Record<string, string> = {
-  PASS: "bg-teal bg-opacity-15 text-teal-dark ring-1 ring-inset ring-teal/30",
-  WARN: "bg-gold bg-opacity-20 text-gold-dark ring-1 ring-inset ring-gold/30",
-  FAIL: "bg-coral bg-opacity-10 text-coral-dark ring-1 ring-inset ring-coral/30",
-  NOT_ASSESSED: "bg-cream text-text-muted ring-1 ring-inset ring-border",
+  PASS: "bg-success bg-opacity-10 text-success border border-success/25",
+  WARN: "bg-warning bg-opacity-20 text-warning border border-warning/30",
+  FAIL: "bg-danger bg-opacity-10 text-danger border border-danger/25",
+  NOT_ASSESSED: "bg-body-secondary text-muted border",
 };
 const FINDING_LABEL: Record<string, string> = {
   PASS: "Lolos",
@@ -159,11 +159,11 @@ const FINDING_LABEL: Record<string, string> = {
   NOT_ASSESSED: "Tidak dinilai",
 };
 const SEVERITY_TONE: Record<string, string> = {
-  CRITICAL: "bg-coral text-coral-dark",
-  HIGH: "bg-coral text-coral-dark",
-  MEDIUM: "bg-gold bg-opacity-20 text-gold-dark",
-  LOW: "bg-cream text-text-muted",
-  INFORMATIONAL: "bg-sky bg-opacity-15 text-sky",
+  CRITICAL: "bg-danger text-danger bg-opacity-10",
+  HIGH: "bg-danger text-danger bg-opacity-10",
+  MEDIUM: "bg-warning bg-opacity-20 text-warning",
+  LOW: "bg-body-secondary text-muted",
+  INFORMATIONAL: "bg-info bg-opacity-10 text-info",
 };
 const SEVERITY_LABEL: Record<string, string> = {
   CRITICAL: "Kritis",
@@ -176,22 +176,22 @@ const RECOMMENDATION: Record<string, { label: string; note: string; tone: string
   RECOMMEND_APPROVE: {
     label: "Rekomendasi: setujui",
     note: "Tidak ada temuan penghalang. Persetujuan manusia tetap wajib.",
-    tone: "bg-teal bg-opacity-15 text-teal-dark",
+    tone: "bg-success bg-opacity-10 text-success",
   },
   RECOMMEND_APPROVE_WITH_CONDITIONS: {
     label: "Rekomendasi: setujui dengan syarat",
     note: "Selesaikan syarat di bawah sebelum persetujuan manusia.",
-    tone: "bg-gold bg-opacity-20 text-gold-dark",
+    tone: "bg-warning bg-opacity-20 text-warning",
   },
   RECOMMEND_REJECT: {
     label: "Rekomendasi: tolak",
     note: "Terdapat risiko penghalang atau pelanggaran kebijakan.",
-    tone: "bg-coral bg-opacity-10 text-coral-dark",
+    tone: "bg-danger bg-opacity-10 text-danger",
   },
   UNABLE_TO_CONCLUDE: {
     label: "Tidak dapat menyimpulkan",
     note: "Konteks kurang atau berkas tidak terbaca. Tinjauan manusia diperlukan.",
-    tone: "bg-cream text-text-muted",
+    tone: "bg-body-secondary text-muted",
   },
 };
 
@@ -242,11 +242,11 @@ function ReviewPanel({
       actions={
         <>
           {result?.result_json?.provider_label && (
-            <span className="chip bg-sky text-sky ring-1 ring-inset ring-info/25">{result.result_json.provider_label}</span>
+            <span className="badge bg-info text-info">{result.result_json.provider_label}</span>
           )}
           <StatusBadge status={running ? "AI_REVIEW" : review.status === "FAILED" ? "REVIEW_FAILED" : "COMPLETED"} />
           {canRerun && (review.status === "FAILED" || !running) && (
-            <button type="button" onClick={onRerun} disabled={busy} className="btn-secondary btn-sm">
+            <button type="button" onClick={onRerun} disabled={busy} className="btn btn-secondary btn-sm">
               {review.status === "FAILED" ? "Jalankan ulang tinjauan" : "Tinjau ulang"}
             </button>
           )}
@@ -254,79 +254,81 @@ function ReviewPanel({
       }
     >
       {running ? (
-        <div className="flex items-center gap-3 text-sm text-text-muted" role="status">
-          <span className="h-4 w-4 animate-spin rounded-full border-2 border-border-strong border-t-brand" aria-hidden />
+        <div className="d-flex align-items-center gap-3 text-sm text-muted" role="status">
+          <span className="spinner-border spinner-border-sm" aria-hidden></span>
           Tinjauan sedang diproses oleh worker. Hasil muncul otomatis.
         </div>
       ) : review.status === "FAILED" ? (
-        <div role="alert" className="rounded-md bg-coral p-4 text-sm text-coral-dark">
+        <div role="alert" className="alert alert-danger alert-sm">
           {review.review_error || "Tinjauan AI gagal diproses. Silakan jalankan ulang."}
         </div>
       ) : !result ? (
-        <p className="text-sm text-text-muted">Belum ada hasil tinjauan.</p>
+        <p className="text-sm text-muted">Belum ada hasil tinjauan.</p>
       ) : (
-        <div className="space-y-5">
+        <div className="d-flex flex-column gap-4">
           {rec && (
-            <div className={`rounded-md p-4 ${rec.tone}`}>
-              <p className="text-sm font-bold">{rec.label}</p>
-              <p className="mt-0.5 text-sm opacity-90">{rec.note}</p>
+            <div className={`p-4 rounded ${rec.tone}`}>
+              <p className="small fw-bold mb-1">{rec.label}</p>
+              <p className="small mb-0 opacity-75">{rec.note}</p>
             </div>
           )}
 
-          <dl className="grid grid-cols-2 gap-3 text-sm md:grid-cols-4">
+          <dl className="row g-3 text-sm">
             {[
               ["Skor risiko", result.overall_risk_score != null ? `${result.overall_risk_score}/100` : "—"],
               ["Provider", review.provider ?? "—"],
               ["Model", review.model_name ?? "—"],
               ["Selesai", fmtDateTime(review.completed_at)],
             ].map(([k, v]) => (
-              <div key={k} className="rounded-md bg-cream p-3">
-                <dt className="text-meta text-text-muted">{k}</dt>
-                <dd className="mt-0.5 font-medium tabular-nums">{v}</dd>
+              <div key={k} className="col-6 col-md-3">
+                <div className="p-3 rounded bg-body-secondary">
+                  <dt className="text-muted small mb-0">{k}</dt>
+                  <dd className="mt-1 fw-semibold tabular-nums mb-0">{v}</dd>
+                </div>
               </div>
             ))}
           </dl>
 
-          <div className="flex flex-wrap gap-2">
+          <div className="d-flex flex-wrap gap-2">
             {(["FAIL", "WARN", "PASS", "NOT_ASSESSED"] as const)
               .filter((s) => counts[s])
               .map((s) => (
-                <span key={s} className={`chip ${FINDING_TONE[s]}`}>
+                <span key={s} className={`badge ${FINDING_TONE[s]}`}>
                   {counts[s]} {FINDING_LABEL[s]}
                 </span>
               ))}
           </div>
 
-          {result.summary && <p className="text-sm leading-relaxed text-text">{result.summary}</p>}
+          {result.summary && <p className="text-sm">{result.summary}</p>}
 
           <div>
-            <h3 className="mb-2 text-meta font-semibold uppercase tracking-wide text-text-muted">Temuan</h3>
+            <h3 className="text-muted small fw-bold text-uppercase mb-2">Temuan</h3>
             {findings.length === 0 ? (
-              <p className="text-sm text-text-muted">Tidak ada temuan. Ini bukan jaminan perubahan aman.</p>
+              <p className="text-sm text-muted">Tidak ada temuan. Ini bukan jaminan perubahan aman.</p>
             ) : (
-              <ul className="space-y-3">
+              <ul className="d-flex flex-column gap-3">
                 {findings.map((f) => (
-                  <li key={f.id} className="rounded-md border border-border p-4">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <span className={`chip ${FINDING_TONE[f.status] ?? FINDING_TONE.NOT_ASSESSED}`}>
+                  <li key={f.id} className="border rounded p-4">
+                    <div className="d-flex flex-wrap align-items-center gap-2">
+                      <span className={`badge ${FINDING_TONE[f.status] ?? FINDING_TONE.NOT_ASSESSED}`}>
                         {FINDING_LABEL[f.status] ?? f.status}
                       </span>
-                      <span className={`chip ${SEVERITY_TONE[f.severity] ?? SEVERITY_TONE.LOW}`}>
+                      <span className={`badge ${SEVERITY_TONE[f.severity] ?? SEVERITY_TONE.LOW}`}>
                         {SEVERITY_LABEL[f.severity] ?? f.severity}
                       </span>
-                      <span className="text-sm font-semibold text-text">{f.title}</span>
+                      <span className="text-sm fw-semibold text-body">{f.title}</span>
                       {f.human_validation_required && (
-                        <span className="chip bg-sky text-sky">perlu validasi manusia</span>
+                        <span className="badge bg-info text-info">perlu validasi manusia</span>
                       )}
                     </div>
-                    {f.description && <p className="mt-2 text-sm text-text">{f.description}</p>}
+                    {f.description && <p className="mt-2 text-sm text-body">{f.description}</p>}
                     {f.evidence.length > 0 ? (
-                      <ul className="mt-2 space-y-1.5">
+                      <ul className="mt-2 d-flex flex-column gap-1">
                         {f.evidence.map((e, i) => (
-                          <li key={i} className="text-meta text-text-muted">
-                            <span className="font-semibold text-text">Bukti:</span> {evidenceLabel(e)}
+                          <li key={i} className="text-muted small">
+                            <span className="fw-semibold text-body">Bukti:</span> {evidenceLabel(e)}
                             {e.snippet && (
-                              <code className="mt-1 block overflow-x-auto whitespace-pre-wrap break-all rounded-md bg-cream px-2.5 py-1.5 font-mono text-[12px] text-text">
+                              <code className="d-block mt-1 overflow-x-auto text-break rounded bg-body-secondary px-2.5 py-1.5 fw-mono" style={{ fontSize: "12px" }}>
                                 {e.snippet}
                               </code>
                             )}
@@ -334,10 +336,10 @@ function ReviewPanel({
                         ))}
                       </ul>
                     ) : (
-                      <p className="mt-2 text-meta italic text-gold-dark">Tanpa bukti rujukan — verifikasi manual.</p>
+                      <p className="mt-2 text-muted small fst-italic text-warning">Tanpa bukti rujukan — verifikasi manual.</p>
                     )}
                     {f.remediation && (
-                      <p className="mt-2 rounded-md bg-gold px-2.5 py-1.5 text-meta text-gold-dark">
+                      <p className="mt-2 rounded bg-warning bg-opacity-25 px-2.5 py-1.5 text-muted small text-warning">
                         Saran: {f.remediation}
                       </p>
                     )}
@@ -348,68 +350,68 @@ function ReviewPanel({
           </div>
 
           {result.limitations.length > 0 && (
-            <div className="rounded-md bg-cream p-3">
-              <h3 className="text-meta font-semibold uppercase tracking-wide text-text-muted">Keterbatasan</h3>
-              <ul className="mt-1 list-disc space-y-0.5 pl-4 text-meta text-text-muted">
+            <div className="p-3 rounded bg-body-secondary">
+              <h3 className="text-muted small fw-bold text-uppercase mb-1">Keterbatasan</h3>
+              <ul className="mt-1 list-unstyled mb-0 text-muted small">
                 {result.limitations.map((l) => (
-                  <li key={l}>{l}</li>
+                  <li key={l}>• {l}</li>
                 ))}
               </ul>
             </div>
           )}
 
-          <p className="text-meta text-text-muted">
+          <p className="text-muted small">
             Prompt {review.prompt_version ?? "—"} · Ruleset {review.ruleset_version ?? "—"}. Skor tinggi tidak menjamin
             perubahan aman.
           </p>
 
           {result.decision ? (
-            <div className="rounded-md bg-cream p-4 text-sm">
-              <p className="font-semibold text-text">
+            <div className="p-4 rounded bg-body-secondary text-sm">
+              <p className="fw-semibold text-body mb-1">
                 Keputusan reviewer: {result.decision === "ACCEPT" ? "Hasil tinjauan diterima" : "Dikembalikan untuk perbaikan"}
               </p>
-              <p className="mt-1 text-text-muted">
+              <p className="text-muted small mb-1">
                 {result.decided_by ?? "—"} · {fmtDateTime(result.decided_at)}
               </p>
               {result.decision_comment && (
-                <p className="mt-2 text-text">“{result.decision_comment}”</p>
+                <p className="text-body mt-2">"{result.decision_comment}"</p>
               )}
             </div>
           ) : showDecision ? (
-            <div className="rounded-md border border-border p-4">
-              <h3 className="text-sm font-semibold text-text">Keputusan reviewer</h3>
-              <p className="mt-1 text-meta text-text-muted">
+            <div className="border rounded p-4">
+              <h3 className="text-sm fw-semibold text-body">Keputusan reviewer</h3>
+              <p className="text-muted small mt-1">
                 Periksa bukti tiap temuan. Menerima hasil tinjauan meneruskan CRF ke persetujuan; mengembalikannya membuat
                 pemohon memperbaiki dokumen lalu mengirim ulang. Alasan keputusan wajib diisi dan tercatat di audit.
               </p>
               {blockers > 0 && (
-                <p className="mt-2 rounded-md bg-gold px-2.5 py-1.5 text-meta text-gold-dark">
+                <p className="mt-2 rounded bg-warning bg-opacity-25 px-2.5 py-1.5 text-warning small">
                   {blockers} temuan risiko tinggi/kritis masih terbuka. Anda tetap boleh menerima bila setelah tinjauan
                   manual risikonya dapat diterima — sebutkan alasannya. Temuan AI tidak berubah; persetujuan tetap lewat alur
                   approval.
                 </p>
               )}
               <div className="mt-3">
-                <label htmlFor="review-comment" className="label">
-                  Alasan / catatan keputusan <span className="text-coral-dark">*</span>
+                <label htmlFor="review-comment" className="form-label">
+                  Alasan / catatan keputusan <span className="text-danger">*</span>
                 </label>
                 <textarea
                   id="review-comment"
                   rows={3}
                   value={comment}
                   onChange={(e) => setComment(e.target.value)}
-                  className="field h-auto py-2"
+                  className="form-control"
                   placeholder="mis. Risiko diterima karena perubahan dijadwalkan di luar jam sibuk dan rollback sudah diuji."
                 />
               </div>
               {deciding ? (
-                <div className="mt-3 rounded-md bg-cream p-3" role="alertdialog" aria-label="Konfirmasi keputusan">
-                  <p className="text-sm text-text">
+                <div className="mt-3 rounded bg-body-secondary p-3" role="alertdialog" aria-label="Konfirmasi keputusan">
+                  <p className="text-sm text-body">
                     {deciding === "ACCEPT"
                       ? "Terima hasil tinjauan ini? CRF diteruskan ke persetujuan dan keputusan tercatat di audit."
                       : "Kembalikan CRF untuk perbaikan? Pemohon harus memperbaiki dokumen dan mengirim ulang."}
                   </p>
-                  <div className="mt-2 flex flex-wrap gap-2">
+                  <div className="mt-2 d-flex flex-wrap gap-2">
                     <button
                       type="button"
                       disabled={busy || !comment.trim()}
@@ -418,23 +420,23 @@ function ReviewPanel({
                         setDeciding(null);
                         setComment("");
                       }}
-                      className={deciding === "ACCEPT" ? "btn-primary btn-sm" : "btn-danger btn-sm"}
+                      className={deciding === "ACCEPT" ? "btn btn-primary btn-sm" : "btn btn-danger btn-sm"}
                     >
                       {busy ? "Menyimpan…" : deciding === "ACCEPT" ? "Ya, terima" : "Ya, kembalikan"}
                     </button>
-                    <button type="button" onClick={() => setDeciding(null)} className="btn-ghost btn-sm">
+                    <button type="button" onClick={() => setDeciding(null)} className="btn btn-link btn-sm text-decoration-none">
                       Batal
                     </button>
                   </div>
                 </div>
               ) : (
-                <div className="mt-3 flex flex-wrap gap-3">
+                <div className="mt-3 d-flex flex-wrap gap-3">
                   <button
                     type="button"
                     disabled={busy || !comment.trim()}
                     title={!comment.trim() ? "Isi alasan keputusan terlebih dahulu" : undefined}
                     onClick={() => setDeciding("ACCEPT")}
-                    className="btn-primary"
+                    className="btn btn-primary"
                   >
                     Terima hasil tinjauan
                   </button>
@@ -443,7 +445,7 @@ function ReviewPanel({
                     disabled={busy || !comment.trim()}
                     title={!comment.trim() ? "Isi alasan keputusan terlebih dahulu" : undefined}
                     onClick={() => setDeciding("RETURN_FOR_REVISION")}
-                    className="btn-secondary"
+                    className="btn btn-secondary"
                   >
                     Kembalikan ke pemohon
                   </button>
@@ -495,10 +497,10 @@ const DOC_TYPE_LABEL: Record<string, string> = {
 const UPLOADABLE_STATUSES = ["DRAFT", "SUBMITTED", "DOCUMENT_VALIDATION", "AI_REVIEW", "REVISION_REQUIRED"];
 const MAX_UPLOAD_BYTES = 50 * 1024 * 1024;
 const EXTRACT_TONE: Record<string, string> = {
-  COMPLETED: "bg-teal text-teal-dark ring-1 ring-inset ring-success/25",
-  PENDING: "bg-gold text-gold-dark ring-1 ring-inset ring-warning/25",
-  FAILED: "bg-coral text-coral-dark ring-1 ring-inset ring-danger/25",
-  ERROR: "bg-coral text-coral-dark ring-1 ring-inset ring-danger/25",
+  COMPLETED: "bg-success text-success border border-success/25",
+  PENDING: "bg-warning text-warning border border-warning/25",
+  FAILED: "bg-danger text-danger border border-danger/25",
+  ERROR: "bg-danger text-danger border border-danger/25",
 };
 const EXTRACT_LABEL: Record<string, string> = {
   COMPLETED: "Terbaca AI",
@@ -587,39 +589,39 @@ function DocumentsPanel({
     <Card
       title="Dokumen"
       description="Berkas diperlakukan sebagai input tidak tepercaya; rahasia disamarkan sebelum dikirim ke AI."
-      actions={unreadable > 0 ? <span className="chip bg-coral text-coral-dark">{unreadable} gagal dibaca AI</span> : undefined}
+      actions={unreadable > 0 ? <span className="badge bg-danger text-danger">{unreadable} gagal dibaca AI</span> : undefined}
     >
       {documents.length === 0 ? (
-        <p className="text-sm text-text-muted">Belum ada dokumen.</p>
+        <p className="text-sm text-muted">Belum ada dokumen.</p>
       ) : (
-        <div className="-mx-5 mb-4 overflow-x-auto md:-mx-6">
-          <table className="w-full min-w-[720px]">
-            <thead className="border-b border-border bg-cream">
+        <div className="table-responsive">
+          <table className="table table-sm table-striped mb-0">
+            <thead className="border-bottom bg-body-secondary">
               <tr>
-                <th className="th">Nama</th>
-                <th className="th">Jenis</th>
-                <th className="th">Versi</th>
-                <th className="th">Ukuran</th>
-                <th className="th">Ekstraksi</th>
-                <th className="th">SHA-256</th>
-                <th className="th">Aksi</th>
+                <th className="text-nowrap">Nama</th>
+                <th className="text-nowrap">Jenis</th>
+                <th className="text-nowrap">Versi</th>
+                <th className="text-nowrap">Ukuran</th>
+                <th className="text-nowrap">Ekstraksi</th>
+                <th className="text-nowrap">SHA-256</th>
+                <th className="text-nowrap">Aksi</th>
               </tr>
             </thead>
             <tbody>
               {documents.map((d) => (
-                <tr key={d.id} className="border-b border-border last:border-0">
-                  <td className="td font-medium">{d.original_filename}</td>
-                  <td className="td text-text-muted">{d.document_type ? (DOC_TYPE_LABEL[d.document_type] ?? d.document_type) : "—"}</td>
-                  <td className="td font-mono">v{d.version_number}</td>
-                  <td className="td text-text-muted">{humanSize(d.size_bytes)}</td>
-                  <td className="td">
-                    <span className={`chip ${EXTRACT_TONE[d.extraction_status ?? ""] ?? "bg-cream text-text-muted"}`}>
+                <tr key={d.id} className="border-bottom last:border-0">
+                  <td className="text-nowrap fw-medium text-truncate" style={{ maxWidth: "200px" }}>{d.original_filename}</td>
+                  <td className="text-nowrap text-muted">{d.document_type ? (DOC_TYPE_LABEL[d.document_type] ?? d.document_type) : "—"}</td>
+                  <td className="text-nowrap fw-mono">v{d.version_number}</td>
+                  <td className="text-nowrap text-muted">{humanSize(d.size_bytes)}</td>
+                  <td className="text-nowrap">
+                    <span className={`badge ${EXTRACT_TONE[d.extraction_status ?? ""] ?? "bg-body-secondary text-muted"}`}>
                       {EXTRACT_LABEL[d.extraction_status ?? ""] ?? d.extraction_status ?? "—"}
                     </span>
                   </td>
-                  <td className="td font-mono text-meta text-text-muted">{d.sha256.slice(0, 12)}</td>
-                  <td className="td">
-                    <button onClick={() => void openDocument(changeId, d.id)} className="btn-ghost btn-sm">
+                  <td className="text-nowrap fw-mono text-muted small">{d.sha256.slice(0, 12)}</td>
+                  <td className="text-nowrap">
+                    <button onClick={() => void openDocument(changeId, d.id)} className="btn btn-link btn-sm text-decoration-none px-0">
                       Lihat / unduh
                     </button>
                   </td>
@@ -630,29 +632,29 @@ function DocumentsPanel({
         </div>
       )}
 
-      <details className="mb-4 rounded-md bg-cream p-3 text-meta text-text-muted">
-        <summary className="cursor-pointer font-semibold text-text">Format dokumen yang bisa dibaca AI</summary>
-        <ul className="mt-2 list-disc space-y-1 pl-4">
-          <li>PDF berbasis teks, DOCX, XLSX, TXT, CFG, YAML, JSON — diekstrak jadi teks lalu dibaca AI.</li>
-          <li>
-            PNG/JPG dan PDF hasil scan <span className="font-semibold text-text">tidak terbaca</span> (belum ada
-            OCR) — AI menandainya “Tidak dinilai”.
+      <details className="mb-3 rounded bg-body-secondary p-3 text-muted small">
+        <summary className="cursor-pointer fw-semibold text-body">Format dokumen yang bisa dibaca AI</summary>
+        <ul className="mt-2 list-unstyled mb-0">
+          <li className="mb-1">PDF berbasis teks, DOCX, XLSX, TXT, CFG, YAML, JSON — diekstrak jadi teks lalu dibaca AI.</li>
+          <li className="mb-1">
+            PNG/JPG dan PDF hasil scan <span className="fw-semibold text-body">tidak terbaca</span> (belum ada
+            OCR) — AI menandai "Tidak dinilai".
           </li>
-          <li>Simpan sebagai PDF hasil ekspor, bukan scan/foto.</li>
-          <li>Sertakan minimum: MOP, konfigurasi sebelum (BEFORE_CONFIG), konfigurasi yang diajukan (AFTER_CONFIG).</li>
-          <li>CRF: formulir permohonan perubahan (Word/PDF) yang memuat ringkasan, dampak, jadwal, dan tanda tangan persetujuan awal.</li>
-          <li>MOP sebaiknya memuat: tujuan, langkah eksekusi berurutan, verifikasi per langkah, estimasi durasi, rollback, kontak eskalasi.</li>
+          <li className="mb-1">Simpan sebagai PDF hasil ekspor, bukan scan/foto.</li>
+          <li className="mb-1">Sertakan minimum: MOP, konfigurasi sebelum (BEFORE_CONFIG), konfigurasi yang diajukan (AFTER_CONFIG).</li>
+          <li className="mb-1">CRF: formulir permohonan perubahan (Word/PDF) yang memuat ringkasan, dampak, jadwal, dan tanda tangan persetujuan awal.</li>
+          <li className="mb-1">MOP sebaiknya memuat: tujuan, langkah eksekusi berurutan, verifikasi per langkah, estimasi durasi, rollback, kontak eskalasi.</li>
           <li>Password/community/API key boleh ada — otomatis disamarkan ([REDACTED]) sebelum dikirim ke AI.</li>
         </ul>
       </details>
 
       {canUpload ? (
-        <div className="flex flex-wrap items-end gap-3 border-t border-border pt-4">
-          <div>
-            <label htmlFor="doc-type" className="label">
+        <div className="d-flex flex-wrap align-items-end gap-3 border-top pt-3">
+          <div className="flex-grow-1">
+            <label htmlFor="doc-type" className="form-label">
               Jenis dokumen
             </label>
-            <select id="doc-type" value={docType} onChange={(e) => setDocType(e.target.value)} className="field">
+            <select id="doc-type" value={docType} onChange={(e) => setDocType(e.target.value)} className="form-select">
               {DOC_TYPES.map((t) => (
                 <option key={t} value={t}>
                   {DOC_TYPE_LABEL[t] ?? t}
@@ -660,29 +662,29 @@ function DocumentsPanel({
               ))}
             </select>
           </div>
-          <div className="min-w-[240px] flex-1">
-            <label htmlFor="doc-file" className="label">
-              Berkas <span className="text-text-muted">(PDF, DOCX, XLSX, TXT, CFG, YAML, JSON · maks 50 MB)</span>
+          <div className="flex-grow-1" style={{ minWidth: "240px" }}>
+            <label htmlFor="doc-file" className="form-label">
+              Berkas <span className="text-muted">(PDF, DOCX, XLSX, TXT, CFG, YAML, JSON · maks 50 MB)</span>
             </label>
             <input
               id="doc-file"
               type="file"
               accept=".pdf,.docx,.xlsx,.txt,.cfg,.yaml,.yml,.json"
               onChange={(e) => setFile(e.target.files?.[0] ?? null)}
-              className="block w-full text-sm text-text-muted file:mr-3 file:h-control file:cursor-pointer file:rounded-md file:border-0 file:bg-cream file:px-3 file:text-sm file:font-medium file:text-text"
+              className="form-control text-sm text-muted"
             />
           </div>
-          <button disabled={busy || !file} onClick={upload} className="btn-primary">
+          <button disabled={busy || !file} onClick={upload} className="btn btn-primary">
             {busy ? "Mengunggah…" : "Unggah"}
           </button>
           {message && (
-            <p className={`text-sm ${isError ? "text-coral-dark" : "text-teal-dark"}`} role={isError ? "alert" : "status"}>
+            <p className={`small mb-0 ${isError ? "text-danger" : "text-success"}`} role={isError ? "alert" : "status"}>
               {message}
             </p>
           )}
         </div>
       ) : (
-        <p className="border-t border-border pt-4 text-meta text-text-muted">
+        <p className="border-top pt-3 text-muted small">
           Unggahan hanya dapat dilakukan sebelum perubahan disetujui (status saat ini: {statusLabel(status)}).
         </p>
       )}
@@ -727,53 +729,61 @@ function ImplementationPanel({
   return (
     <Card title="Implementasi & tinjauan pasca-implementasi" description="Catat eksekusi aktual, hasil, dan bukti validasi">
       {record && (
-        <dl className="mb-4 grid grid-cols-1 gap-3 text-sm md:grid-cols-3">
-          <div className="rounded-md bg-cream p-3">
-            <dt className="text-meta text-text-muted">Mulai aktual</dt>
-            <dd className="mt-0.5 font-medium">{fmtDateTime(record.actual_start)}</dd>
+        <dl className="mb-3 row g-3 text-sm">
+          <div className="col-md-4">
+            <div className="p-3 rounded bg-body-secondary">
+              <dt className="text-muted small mb-0">Mulai aktual</dt>
+              <dd className="mt-1 fw-semibold mb-0">{fmtDateTime(record.actual_start)}</dd>
+            </div>
           </div>
-          <div className="rounded-md bg-cream p-3">
-            <dt className="text-meta text-text-muted">Selesai aktual</dt>
-            <dd className="mt-0.5 font-medium">{fmtDateTime(record.actual_end)}</dd>
+          <div className="col-md-4">
+            <div className="p-3 rounded bg-body-secondary">
+              <dt className="text-muted small mb-0">Selesai aktual</dt>
+              <dd className="mt-1 fw-semibold mb-0">{fmtDateTime(record.actual_end)}</dd>
+            </div>
           </div>
-          <div className="rounded-md bg-cream p-3">
-            <dt className="text-meta text-text-muted">Hasil</dt>
-            <dd className="mt-0.5 font-medium">
-              {record.outcome ? (OUTCOME_LABEL[record.outcome] ?? record.outcome) : "—"}
-            </dd>
+          <div className="col-md-4">
+            <div className="p-3 rounded bg-body-secondary">
+              <dt className="text-muted small mb-0">Hasil</dt>
+              <dd className="mt-1 fw-semibold mb-0">
+                {record.outcome ? (OUTCOME_LABEL[record.outcome] ?? record.outcome) : "—"}
+              </dd>
+            </div>
           </div>
           {record.rollback_performed && (
-            <p className="rounded-md bg-gold p-3 text-sm text-gold-dark md:col-span-3">
-              Rollback tercatat untuk perubahan ini.
-            </p>
+            <div className="col-12">
+              <p className="rounded bg-warning bg-opacity-25 p-3 text-sm text-warning mb-0">
+                Rollback tercatat untuk perubahan ini.
+              </p>
+            </div>
           )}
           {Boolean(record.postcheck?.pir_notes) && (
-            <div className="md:col-span-3">
-              <dt className="text-meta text-text-muted">Catatan PIR</dt>
-              <dd className="whitespace-pre-wrap">{String(record.postcheck?.pir_notes)}</dd>
+            <div className="col-md-12">
+              <dt className="text-muted small mb-0">Catatan PIR</dt>
+              <dd className="text-break mb-0">{String(record.postcheck?.pir_notes)}</dd>
             </div>
           )}
         </dl>
       )}
 
       {canSchedule && (
-        <div className="flex flex-wrap items-end gap-3 border-t border-border pt-4">
-          <div>
-            <label htmlFor="sched-start" className="label">
+        <div className="d-flex flex-wrap align-items-end gap-3 border-top pt-3">
+          <div className="flex-grow-1">
+            <label htmlFor="sched-start" className="form-label">
               Mulai (WIB)
             </label>
-            <input id="sched-start" type="datetime-local" value={start} onChange={(e) => setStart(e.target.value)} className="field" />
+            <input id="sched-start" type="datetime-local" value={start} onChange={(e) => setStart(e.target.value)} className="form-control" />
           </div>
-          <div>
-            <label htmlFor="sched-end" className="label">
+          <div className="flex-grow-1">
+            <label htmlFor="sched-end" className="form-label">
               Selesai (WIB)
             </label>
-            <input id="sched-end" type="datetime-local" value={end} onChange={(e) => setEnd(e.target.value)} className="field" />
+            <input id="sched-end" type="datetime-local" value={end} onChange={(e) => setEnd(e.target.value)} className="form-control" />
           </div>
           <button
             disabled={busy || !start || !end}
             onClick={() => onAct("schedule", { start: `${start}:00+07:00`, end: `${end}:00+07:00`, reason: "penjadwalan" }, "Jadwalkan")}
-            className="btn-primary"
+            className="btn btn-primary"
           >
             Jadwalkan
           </button>
@@ -781,11 +791,11 @@ function ImplementationPanel({
       )}
 
       {canStart && (
-        <div className="border-t border-border pt-4">
+        <div className="border-top pt-3">
           <button
             disabled={busy}
             onClick={() => onAct("implementation/start", {}, "Mulai implementasi")}
-            className="btn-primary"
+            className="btn btn-primary"
           >
             Mulai implementasi
           </button>
@@ -793,35 +803,35 @@ function ImplementationPanel({
       )}
 
       {canOutcome && (
-        <div className="space-y-3 border-t border-border pt-4">
-          <div className="flex flex-wrap items-end gap-3">
+        <div className="d-flex flex-column gap-3 border-top pt-3">
+          <div className="d-flex flex-wrap align-items-end gap-3">
             <div>
-              <label htmlFor="outcome" className="label">
+              <label htmlFor="outcome" className="form-label">
                 Hasil
               </label>
-              <select id="outcome" value={outcome} onChange={(e) => setOutcome(e.target.value)} className="field">
+              <select id="outcome" value={outcome} onChange={(e) => setOutcome(e.target.value)} className="form-select">
                 <option value="SUCCESSFUL">Sukses</option>
                 <option value="SUCCESSFUL_WITH_DEVIATION">Sukses dengan deviasi</option>
                 <option value="FAILED">Gagal</option>
                 <option value="ROLLED_BACK">Rollback</option>
               </select>
             </div>
-            <div className="min-w-[240px] flex-1">
-              <label htmlFor="exec-notes" className="label">
+            <div className="flex-grow-1" style={{ minWidth: "240px" }}>
+              <label htmlFor="exec-notes" className="form-label">
                 Catatan eksekusi
               </label>
-              <input id="exec-notes" value={notes} onChange={(e) => setNotes(e.target.value)} className="field" placeholder="Apa yang terjadi saat eksekusi" />
+              <input id="exec-notes" value={notes} onChange={(e) => setNotes(e.target.value)} className="form-control" placeholder="Apa yang terjadi saat eksekusi" />
             </div>
-            <label className="flex h-control items-center gap-2 text-sm">
-              <input type="checkbox" checked={postOk} onChange={(e) => setPostOk(e.target.checked)} className="h-4 w-4 rounded border-border-strong" />
-              Post-check lulus
-            </label>
+            <div className="d-flex align-items-center gap-2">
+              <input type="checkbox" checked={postOk} onChange={(e) => setPostOk(e.target.checked)} className="form-check-input" id="postcheck-ok" />
+              <label htmlFor="postcheck-ok" className="text-sm mb-0">Post-check lulus</label>
+            </div>
           </div>
           <div>
-            <label htmlFor="evidence" className="label">
+            <label htmlFor="evidence" className="form-label">
               Bukti validasi layanan
             </label>
-            <input id="evidence" value={evidence} onChange={(e) => setEvidence(e.target.value)} className="field" placeholder="mis. monitoring hijau, ping 0% loss" />
+            <input id="evidence" value={evidence} onChange={(e) => setEvidence(e.target.value)} className="form-control" placeholder="mis. monitoring hijau, ping 0% loss" />
           </div>
           <button
             disabled={busy}
@@ -832,7 +842,7 @@ function ImplementationPanel({
                 "Catat hasil",
               )
             }
-            className="btn-primary"
+            className="btn btn-primary"
           >
             Catat hasil
           </button>
@@ -840,36 +850,36 @@ function ImplementationPanel({
       )}
 
       {canPir && (
-        <div className="space-y-3 border-t border-border pt-4">
+        <div className="d-flex flex-column gap-3 border-top pt-3">
           <div>
-            <label htmlFor="pir" className="label">
-              Catatan PIR <span className="text-coral-dark">*</span>
+            <label htmlFor="pir" className="form-label">
+              Catatan PIR <span className="text-danger">*</span>
             </label>
             <textarea
               id="pir"
               value={pirNotes}
               onChange={(e) => setPirNotes(e.target.value)}
               rows={3}
-              className="field h-auto py-2"
+              className="form-control"
               placeholder="Hasil validasi layanan setelah perubahan"
             />
           </div>
-          <div className="flex flex-wrap items-center gap-3">
+          <div className="d-flex flex-wrap align-items-center gap-3">
             <button
               disabled={busy || !pirNotes.trim() || !postOk}
               onClick={() => onAct("implementation/pir", { notes: pirNotes, post_check_passed: postOk }, "Simpan PIR")}
-              className="btn-primary"
+              className="btn btn-primary"
             >
               Simpan PIR & selesaikan
             </button>
-            {!postOk && <p className="text-sm text-coral-dark">Post-check gagal: tandai rollback, bukan selesai.</p>}
+            {!postOk && <p className="small text-danger mb-0">Post-check gagal: tandai rollback, bukan selesai.</p>}
           </div>
         </div>
       )}
 
       {canClose && (
-        <div className="border-t border-border pt-4">
-          <button disabled={busy} onClick={() => onAct("implementation/close", {}, "Tutup perubahan")} className="btn-secondary">
+        <div className="border-top pt-3">
+          <button disabled={busy} onClick={() => onAct("implementation/close", {}, "Tutup perubahan")} className="btn btn-secondary">
             Tutup perubahan
           </button>
         </div>
@@ -1134,7 +1144,7 @@ export default function ChangeDetailPage() {
         back={{ href: "/changes", label: "Permohonan Perubahan" }}
         breadcrumb={
           <span>
-            <span className="font-mono">{change.change_number}</span> · Revisi {change.current_revision_number ?? "—"} ·
+            <span className="fw-mono">{change.change_number}</span> · Revisi {change.current_revision_number ?? "—"} ·
             Pemohon {change.requester_name ?? "—"}
           </span>
         }
@@ -1156,32 +1166,33 @@ export default function ChangeDetailPage() {
           </Notice>
         )}
 
-        <div className="space-y-6">
+        <div className="d-flex flex-column gap-4">
           {(canSubmit || canReopen || cancellable) && (
             <Card title="Aksi" description="Setiap aksi dicatat di jejak audit">
-              <div className="flex flex-wrap items-end gap-3">
+              <div className="d-flex flex-wrap align-items-end gap-3">
                 {canSubmit && (
-                  <button disabled={busy} onClick={() => act("submit", undefined, "Ajukan untuk review")} className="btn-primary">
+                  <button disabled={busy} onClick={() => act("submit", undefined, "Ajukan untuk review")} className="btn btn-primary">
                     Ajukan untuk review
                   </button>
                 )}
                 {canEdit && (
-                  <button disabled={busy} onClick={() => openEdit()} className="btn-secondary">
+                  <button disabled={busy} onClick={() => openEdit()} className="btn btn-secondary">
                     Edit CRF
                   </button>
                 )}
                 {cancellable && (
                   <>
                     <div>
-                      <label htmlFor="cancel-reason" className="label">
-                        Alasan pembatalan <span className="text-coral-dark">*</span>
+                      <label htmlFor="cancel-reason" className="form-label">
+                        Alasan pembatalan <span className="text-danger">*</span>
                       </label>
                       <input
                         id="cancel-reason"
                         value={reason}
                         onChange={(e) => setReason(e.target.value)}
                         placeholder="Wajib diisi"
-                        className="field w-72"
+                        className="form-control"
+                        style={{ maxWidth: "300px" }}
                       />
                     </div>
                     <button
@@ -1191,7 +1202,7 @@ export default function ChangeDetailPage() {
                           void act("cancel", { reason }, "Batalkan");
                         }
                       }}
-                      className="btn-danger"
+                      className="btn btn-danger"
                     >
                       Batalkan perubahan
                     </button>
@@ -1203,20 +1214,20 @@ export default function ChangeDetailPage() {
 
           {gate && !TERMINAL_STATUSES.includes(change.status) && (
             <div
-              className={`rounded-card border p-5 ${
-                gate.ready ? "border-success bg-teal" : "border-warning bg-gold"
+              className={`p-4 rounded border ${
+                gate.ready ? "border-success bg-success bg-opacity-10" : "border-warning bg-warning bg-opacity-25"
               }`}
               aria-live="polite"
             >
-              <p className={`text-card-title ${gate.ready ? "text-teal-dark" : "text-gold-dark"}`}>
+              <p className={`${gate.ready ? "text-success" : "text-warning"} fw-bold`}>
                 {gate.ready ? "● Siap dieksekusi" : "◑ Belum siap dieksekusi"}
               </p>
               {gate.ready ? (
-                <p className="mt-1 text-sm text-text">Semua prasyarat terpenuhi. Eksekusi tetap dilakukan manusia.</p>
+                <p className="small text-body mt-1 mb-0">Semua prasyarat terpenuhi. Eksekusi tetap dilakukan manusia.</p>
               ) : (
-                <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-text">
+                <ul className="mt-2 list-unstyled mb-0 text-sm text-body">
                   {gate.blocking_reasons.map((r) => (
-                    <li key={r}>{gateReasonText(r)}</li>
+                    <li key={r}>• {gateReasonText(r)}</li>
                   ))}
                 </ul>
               )}
@@ -1237,12 +1248,12 @@ export default function ChangeDetailPage() {
               title="Tinjauan AI"
               description="Belum ada tinjauan untuk revisi ini."
               actions={
-                <button type="button" onClick={() => void rerunReview()} disabled={busy} className="btn-primary btn-sm">
+                <button type="button" onClick={() => void rerunReview()} disabled={busy} className="btn btn-primary btn-sm">
                   Jalankan tinjauan AI
                 </button>
               }
             >
-              <p className="text-sm text-text-muted">
+              <p className="text-sm text-muted">
                 AI akan membaca dokumen revisi ini dan memberi rekomendasi beserta bukti. AI tidak menyetujui.
               </p>
             </Card>
@@ -1252,175 +1263,181 @@ export default function ChangeDetailPage() {
 
           <DocumentsPanel changeId={change.id} status={change.status} documents={documents} onUploaded={load} />
 
-          <div className="grid grid-cols-1 gap-6 lg:grid-cols-5">
+          <div className="row g-4">
             {editing && editDraft ? (
-              <Card title="Edit CRF" description="Isi perubahan pada field yang perlu direvisi" className="lg:col-span-3">
-                <div className="space-y-4">
-                  <div>
-                    <label htmlFor="edit-title" className="label">
-                      Judul <span className="text-coral-dark">*</span>
-                    </label>
-                    <input id="edit-title" value={String(editDraft.title ?? "")} onChange={(e) => setEditDraft({ ...editDraft, title: e.target.value })} className="field" />
-                  </div>
-                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <div className="col-md-7">
+                <Card title="Edit CRF" description="Isi perubahan pada field yang perlu direvisi">
+                  <div className="d-flex flex-column gap-3">
                     <div>
-                      <label htmlFor="edit-category" className="label">Kategori</label>
-                      <select id="edit-category" value={String(editDraft.category ?? "")} onChange={(e) => setEditDraft({ ...editDraft, category: e.target.value })} className="field">
-                        {Object.keys(CATEGORY).map((c) => (
-                          <option key={c} value={c}>{categoryLabel(c)}</option>
-                        ))}
-                      </select>
+                      <label htmlFor="edit-title" className="form-label">
+                        Judul <span className="text-danger">*</span>
+                      </label>
+                      <input id="edit-title" value={String(editDraft.title ?? "")} onChange={(e) => setEditDraft({ ...editDraft, title: e.target.value })} className="form-control" />
+                    </div>
+                    <div className="row g-3">
+                      <div className="col-md-6">
+                        <label htmlFor="edit-category" className="form-label">Kategori</label>
+                        <select id="edit-category" value={String(editDraft.category ?? "")} onChange={(e) => setEditDraft({ ...editDraft, category: e.target.value })} className="form-select">
+                          {Object.keys(CATEGORY).map((c) => (
+                            <option key={c} value={c}>{categoryLabel(c)}</option>
+                          ))}
+                        </select>
+                      </div>
+                      <div className="col-md-6">
+                        <label htmlFor="edit-type" className="form-label">Tipe perubahan</label>
+                        <select id="edit-type" value={String(editDraft.change_type ?? "")} onChange={(e) => setEditDraft({ ...editDraft, change_type: e.target.value })} className="form-select">
+                          {Object.keys(CHANGE_TYPE).map((t) => (
+                            <option key={t} value={t}>{changeTypeLabel(t)}</option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+                    <div className="row g-3">
+                      <div className="col-md-6">
+                        <label htmlFor="edit-env" className="form-label">Lingkungan</label>
+                        <select id="edit-env" value={String(editDraft.environment ?? "")} onChange={(e) => setEditDraft({ ...editDraft, environment: e.target.value })} className="form-select">
+                          {Object.keys(ENVIRONMENT).map((e) => (
+                            <option key={e} value={e}>{environmentLabel(e)}</option>
+                          ))}
+                        </select>
+                      </div>
                     </div>
                     <div>
-                      <label htmlFor="edit-type" className="label">Tipe perubahan</label>
-                      <select id="edit-type" value={String(editDraft.change_type ?? "")} onChange={(e) => setEditDraft({ ...editDraft, change_type: e.target.value })} className="field">
-                        {Object.keys(CHANGE_TYPE).map((t) => (
-                          <option key={t} value={t}>{changeTypeLabel(t)}</option>
-                        ))}
-                      </select>
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                    <div>
-                      <label htmlFor="edit-env" className="label">Lingkungan</label>
-                      <select id="edit-env" value={String(editDraft.environment ?? "")} onChange={(e) => setEditDraft({ ...editDraft, environment: e.target.value })} className="field">
-                        {Object.keys(ENVIRONMENT).map((e) => (
-                          <option key={e} value={e}>{environmentLabel(e)}</option>
-                        ))}
-                      </select>
-                    </div>
-                  </div>
-                  <div>
-                    <label htmlFor="edit-description" className="label">Deskripsi</label>
-                    <textarea id="edit-description" rows={3} value={String(editDraft.description ?? "")} onChange={(e) => setEditDraft({ ...editDraft, description: e.target.value })} className="field h-auto py-2" />
-                  </div>
-                  <div>
-                    <label htmlFor="edit-justification" className="label">Justifikasi bisnis</label>
-                    <textarea id="edit-justification" rows={3} value={String(editDraft.business_justification ?? "")} onChange={(e) => setEditDraft({ ...editDraft, business_justification: e.target.value })} className="field h-auto py-2" placeholder="Mengapa perubahan ini dibutuhkan." />
-                  </div>
-                  <div>
-                    <label htmlFor="edit-impact" className="label">Dampak</label>
-                    <textarea id="edit-impact" rows={2} value={String(editDraft.impact_description ?? "")} onChange={(e) => setEditDraft({ ...editDraft, impact_description: e.target.value })} className="field h-auto py-2" placeholder="Layanan, pengguna, atau jendela operasi yang terdampak." />
-                  </div>
-                  <div>
-                    <label htmlFor="edit-implementation" className="label">Rencana implementasi <span className="text-coral-dark">*</span></label>
-                    <textarea id="edit-implementation" rows={4} value={String(editDraft.implementation_plan ?? "")} onChange={(e) => setEditDraft({ ...editDraft, implementation_plan: e.target.value })} className="field h-auto py-2" placeholder="Langkah eksekusi berurutan. Jangan sertakan kredensial." />
-                  </div>
-                  <div>
-                    <label htmlFor="edit-test" className="label">Rencana uji</label>
-                    <textarea id="edit-test" rows={3} value={String(editDraft.test_plan ?? "")} onChange={(e) => setEditDraft({ ...editDraft, test_plan: e.target.value })} className="field h-auto py-2" />
-                  </div>
-                  <div>
-                    <label htmlFor="edit-rollback" className="label">Rencana rollback <span className="text-coral-dark">*</span></label>
-                    <textarea id="edit-rollback" rows={3} value={String(editDraft.rollback_plan ?? "")} onChange={(e) => setEditDraft({ ...editDraft, rollback_plan: e.target.value })} className="field h-auto py-2" placeholder="Langkah mengembalikan ke kondisi awal jika terjadi kegagalan." />
-                  </div>
-                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                    <div>
-                      <label htmlFor="edit-devices" className="label">Perangkat terdampak</label>
-                      <input id="edit-devices" value={String(editDraft.affected_devices ?? "")} onChange={(e) => setEditDraft({ ...editDraft, affected_devices: e.target.value })} className="field" placeholder="Komma-separated" />
+                      <label htmlFor="edit-description" className="form-label">Deskripsi</label>
+                      <textarea id="edit-description" rows={3} value={String(editDraft.description ?? "")} onChange={(e) => setEditDraft({ ...editDraft, description: e.target.value })} className="form-control" />
                     </div>
                     <div>
-                      <label htmlFor="edit-services" className="label">Layanan terdampak</label>
-                      <input id="edit-services" value={String(editDraft.affected_services ?? "")} onChange={(e) => setEditDraft({ ...editDraft, affected_services: e.target.value })} className="field" placeholder="Komma-separated" />
+                      <label htmlFor="edit-justification" className="form-label">Justifikasi bisnis</label>
+                      <textarea id="edit-justification" rows={3} value={String(editDraft.business_justification ?? "")} onChange={(e) => setEditDraft({ ...editDraft, business_justification: e.target.value })} className="form-control" placeholder="Mengapa perubahan ini dibutuhkan." />
+                    </div>
+                    <div>
+                      <label htmlFor="edit-impact" className="form-label">Dampak</label>
+                      <textarea id="edit-impact" rows={2} value={String(editDraft.impact_description ?? "")} onChange={(e) => setEditDraft({ ...editDraft, impact_description: e.target.value })} className="form-control" placeholder="Layanan, pengguna, atau jendela operasi yang terdampak." />
+                    </div>
+                    <div>
+                      <label htmlFor="edit-implementation" className="form-label">Rencana implementasi <span className="text-danger">*</span></label>
+                      <textarea id="edit-implementation" rows={4} value={String(editDraft.implementation_plan ?? "")} onChange={(e) => setEditDraft({ ...editDraft, implementation_plan: e.target.value })} className="form-control" placeholder="Langkah eksekusi berurutan. Jangan sertakan kredensial." />
+                    </div>
+                    <div>
+                      <label htmlFor="edit-test" className="form-label">Rencana uji</label>
+                      <textarea id="edit-test" rows={3} value={String(editDraft.test_plan ?? "")} onChange={(e) => setEditDraft({ ...editDraft, test_plan: e.target.value })} className="form-control" />
+                    </div>
+                    <div>
+                      <label htmlFor="edit-rollback" className="form-label">Rencana rollback <span className="text-danger">*</span></label>
+                      <textarea id="edit-rollback" rows={3} value={String(editDraft.rollback_plan ?? "")} onChange={(e) => setEditDraft({ ...editDraft, rollback_plan: e.target.value })} className="form-control" placeholder="Langkah mengembalikan ke kondisi awal jika terjadi kegagalan." />
+                    </div>
+                    <div className="row g-3">
+                      <div className="col-md-6">
+                        <label htmlFor="edit-devices" className="form-label">Perangkat terdampak</label>
+                        <input id="edit-devices" value={String(editDraft.affected_devices ?? "")} onChange={(e) => setEditDraft({ ...editDraft, affected_devices: e.target.value })} className="form-control" placeholder="Komma-separated" />
+                      </div>
+                      <div className="col-md-6">
+                        <label htmlFor="edit-services" className="form-label">Layanan terdampak</label>
+                        <input id="edit-services" value={String(editDraft.affected_services ?? "")} onChange={(e) => setEditDraft({ ...editDraft, affected_services: e.target.value })} className="form-control" placeholder="Komma-separated" />
+                      </div>
+                    </div>
+                    <div className="d-flex flex-wrap gap-2 pt-2">
+                      <button disabled={busy || !editDraft?.title || !editDraft?.implementation_plan || !editDraft?.rollback_plan} onClick={() => void saveEdit()} className="btn btn-primary">
+                        {busy ? "Menyimpan…" : "Simpan perubahan"}
+                      </button>
+                      <button type="button" onClick={cancelEdit} disabled={busy} className="btn btn-link text-decoration-none">
+                        Batal
+                      </button>
                     </div>
                   </div>
-                  <div className="flex flex-wrap gap-2 pt-2">
-                    <button disabled={busy || !editDraft?.title || !editDraft?.implementation_plan || !editDraft?.rollback_plan} onClick={() => void saveEdit()} className="btn-primary">
-                      {busy ? "Menyimpan…" : "Simpan perubahan"}
-                    </button>
-                    <button type="button" onClick={cancelEdit} disabled={busy} className="btn-ghost">
-                      Batal
-                    </button>
-                  </div>
-                </div>
-              </Card>
+                </Card>
+              </div>
             ) : (
-              <Card title="Detail CRF" description="Alasan, dampak, dan kesiapan rollback" className="lg:col-span-3">
-                <dl className="space-y-4 text-sm">
-                  {[
-                    ["Justifikasi bisnis", change.business_justification],
-                    ["Dampak", change.impact_description],
-                    ["Rencana implementasi", change.implementation_plan],
-                    ["Rencana uji", change.test_plan],
-                    ["Rencana rollback", change.rollback_plan],
-                  ].map(([label, value]) => (
-                    <div key={label as string}>
-                      <dt className="text-meta font-semibold uppercase tracking-wide text-text-muted">{label}</dt>
-                      <dd
-                        className={`mt-0.5 whitespace-pre-wrap ${
-                          label === "Rencana rollback" && !value ? "font-medium text-coral-dark" : "text-text"
-                        }`}
-                      >
-                        {value || (label === "Rencana rollback" ? "Tidak ada — rollback belum siap" : "—")}
-                      </dd>
+              <div className="col-md-7">
+                <Card title="Detail CRF" description="Alasan, dampak, dan kesiapan rollback">
+                  <dl className="d-flex flex-column gap-3 text-sm">
+                    {[
+                      ["Justifikasi bisnis", change.business_justification],
+                      ["Dampak", change.impact_description],
+                      ["Rencana implementasi", change.implementation_plan],
+                      ["Rencana uji", change.test_plan],
+                      ["Rencana rollback", change.rollback_plan],
+                    ].map(([label, value]) => (
+                      <div key={label as string}>
+                        <dt className="text-muted small fw-bold text-uppercase mb-0">{label}</dt>
+                        <dd
+                          className={`text-break mt-0 ${
+                            label === "Rencana rollback" && !value ? "fw-semibold text-danger" : "text-body"
+                          }`}
+                        >
+                          {value || (label === "Rencana rollback" ? "Tidak ada — rollback belum siap" : "—")}
+                        </dd>
+                      </div>
+                    ))}
+                    <div>
+                      <dt className="text-muted small fw-bold text-uppercase mb-0">Perangkat terdampak</dt>
+                      <dd className="mt-0 fw-mono text-xs mb-0">{(change.affected_devices || []).join(", ") || "—"}</dd>
                     </div>
-                  ))}
-                  <div>
-                    <dt className="text-meta font-semibold uppercase tracking-wide text-text-muted">Perangkat terdampak</dt>
-                    <dd className="mt-0.5 font-mono text-xs">{(change.affected_devices || []).join(", ") || "—"}</dd>
-                  </div>
-                  <div>
-                    <dt className="text-meta font-semibold uppercase tracking-wide text-text-muted">Layanan terdampak</dt>
-                    <dd className="mt-0.5">{(change.affected_services || []).join(", ") || "—"}</dd>
-                  </div>
-                </dl>
-              </Card>
+                    <div>
+                      <dt className="text-muted small fw-bold text-uppercase mb-0">Layanan terdampak</dt>
+                      <dd className="mt-0 mb-0">{(change.affected_services || []).join(", ") || "—"}</dd>
+                    </div>
+                  </dl>
+                </Card>
+              </div>
             )}
 
-            <Card title="Riwayat status" description="Kronologis perubahan state" className="lg:col-span-2">
-              {!history || history.status_history.length === 0 ? (
-                <p className="text-sm text-text-muted">Belum ada riwayat.</p>
-              ) : (
-                <ol className="space-y-3">
-                  {history.status_history.map((t) => (
-                    <li key={t.id} className="flex items-start gap-3 text-sm">
-                      <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-brand" aria-hidden />
-                      <div className="min-w-0">
-                        <p className="text-text">
-                          {t.from_status && <span className="text-text-muted">{statusLabel(t.from_status)} → </span>}
-                          <span className="font-medium">{statusLabel(t.to_status)}</span>
-                        </p>
-                        <p className="text-meta text-text-muted">
-                          {fmtDateTime(t.occurred_at)} ·{" "}
-                          {t.actor_name
-                            ? `oleh ${t.actor_name}`
-                            : t.actor_type === "USER"
-                              ? "otomatis"
-                              : ACTOR_LABEL[t.actor_type] ?? t.actor_type}
-                          {t.reason ? ` · ${t.reason}` : ""}
-                        </p>
-                      </div>
-                    </li>
-                  ))}
-                </ol>
-              )}
-            </Card>
+            <div className="col-md-5">
+              <Card title="Riwayat status" description="Kronologis perubahan state">
+                {!history || history.status_history.length === 0 ? (
+                  <p className="text-sm text-muted">Belum ada riwayat.</p>
+                ) : (
+                  <ol className="d-flex flex-column gap-3">
+                    {history.status_history.map((t) => (
+                      <li key={t.id} className="d-flex align-items-start gap-3 text-sm">
+                        <span className="mt-1.5" style={{ minWidth: "8px", width: "8px", height: "8px", borderRadius: "50%", backgroundColor: "var(--app-primary)" }} aria-hidden></span>
+                        <div className="min-w-0">
+                          <p className="text-body mb-0">
+                            {t.from_status && <span className="text-muted">{statusLabel(t.from_status)} → </span>}
+                            <span className="fw-medium">{statusLabel(t.to_status)}</span>
+                          </p>
+                          <p className="text-muted small mb-0">
+                            {fmtDateTime(t.occurred_at)} ·{" "}
+                            {t.actor_name
+                              ? `oleh ${t.actor_name}`
+                              : t.actor_type === "USER"
+                                ? "otomatis"
+                                : ACTOR_LABEL[t.actor_type] ?? t.actor_type}
+                            {t.reason ? ` · ${t.reason}` : ""}
+                          </p>
+                        </div>
+                      </li>
+                    ))}
+                  </ol>
+                )}
+              </Card>
+            </div>
           </div>
 
           <Card title="Revisi" description="Setiap revisi terkunci setelah disetujui; tinjauan terikat ke hash dokumen">
             {!history || history.revisions.length === 0 ? (
-              <p className="text-sm text-text-muted">Belum ada revisi.</p>
+              <p className="text-sm text-muted">Belum ada revisi.</p>
             ) : (
-              <div className="-mx-5 overflow-x-auto md:-mx-6">
-                <table className="w-full min-w-[520px]">
-                  <thead className="border-b border-border bg-cream">
+              <div className="table-responsive">
+                <table className="table table-sm table-striped mb-0">
+                  <thead className="border-bottom bg-body-secondary">
                     <tr>
-                      <th className="th">Revisi</th>
-                      <th className="th">Hash</th>
-                      <th className="th">Status</th>
-                      <th className="th">Dibuat</th>
+                      <th className="text-nowrap">Revisi</th>
+                      <th className="text-nowrap">Hash</th>
+                      <th className="text-nowrap">Status</th>
+                      <th className="text-nowrap">Dibuat</th>
                     </tr>
                   </thead>
                   <tbody>
                     {history.revisions.map((r) => (
-                      <tr key={r.id} className="border-b border-border last:border-0">
-                        <td className="td font-mono">rev{r.revision_number}</td>
-                        <td className="td font-mono text-meta text-text-muted">{r.content_hash?.slice(0, 12) ?? "—"}</td>
-                        <td className="td text-meta">
-                          {r.is_current ? <span className="font-semibold text-brand">Aktif</span> : "Lampau"}
+                      <tr key={r.id} className="border-bottom last:border-0">
+                        <td className="text-nowrap fw-mono">rev{r.revision_number}</td>
+                        <td className="text-nowrap fw-mono text-muted small">{r.content_hash?.slice(0, 12) ?? "—"}</td>
+                        <td className="text-nowrap text-muted">
+                          {r.is_current ? <span className="fw-bold text-primary">Aktif</span> : "Lampau"}
                           {r.locked ? " · terkunci" : ""}
                         </td>
-                        <td className="td text-text-muted">{fmtDateTime(r.created_at)}</td>
+                        <td className="text-nowrap text-muted">{fmtDateTime(r.created_at)}</td>
                       </tr>
                     ))}
                   </tbody>

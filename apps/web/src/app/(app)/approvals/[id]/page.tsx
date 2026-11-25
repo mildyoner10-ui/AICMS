@@ -62,9 +62,9 @@ interface Detail {
 }
 
 const STEP_TONE: Record<string, string> = {
-  APPROVED: "bg-success-soft text-success ring-1 ring-inset ring-success/25",
-  PENDING: "bg-warning-soft text-warning ring-1 ring-inset ring-warning/25",
-  REJECTED: "bg-danger-soft text-danger ring-1 ring-inset ring-danger/25",
+  APPROVED: "bg-success text-success",
+  PENDING: "bg-warning text-warning",
+  REJECTED: "bg-danger text-danger",
 };
 
 const DECISION_LABEL: Record<string, string> = {
@@ -143,8 +143,8 @@ export default function ApprovalDetailPage() {
         <Page>
           <Card>
             <div role="alert">
-              <p className="font-semibold text-danger">{error || "Tugas tidak ditemukan."}</p>
-              <button onClick={() => router.push("/approvals")} className="btn-secondary btn-sm mt-4">
+              <p className="fw-bold text-danger">{error || "Tugas tidak ditemukan."}</p>
+              <button onClick={() => router.push("/approvals")} className="btn btn-secondary btn-sm mt-3">
                 Kembali ke inbox
               </button>
             </div>
@@ -161,20 +161,20 @@ export default function ApprovalDetailPage() {
     {
       key: "APPROVE" as const,
       label: "Setujui",
-      className: "btn-primary",
+      className: "btn btn-primary",
       confirm: "Setujui langkah ini? Keputusan tersimpan permanen di jejak audit.",
     },
     {
       key: "REQUEST_REVISION" as const,
       label: "Minta Revisi",
-      className: "btn-secondary",
+      className: "btn btn-secondary",
       confirm: "Minta revisi? Pemohon harus mengirim ulang CRF dan persetujuan ulang dimulai.",
       needsComment: true,
     },
     {
       key: "REJECT" as const,
       label: "Tolak",
-      className: "btn-danger",
+      className: "btn btn-danger",
       confirm: "Tolak perubahan ini? Keputusan tersimpan permanen di jejak audit.",
       needsComment: true,
     },
@@ -186,7 +186,7 @@ export default function ApprovalDetailPage() {
         back={{ href: "/approvals", label: "Persetujuan" }}
         breadcrumb={
           <span>
-            <span className="font-mono">{change.change_number}</span> · Langkah {task.step_order} dari{" "}
+            <span className="fw-mono">{change.change_number}</span> · Langkah {task.step_order} dari{" "}
             {workflow_steps.length}
           </span>
         }
@@ -213,52 +213,52 @@ export default function ApprovalDetailPage() {
           </Notice>
         )}
 
-        <div className="space-y-6">
+        <div className="d-flex flex-column gap-4">
           <Card title={`Keputusan Anda — langkah ${task.step_order} (${task.role_name ?? task.step_code})`}>
             {decided ? (
-              <div className="rounded-md bg-cream px-4 py-3 text-sm font-bold text-text-muted border border-border">
-                <p className="font-semibold text-foreground">Keputusan tercatat</p>
-                <p className="mt-1 text-foreground">
+              <div className="rounded bg-body-secondary p-3 text-sm border">
+                <p className="fw-bold text-body mb-1">Keputusan tercatat</p>
+                <p className="text-body mb-0">
                   {DECISION_LABEL[task.decision ?? task.status] ?? task.decision ?? task.status}
                   {task.decided_at ? ` · ${fmtDateTime(task.decided_at)}` : ""}
                   {task.comment ? (
                     <>
                       <br />
-                      <span className="text-foreground-muted">“{task.comment}”</span>
+                      <span className="text-muted">"{task.comment}"</span>
                     </>
                   ) : null}
                 </p>
               </div>
             ) : !task.actionable ? (
-              <p className="rounded-md bg-warning/10 px-4 py-3 text-sm text-coral-dark font-bold border border-coral/30">
+              <p className="rounded bg-warning bg-opacity-25 p-3 text-sm text-warning fw-bold border border-warning/25">
                 Menunggu langkah persetujuan sebelumnya selesai. Anda belum dapat memutuskan.
               </p>
             ) : (
-              <div className="space-y-4">
-                <p className="text-sm text-foreground-muted">
+              <div className="d-flex flex-column gap-3">
+                <p className="text-sm text-muted">
                   Putuskan berdasarkan bukti CRF di halaman ini. Keputusan tidak dapat diubah setelah tersimpan; menolak
                   atau meminta revisi wajib menyertakan alasan.
                 </p>
                 <div>
-                  <label htmlFor="comment" className="label">
-                    Komentar <span className="text-foreground-muted">(wajib untuk tolak / minta revisi)</span>
+                  <label htmlFor="comment" className="form-label">
+                    Komentar <span className="text-muted">(wajib untuk tolak / minta revisi)</span>
                   </label>
                   <textarea
                     id="comment"
                     rows={3}
                     value={comment}
                     onChange={(e) => setComment(e.target.value)}
-                    className="field h-auto py-2"
+                    className="form-control"
                     placeholder="Dasar keputusan, mis. 3 temuan risiko tinggi belum ditangani."
                   />
                 </div>
 
                 {confirming ? (
-                  <div className="rounded-control bg-surface-muted p-4" role="alertdialog" aria-label="Konfirmasi keputusan">
-                    <p className="text-sm font-medium text-foreground">
+                  <div className="rounded bg-body-secondary p-4" role="alertdialog" aria-label="Konfirmasi keputusan">
+                    <p className="text-sm fw-medium text-body">
                       {decisionButtons.find((b) => b.key === confirming)?.confirm}
                     </p>
-                    <div className="mt-3 flex flex-wrap gap-2">
+                    <div className="mt-3 d-flex flex-wrap gap-2">
                       <button
                         onClick={() => void decide(confirming)}
                         disabled={busy}
@@ -266,13 +266,13 @@ export default function ApprovalDetailPage() {
                       >
                         {busy ? "Menyimpan…" : `Ya, ${decisionButtons.find((b) => b.key === confirming)?.label}`}
                       </button>
-                      <button onClick={() => setConfirming(null)} className="btn-ghost">
+                      <button onClick={() => setConfirming(null)} className="btn btn-link btn-sm text-decoration-none">
                         Batal
                       </button>
                     </div>
                   </div>
                 ) : (
-                  <div className="flex flex-wrap gap-3">
+                  <div className="d-flex flex-wrap gap-2">
                     {decisionButtons.map((b) => (
                       <button
                         key={b.key}
@@ -290,64 +290,74 @@ export default function ApprovalDetailPage() {
             )}
           </Card>
 
-          <div className="grid grid-cols-1 gap-6 lg:grid-cols-5">
-            <Card title="Alur persetujuan" description="Berurutan; setiap langkah harus selesai" className="lg:col-span-2">
-              <ol className="space-y-3">
-                {workflow_steps.map((step) => (
-                  <li key={step.id} className="flex items-start gap-3 text-sm">
-                    <span
-                      className={`mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-bold tabular-nums ${
-                        STEP_TONE[step.status] ?? "bg-surface-muted text-foreground-muted ring-1 ring-inset ring-border-strong"
-                      }`}
-                      aria-hidden
-                    >
-                      {step.step_order}
-                    </span>
-                    <div className="min-w-0">
-                      <p className="font-medium text-foreground">{step.role_name ?? step.step_code}</p>
-                      <p className="text-meta text-foreground-muted">
-                        {step.status === "APPROVED"
-                          ? "Disetujui"
-                          : step.status === "PENDING"
-                            ? "Menunggu"
-                            : step.status === "REJECTED"
-                              ? "Ditolak"
-                              : step.status.replace(/_/g, " ")}
-                        {step.decided_at ? ` · ${fmtDateTime(step.decided_at)}` : ""}
-                      </p>
-                      {step.comment && <p className="mt-0.5 text-meta italic text-foreground-muted">“{step.comment}”</p>}
-                    </div>
-                  </li>
-                ))}
-              </ol>
-            </Card>
+          <div className="row g-4">
+            <div className="col-md-4">
+              <Card title="Alur persetujuan" description="Berurutan; setiap langkah harus selesai">
+                <ol className="d-flex flex-column gap-3">
+                  {workflow_steps.map((step) => (
+                    <li key={step.id} className="d-flex align-items-start gap-3 text-sm">
+                      <span
+                        className={`d-flex flex-shrink-0 align-items-center justify-content-center rounded-circle small fw-bold`}
+                        style={{
+                          minWidth: "24px",
+                          width: "24px",
+                          height: "24px",
+                          backgroundColor: STEP_TONE[step.status] ? undefined : "var(--app-surface-secondary)",
+                          color: STEP_TONE[step.status] ? "var(--app-text)" : "var(--app-text-muted)",
+                          border: STEP_TONE[step.status] ? "1px solid" : "1px solid var(--app-border-strong)",
+                        }}
+                        aria-hidden
+                      >
+                        {step.step_order}
+                      </span>
+                      <div className="min-w-0">
+                        <p className="fw-medium text-body mb-0">{step.role_name ?? step.step_code}</p>
+                        <p className="text-muted small mb-0">
+                          {step.status === "APPROVED"
+                            ? "Disetujui"
+                            : step.status === "PENDING"
+                              ? "Menunggu"
+                              : step.status === "REJECTED"
+                                ? "Ditolak"
+                                : step.status.replace(/_/g, " ")}
+                          {step.decided_at ? ` · ${fmtDateTime(step.decided_at)}` : ""}
+                        </p>
+                        {step.comment && <p className="text-muted small fst-italic mb-0">"{step.comment}"</p>}
+                      </div>
+                    </li>
+                  ))}
+                </ol>
+              </Card>
+            </div>
 
-            <Card title="Detail CRF" description="Cakupan dan kesiapan rollback yang Anda setujui" className="lg:col-span-3">
-              <dl className="space-y-4 text-sm">
-                {[
-                  ["Justifikasi bisnis", change.business_justification],
-                  ["Dampak", change.impact_description],
-                  ["Rencana implementasi", change.implementation_plan],
-                  ["Rencana uji", change.test_plan],
-                  ["Rencana rollback", change.rollback_plan],
-                ].map(([label, value]) => (
-                  <div key={label as string}>
-                    <dt className="text-meta font-semibold uppercase tracking-wide text-foreground-muted">{label}</dt>
-                    <dd className={`mt-0.5 whitespace-pre-wrap ${label === "Rencana rollback" && !value ? "text-danger" : "text-foreground"}`}>
-                      {value || (label === "Rencana rollback" ? "Tidak ada — rollback belum siap" : "—")}
+            <div className="col-md-8">
+              <Card title="Detail CRF" description="Cakupan dan kesiapan rollback yang Anda setujui">
+                <dl className="d-flex flex-column gap-3 text-sm">
+                  {[
+                    ["Justifikasi bisnis", change.business_justification],
+                    ["Dampak", change.impact_description],
+                    ["Rencana implementasi", change.implementation_plan],
+                    ["Rencana uji", change.test_plan],
+                    ["Rencana rollback", change.rollback_plan],
+                  ].map(([label, value]) => (
+                    <div key={label as string}>
+                      <dt className="text-muted small fw-bold text-uppercase mb-0">{label}</dt>
+                      <dd className={`text-break mt-0 ${label === "Rencana rollback" && !value ? "text-danger" : "text-body"}`}>
+                        {value || (label === "Rencana rollback" ? "Tidak ada — rollback belum siap" : "—")}
+                      </dd>
+                    </div>
+                  ))}
+                  <div>
+                    <dt className="text-muted small fw-bold text-uppercase mb-0">Perangkat / layanan</dt>
+                    <dd className="mt-0 fw-mono text-xs text-body">
+                      {(change.affected_devices || []).join(", ") || "—"}
+                      <br />
+                      {(change.affected_services || []).join(", ") || "—"}
                     </dd>
                   </div>
-                ))}
-                <div>
-                  <dt className="text-meta font-semibold uppercase tracking-wide text-foreground-muted">Perangkat / layanan</dt>
-                  <dd className="mt-1 font-mono text-xs text-foreground">
-                    {(change.affected_devices || []).join(", ") || "—"}
-                    <br />
-                    {(change.affected_services || []).join(", ") || "—"}
-                  </dd>
-                </div>
-              </dl>
-            </Card>
+                </dl>
+              </Card>
+            </div>
           </div>
         </div>
       </Page>

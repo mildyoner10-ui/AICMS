@@ -75,8 +75,8 @@ function DonutChart({ data, size = 200, cx = 100, cy = 100, r = 70, thickness = 
     });
 
   return (
-    <div className="flex flex-col items-center gap-3">
-      <svg viewBox={`0 0 ${size} ${size}`} width={size} height={size} role="img" aria-label="Grafik donat" className="drop-shadow-sm">
+    <div className="d-flex flex-column align-items-center gap-3">
+      <svg viewBox={`0 0 ${size} ${size}`} style={{ width: size, height: size }} role="img" aria-label="Grafik donat">
         {slices.map((s, i) => (
           <path
             key={i}
@@ -84,22 +84,22 @@ function DonutChart({ data, size = 200, cx = 100, cy = 100, r = 70, thickness = 
             fill={s.color}
             stroke="#ffffff"
             strokeWidth={2}
-            className="transition-opacity duration-ui hover:opacity-80"
+            style={{ opacity: 0.85 }}
           />
         ))}
         {/* Center text */}
-        <text x={cx} y={cy - 6} textAnchor="middle" className="fill-foreground" fontSize="22" fontWeight={700}>
+        <text x={cx} y={cy - 6} textAnchor="middle" style={{ fill: "var(--app-text)", fontSize: 22, fontWeight: 700 }}>
           {total}
         </text>
-        <text x={cx} y={cy + 12} textAnchor="middle" className="fill-foreground-muted" fontSize="11">
+        <text x={cx} y={cy + 12} textAnchor="middle" style={{ fill: "var(--app-text-muted)", fontSize: 11 }}>
           Total
         </text>
       </svg>
       {/* Legend */}
-      <div className="flex flex-wrap justify-center gap-x-4 gap-y-1.5">
+      <div className="d-flex flex-wrap justify-content-center gap-2">
         {slices.map((s, i) => (
-          <span key={i} className="flex items-center gap-1.5 text-xs text-foreground-muted">
-            <span className="inline-block h-2.5 w-2.5 rounded-sm" style={{ backgroundColor: s.color || CHART_COLORS.brand }} />
+          <span key={i} className="d-flex align-items-center gap-1 small text-muted">
+            <span className="d-inline-block" style={{ width: "10px", height: "10px", borderRadius: "2px", backgroundColor: s.color || CHART_COLORS.brand }} />
             <span>{s.label} ({s.value})</span>
           </span>
         ))}
@@ -165,7 +165,7 @@ function WeeklyChart({ data }: { data: DashboardData["weekly_counts"] }) {
     <div className="overflow-x-auto">
       <svg
         viewBox={`0 0 ${CHART_W} ${CHART_H}`}
-        className="h-56 w-full min-w-[320px]"
+        style={{ height: 180, width: "100%", minWidth: 320 }}
         role="img"
         aria-label="Grafik jumlah request per minggu"
       >
@@ -174,8 +174,8 @@ function WeeklyChart({ data }: { data: DashboardData["weekly_counts"] }) {
           const y = CHART_PAD.top + tickH - (v / maxVal) * tickH;
           return (
             <g key={i}>
-              <line x1={CHART_PAD.left} y1={y} x2={CHART_W - CHART_PAD.right} y2={y} stroke="var(--border)" strokeDasharray="4 3" />
-              <text x={CHART_PAD.left - 6} y={y + 4} textAnchor="end" className="fill-foreground-muted" fontSize="11" fontFamily="monospace">
+              <line x1={CHART_PAD.left} y1={y} x2={CHART_W - CHART_PAD.right} y2={y} stroke="var(--app-border)" strokeDasharray="4 3" />
+              <text x={CHART_PAD.left - 6} y={y + 4} textAnchor="end" style={{ fill: "var(--app-text-muted)", fontSize: 11 }}>
                 {v}
               </text>
             </g>
@@ -188,11 +188,11 @@ function WeeklyChart({ data }: { data: DashboardData["weekly_counts"] }) {
           const y = CHART_PAD.top + tickH - barH;
           return (
             <g key={i}>
-              <rect x={x} y={y} width={BAR_W} height={barH} rx={4} fill="var(--brand)" opacity={0.85} />
-              <text x={x + BAR_W / 2} y={y - 6} textAnchor="middle" className="fill-foreground" fontSize="12" fontWeight={600}>
+              <rect x={x} y={y} width={BAR_W} height={barH} rx={4} fill="var(--app-primary)" opacity={0.85} />
+              <text x={x + BAR_W / 2} y={y - 6} textAnchor="middle" style={{ fill: "var(--app-text)", fontSize: 12, fontWeight: 600 }}>
                 {d.value}
               </text>
-              <text x={x + BAR_W / 2} y={CHART_PAD.top + tickH + 18} textAnchor="middle" className="fill-foreground-muted" fontSize="11">
+              <text x={x + BAR_W / 2} y={CHART_PAD.top + tickH + 18} textAnchor="middle" style={{ fill: "var(--app-text-muted)", fontSize: 11 }}>
                 {d.label}
               </text>
             </g>
@@ -211,7 +211,7 @@ function KpiCard({
   value,
   sub,
   href,
-  tone = "text-foreground",
+  tone = "text-body",
 }: {
   label: string;
   help: string;
@@ -221,18 +221,18 @@ function KpiCard({
   tone?: string;
 }) {
   const wrap = href ? (
-    <Link href={href} className="card group p-4 transition-colors duration-ui hover:border-teal">
-      <p className={`text-kpi tabular-nums ${tone}`}>{value}</p>
-      <p className="mt-1 text-[13px] font-semibold text-foreground">{label}</p>
-      <p className="mt-0.5 text-meta text-foreground-muted">{help}</p>
-      {sub && <p className="mt-0.5 text-meta text-foreground-muted">{sub}</p>}
+    <Link href={href} className="card p-4" style={{ textDecoration: "none", color: "inherit" }}>
+      <p className={`display-6 fw-bold ${tone}`}>{value}</p>
+      <p className="mt-1 text-[13px] fw-semibold text-body">{label}</p>
+      <p className="mt-0.5 small text-muted">{help}</p>
+      {sub && <p className="mt-0.5 small text-muted">{sub}</p>}
     </Link>
   ) : (
     <div className="card p-4">
-      <p className={`text-kpi tabular-nums ${tone}`}>{value}</p>
-      <p className="mt-1 text-[13px] font-semibold text-foreground">{label}</p>
-      <p className="mt-0.5 text-meta text-foreground-muted">{help}</p>
-      {sub && <p className="mt-0.5 text-meta text-foreground-muted">{sub}</p>}
+      <p className={`display-6 fw-bold ${tone}`}>{value}</p>
+      <p className="mt-1 text-[13px] fw-semibold text-body">{label}</p>
+      <p className="mt-0.5 small text-muted">{help}</p>
+      {sub && <p className="mt-0.5 small text-muted">{sub}</p>}
     </div>
   );
   return wrap;
@@ -282,7 +282,7 @@ export default function Dashboard() {
         title="Ringkasan"
         description="Kondisi antrean perubahan hari ini. Setiap angka dapat diklik menuju daftar terkait."
         actions={
-          <Link href="/changes/new" className="btn-primary">
+          <Link href="/changes/new" className="btn btn-primary">
             + Buat CRF Baru
           </Link>
         }
@@ -292,99 +292,115 @@ export default function Dashboard() {
         {loading ? (
           <Spinner label="Memuat ringkasan…" />
         ) : (
-          <div className="space-y-6">
+          <div className="mb-5">
             {/* KPI row */}
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5">
-              <KpiCard
-                label="Perubahan Aktif"
-                help="Belum sampai selesai atau ditutup"
-                value={kpi.total_active ?? open}
-                href="/changes"
-                tone="text-foreground"
-              />
-              <KpiCard
-                label="Menunggu Persetujuan"
-                help="CRF dalam antrian persetujuan"
-                value={data?.by_status?.PENDING_APPROVAL ?? 0}
-                href="/approvals"
-                tone="text-warning"
-              />
-              <KpiCard
-                label="Tinjauan AI Tertunda"
-                help="Antrean atau berjalan di worker"
-                value={data?.ai_review_pending ?? 0}
-                href="/changes?status=AI_REVIEW"
-                tone="text-info"
-              />
-              <KpiCard
-                label="Waktu Persetujuan"
-                help="Rata-rata dari submit → disetujui"
-                value={kpi.approval_avg_hours != null ? `${kpi.approval_avg_hours} jam` : "—"}
-                tone="text-brand"
-              />
-              <KpiCard
-                label="Tingkat Penerimaan"
-                help="Disetujui / (disetujui + ditutup)"
-                value={kpi.acceptance_rate ? `${kpi.acceptance_rate}%` : "—"}
-                tone={kpi.acceptance_rate != null && kpi.acceptance_rate >= 80 ? "text-success" : "text-warning"}
-                sub={kpi.acceptance_rate != null ? `${data?.by_status?.APPROVED ?? 0} disetujui, ${data?.by_status?.CLOSED ?? 0} ditutup` : ""}
-              />
+            <div className="row g-3">
+              <div className="col-12 col-sm-6 col-xl-3">
+                <KpiCard
+                  label="Perubahan Aktif"
+                  help="Belum sampai selesai atau ditutup"
+                  value={kpi.total_active ?? open}
+                  href="/changes"
+                  tone="text-body"
+                />
+              </div>
+              <div className="col-12 col-sm-6 col-xl-3">
+                <KpiCard
+                  label="Menunggu Persetujuan"
+                  help="CRF dalam antrian persetujuan"
+                  value={data?.by_status?.PENDING_APPROVAL ?? 0}
+                  href="/approvals"
+                  tone="text-warning"
+                />
+              </div>
+              <div className="col-12 col-sm-6 col-xl-3">
+                <KpiCard
+                  label="Tinjauan AI Tertunda"
+                  help="Antrean atau berjalan di worker"
+                  value={data?.ai_review_pending ?? 0}
+                  href="/changes?status=AI_REVIEW"
+                  tone="text-info"
+                />
+              </div>
+              <div className="col-12 col-sm-6 col-xl-3">
+                <div style={{ color: "var(--app-primary)" }}>
+                  <KpiCard
+                    label="Waktu Persetujuan"
+                    help="Rata-rata dari submit → disetujui"
+                    value={kpi.approval_avg_hours != null ? `${kpi.approval_avg_hours} jam` : "—"}
+                    tone="text-primary"
+                  />
+                </div>
+              </div>
+              <div className="col-12 col-sm-6 col-xl-3">
+                <KpiCard
+                  label="Tingkat Penerimaan"
+                  help="Disetujui / (disetujui + ditutup)"
+                  value={kpi.acceptance_rate ? `${kpi.acceptance_rate}%` : "—"}
+                  tone={kpi.acceptance_rate != null && kpi.acceptance_rate >= 80 ? "text-success" : "text-warning"}
+                  sub={kpi.acceptance_rate != null ? `${data?.by_status?.APPROVED ?? 0} disetujui, ${data?.by_status?.CLOSED ?? 0} ditutup` : ""}
+                />
+              </div>
             </div>
 
-            <div className="grid grid-cols-1 gap-6 lg:grid-cols-5">
-              <Card title="Perubahan per Status" description="Distribusi seluruh CRF aktif dan arsip" className="lg:col-span-3">
-                {statusEntries.length === 0 ? (
-                  <p className="text-sm text-foreground-muted">Belum ada perubahan tercatat.</p>
-                ) : (
-                  <DonutChart
-                    data={statusEntries.map(([status, count]) => ({
-                      label: statusLabel(status),
-                      value: count,
-                      color: {
-                        SUBMITTED: CHART_COLORS.info,
-                        DOCUMENT_VALIDATION: CHART_COLORS.teal,
-                        AI_REVIEW: CHART_COLORS.teal,
-                        PENDING_APPROVAL: CHART_COLORS.warning,
-                        REVISION_REQUIRED: CHART_COLORS.danger,
-                        APPROVED: CHART_COLORS.success,
-                        SCHEDULED: CHART_COLORS.brand,
-                        IN_PROGRESS: CHART_COLORS.brand,
-                        VALIDATION: CHART_COLORS.purple,
-                        CLOSED: CHART_COLORS.neutral,
-                        CANCELLED: CHART_COLORS.danger,
-                      }[status],
-                    }))}
-                  />
-                )}
-              </Card>
-
-              <div className="space-y-6 lg:col-span-2">
-                <Card title="Perubahan per Kategori" description="Sumber daya yang terdampak">
-                  {categoryEntries.length === 0 ? (
-                    <p className="text-sm text-foreground-muted">Belum ada data kategori.</p>
+            <div className="row g-3 mt-4">
+              <div className="col-12 col-xl-8">
+                <Card title="Perubahan per Status" description="Distribusi seluruh CRF aktif dan arsip">
+                  {statusEntries.length === 0 ? (
+                    <p className="small text-muted">Belum ada perubahan tercatat.</p>
                   ) : (
                     <DonutChart
-                      data={categoryEntries.map(([cat, count], i) => ({
-                        label: categoryLabel(cat),
+                      data={statusEntries.map(([status, count]) => ({
+                        label: statusLabel(status),
                         value: count,
+                        color: {
+                          SUBMITTED: CHART_COLORS.info,
+                          DOCUMENT_VALIDATION: CHART_COLORS.teal,
+                          AI_REVIEW: CHART_COLORS.teal,
+                          PENDING_APPROVAL: CHART_COLORS.warning,
+                          REVISION_REQUIRED: CHART_COLORS.danger,
+                          APPROVED: CHART_COLORS.success,
+                          SCHEDULED: CHART_COLORS.brand,
+                          IN_PROGRESS: CHART_COLORS.brand,
+                          VALIDATION: CHART_COLORS.purple,
+                          CLOSED: CHART_COLORS.neutral,
+                          CANCELLED: CHART_COLORS.danger,
+                        }[status],
                       }))}
-                      size={180}
                     />
                   )}
                 </Card>
+              </div>
+
+              <div className="col-12 col-xl-4">
+                <div className="mb-4">
+                  <Card title="Perubahan per Kategori" description="Sumber daya yang terdampak">
+                    {categoryEntries.length === 0 ? (
+                      <p className="small text-muted">Belum ada data kategori.</p>
+                    ) : (
+                      <DonutChart
+                        data={categoryEntries.map(([cat, count], i) => ({
+                          label: categoryLabel(cat),
+                          value: count,
+                        }))}
+                        size={180}
+                      />
+                    )}
+                  </Card>
+                </div>
 
                 <Card title="Tinjauan AI" description="AI memberi rekomendasi; keputusan tetap pada manusia">
-                  <dl className="grid grid-cols-2 gap-3 text-sm">
-                    <div className="rounded-control bg-surface-muted p-3">
-                      <dt className="text-meta text-foreground-muted">Tertunda</dt>
-                      <dd className="text-xl font-bold tabular-nums">{data?.ai_review_pending ?? 0}</dd>
+                  <dl className="row g-3 text-sm">
+                    <div className="col-6 rounded p-3 bg-body-secondary">
+                      <dt className="small text-muted mb-1">Tertunda</dt>
+                      <dd className="fs-5 fw-bold">{data?.ai_review_pending ?? 0}</dd>
                     </div>
-                    <div className="rounded-control bg-surface-muted p-3">
-                      <dt className="text-meta text-foreground-muted">Ditandai risiko</dt>
-                      <dd className="text-xl font-bold tabular-nums text-warning">{data?.ai_review_flagged ?? 0}</dd>
+                    <div className="col-6 rounded p-3 bg-body-secondary">
+                      <dt className="small text-muted mb-1">Ditandai risiko</dt>
+                      <dd className="fs-5 fw-bold text-warning">{data?.ai_review_flagged ?? 0}</dd>
                     </div>
                   </dl>
-                  <p className="mt-3 text-meta text-foreground-muted">
+                  <p className="mt-3 small text-muted">
                     Skor AI yang tinggi tidak menjamin perubahan aman, dan AI tidak pernah menyetujui.
                   </p>
                 </Card>
@@ -394,7 +410,7 @@ export default function Dashboard() {
             {/* Weekly bar chart */}
             <Card title="Jumlah Request per Minggu" description="4 minggu terakhir (non-dihapus)">
               {data?.weekly_counts.length === 0 ? (
-                <p className="text-sm text-foreground-muted">Belum ada data request dalam 4 minggu terakhir.</p>
+                <p className="small text-muted">Belum ada data request dalam 4 minggu terakhir.</p>
               ) : (
                 <WeeklyChart data={data!.weekly_counts} />
               )}
@@ -404,22 +420,22 @@ export default function Dashboard() {
               title="Perubahan Terbaru"
               description="Diurutkan berdasarkan pembaruan terakhir"
               actions={
-                <Link href="/changes" className="btn-ghost btn-sm">
+                <Link href="/changes" className="btn btn-sm btn-link text-decoration-none">
                   Lihat semua →
                 </Link>
               }
             >
               {recent.length === 0 ? (
-                <p className="text-sm text-foreground-muted">Belum ada perubahan. Mulai dengan membuat CRF baru.</p>
+                <p className="small text-muted">Belum ada perubahan. Mulai dengan membuat CRF baru.</p>
               ) : (
-                <div className="-mx-5 overflow-x-auto md:-mx-6">
-                  <table className="w-full min-w-[560px]">
-                    <thead className="border-b border-border bg-surface-muted">
+                <div className="table-responsive">
+                  <table className="table table-hover table-striped align-middle mb-0" style={{ minWidth: 560 }}>
+                    <thead className="border-bottom" style={{ backgroundColor: "var(--app-surface-secondary)" }}>
                       <tr>
-                        <th className="th">Change ID</th>
-                        <th className="th">Judul</th>
-                        <th className="th">Status</th>
-                        <th className="th">Diperbarui</th>
+                        <th className="text-nowrap">Change ID</th>
+                        <th className="text-nowrap">Judul</th>
+                        <th className="text-nowrap">Status</th>
+                        <th className="text-nowrap">Diperbarui</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -427,14 +443,15 @@ export default function Dashboard() {
                         <tr
                           key={c.id}
                           onClick={() => router.push(`/changes/${c.id}`)}
-                          className="cursor-pointer border-b border-border last:border-0 hover:bg-surface-muted"
+                          className="cursor-pointer border-bottom"
+                          style={{ cursor: "pointer", borderBottom: `1px solid var(--app-border)` }}
                         >
-                          <td className="td font-mono text-brand">{c.change_number}</td>
-                          <td className="td font-medium">{c.title}</td>
-                          <td className="td">
+                          <td className="text-nowrap" style={{ fontFamily: "ui-monospace, SFMono-Regular, Menlo, monospace", color: "var(--app-primary)" }}>{c.change_number}</td>
+                          <td className="text-truncate" style={{ maxWidth: 240 }}>{c.title}</td>
+                          <td>
                             <StatusBadge status={c.status} />
                           </td>
-                          <td className="td text-foreground-muted">{fmtDateTime(c.updated_at)}</td>
+                          <td className="text-muted text-nowrap">{fmtDateTime(c.updated_at)}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -443,7 +460,7 @@ export default function Dashboard() {
               )}
             </Card>
 
-            <p className="text-meta text-foreground-muted">
+            <p className="small text-muted">
               Ringkasan dibuat dari {data?.total_changes ?? 0} perubahan (tidak termasuk yang dihapus). Status terbanyak:{" "}
               {statusEntries[0] ? statusLabel(statusEntries[0][0]) : "—"}.
             </p>

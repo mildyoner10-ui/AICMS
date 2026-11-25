@@ -99,9 +99,9 @@ export default function AuditPage() {
       />
 
       <Page wide>
-        <div className="mb-4 grid grid-cols-1 gap-3 sm:grid-cols-3">
-          <div className="sm:col-span-2">
-            <label htmlFor="action-filter" className="label">
+        <div className="mb-3 row g-3">
+          <div className="col-12 col-sm-8">
+            <label htmlFor="action-filter" className="form-label">
               Cari aksi
             </label>
             <input
@@ -110,14 +110,14 @@ export default function AuditPage() {
               placeholder="mis. diajukan, diunggah, disetujui…"
               value={action}
               onChange={(e) => setAction(e.target.value)}
-              className="field"
+              className="form-control"
             />
           </div>
-          <div>
-            <label htmlFor="object-filter" className="label">
+          <div className="col-12 col-sm-4">
+            <label htmlFor="object-filter" className="form-label">
               Jenis objek
             </label>
-            <select id="object-filter" value={objectType} onChange={(e) => setObjectType(e.target.value)} className="field">
+            <select id="object-filter" value={objectType} onChange={(e) => setObjectType(e.target.value)} className="form-control">
               <option value="">Semua</option>
               {objectTypes.map((t) => (
                 <option key={t} value={t}>
@@ -143,15 +143,15 @@ export default function AuditPage() {
 
         {!loading && !error && visible.length > 0 && (
           <Card className="overflow-hidden [&>div]:p-0">
-            <div className="overflow-x-auto">
-              <table className="w-full min-w-[820px]">
-                <thead className="border-b border-border bg-cream">
+            <div className="overflow-auto border rounded" style={{ borderColor: "var(--app-border)", borderRadius: "var(--app-radius)" }}>
+              <table className="w-100 table table-hover mb-0" style={{ minWidth: "820px" }}>
+                <thead className="border-bottom" style={{ borderBottom: `1px solid var(--app-border)`, backgroundColor: "var(--app-surface-secondary)" }}>
                   <tr>
-                    <th className="th">Waktu (WIB)</th>
-                    <th className="th">Pelaku</th>
-                    <th className="th">Aksi</th>
-                    <th className="th">Objek</th>
-                    <th className="th">Detail</th>
+                    <th className="text-nowrap py-2 px-3 fw-semibold small">Waktu (WIB)</th>
+                    <th className="text-nowrap py-2 px-3 fw-semibold small">Pelaku</th>
+                    <th className="text-nowrap py-2 px-3 fw-semibold small">Aksi</th>
+                    <th className="text-nowrap py-2 px-3 fw-semibold small">Objek</th>
+                    <th className="text-nowrap py-2 px-3 fw-semibold small">Detail</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -159,33 +159,33 @@ export default function AuditPage() {
                     const actor = ACTOR_UI[e.actor_type] ?? ACTOR_UI.SYSTEM;
                     const isOpen = open === e.id;
                     return (
-                      <tr key={e.id} className="border-b border-border align-top last:border-0">
-                        <td className="td whitespace-nowrap text-foreground-muted">{fmtDateTime(e.occurred_at)}</td>
-                        <td className="td">
+                      <tr key={e.id} className="border-bottom align-top last-row:border-0" style={{ borderBottom: `1px solid var(--app-border)` }}>
+                        <td className="py-2 px-3 text-muted small text-nowrap">{fmtDateTime(e.occurred_at)}</td>
+                        <td className="py-2 px-3">
                           <span className={`chip ${actor.cls}`}>{actor.label}</span>
                           {e.actor_username && (
-                            <span className="mt-1 block text-[11px] text-foreground-muted">{e.actor_username}</span>
+                            <span className="mt-1 d-block text-[11px] text-muted">{e.actor_username}</span>
                           )}
                         </td>
-                        <td className="td font-semibold">{auditActionLabel(e.action)}</td>
-                        <td className="td text-foreground-muted">
+                        <td className="py-2 px-3 fw-semibold">{auditActionLabel(e.action)}</td>
+                        <td className="py-2 px-3 text-muted">
                           {objectLabel(e.object_type)}
-                          {e.object_label && <span className="block font-medium text-foreground">{e.object_label}</span>}
+                          {e.object_label && <span className="d-block fw-medium" style={{ color: "var(--app-text)" }}>{e.object_label}</span>}
                         </td>
-                        <td className="td">
+                        <td className="py-2 px-3">
                           {e.event_data && Object.keys(e.event_data).length > 0 ? (
                             <>
-                              <button onClick={() => setOpen(isOpen ? null : e.id)} className="btn-ghost btn-sm">
+                              <button onClick={() => setOpen(isOpen ? null : e.id)} className="btn btn-sm btn-link text-decoration-none p-0">
                                 {isOpen ? "Sembunyikan" : "Lihat"}
                               </button>
                               {isOpen && (
-                                <pre className="mt-2 max-w-[380px] overflow-x-auto rounded-md bg-cream p-2.5 font-mono text-[11px] text-text-muted">
+                                <pre className="mt-2 max-w-[380px] overflow-x-auto rounded bg-light p-2.5 font-monospace text-[11px] text-muted" style={{ borderRadius: "var(--app-radius)", backgroundColor: "var(--app-surface-secondary)" }}>
                                   {JSON.stringify(e.event_data, null, 2)}
                                 </pre>
                               )}
                             </>
                           ) : (
-                            <span className="text-foreground-muted">—</span>
+                            <span className="text-muted">—</span>
                           )}
                         </td>
                       </tr>
@@ -194,18 +194,18 @@ export default function AuditPage() {
                 </tbody>
               </table>
             </div>
-            <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border bg-cream px-4 py-3 text-meta text-text-muted">
+            <div className="d-flex flex-wrap align-items-center justify-content-between gap-3 border-top px-4 py-3 small text-muted" style={{ borderTop: `1px solid var(--app-border)`, backgroundColor: "var(--app-surface-secondary)" }}>
               <span>
                 {total === 0
                   ? "Tidak ada peristiwa."
                   : `Menampilkan ${page * PAGE_SIZE + 1}–${page * PAGE_SIZE + visible.length} dari ${total} peristiwa. Catatan tidak dapat diubah atau dihapus.`}
               </span>
-              <div className="flex items-center gap-2">
-                <button className="btn-secondary btn-sm" disabled={page === 0} onClick={() => setPage((p) => p - 1)}>
+              <div className="d-flex gap-2">
+                <button className="btn btn-sm btn-outline-secondary" disabled={page === 0} onClick={() => setPage((p) => p - 1)}>
                   Sebelumnya
                 </button>
                 <button
-                  className="btn-secondary btn-sm"
+                  className="btn btn-sm btn-outline-secondary"
                   disabled={page * PAGE_SIZE + visible.length >= total}
                   onClick={() => setPage((p) => p + 1)}
                 >

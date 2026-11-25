@@ -78,11 +78,11 @@ export default function NewChangePage() {
         <form onSubmit={submit} noValidate>
           {error && <Notice kind="danger">{error}</Notice>}
 
-          <div className="space-y-6">
+          <div className="d-flex flex-column gap-4">
             <Card title="Ringkasan perubahan" description="Identitas dan klasifikasi CRF">
-              <div className="space-y-4">
+              <div className="d-flex flex-column gap-3">
                 <div>
-                  <label htmlFor="title" className="label">
+                  <label htmlFor="title" className="form-label">
                     Judul <span className="text-danger">*</span>
                   </label>
                   <input
@@ -91,16 +91,16 @@ export default function NewChangePage() {
                     value={form.title}
                     onChange={set("title")}
                     placeholder="Contoh: Upgrade IOS core switch gedung A"
-                    className="field"
+                    className="form-control"
                   />
                 </div>
 
-                <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-                  <div>
-                    <label htmlFor="category" className="label">
+                <div className="row g-3">
+                  <div className="col-md-4">
+                    <label htmlFor="category" className="form-label">
                       Kategori
                     </label>
-                    <select id="category" value={form.category} onChange={set("category")} className="field">
+                    <select id="category" value={form.category} onChange={set("category")} className="form-select">
                       {Object.keys(CATEGORY).map((o) => (
                         <option key={o} value={o}>
                           {categoryLabel(o)}
@@ -108,11 +108,11 @@ export default function NewChangePage() {
                       ))}
                     </select>
                   </div>
-                  <div>
-                    <label htmlFor="change_type" className="label">
+                  <div className="col-md-4">
+                    <label htmlFor="change_type" className="form-label">
                       Tipe perubahan
                     </label>
-                    <select id="change_type" value={form.change_type} onChange={set("change_type")} className="field">
+                    <select id="change_type" value={form.change_type} onChange={set("change_type")} className="form-select">
                       {Object.keys(CHANGE_TYPE).map((o) => (
                         <option key={o} value={o}>
                           {changeTypeLabel(o)}
@@ -120,11 +120,11 @@ export default function NewChangePage() {
                       ))}
                     </select>
                   </div>
-                  <div>
-                    <label htmlFor="environment" className="label">
+                  <div className="col-md-4">
+                    <label htmlFor="environment" className="form-label">
                       Lingkungan
                     </label>
-                    <select id="environment" value={form.environment} onChange={set("environment")} className="field">
+                    <select id="environment" value={form.environment} onChange={set("environment")} className="form-select">
                       {Object.keys(ENVIRONMENT).map((o) => (
                         <option key={o} value={o}>
                           {environmentLabel(o)}
@@ -137,10 +137,10 @@ export default function NewChangePage() {
             </Card>
 
             <Card title="Detail teknis" description="Semakin lengkap, semakin akurat tinjauan AI dan keputusan approver">
-              <div className="space-y-4">
+              <div className="d-flex flex-column gap-3">
                 {TEXTAREAS.map(([key, label, required, hint]) => (
                   <div key={key}>
-                    <label htmlFor={key} className="label">
+                    <label htmlFor={key} className="form-label">
                       {label} {required && <span className="text-danger">*</span>}
                     </label>
                     <textarea
@@ -150,9 +150,9 @@ export default function NewChangePage() {
                       aria-describedby={`${key}-hint`}
                       value={form[key]}
                       onChange={set(key)}
-                      className="field h-auto py-2"
+                      className="form-control"
                     />
-                    <p id={`${key}-hint`} className="mt-1 text-meta text-foreground-muted">
+                    <p id={`${key}-hint`} className="form-text mb-0">
                       {hint}
                     </p>
                   </div>
@@ -161,9 +161,9 @@ export default function NewChangePage() {
             </Card>
 
             <Card title="Cakupan" description="Pisahkan beberapa nilai dengan koma">
-              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                <div>
-                  <label htmlFor="affected_devices" className="label">
+              <div className="row g-3">
+                <div className="col-md-6">
+                  <label htmlFor="affected_devices" className="form-label">
                     Perangkat terdampak
                   </label>
                   <input
@@ -171,11 +171,11 @@ export default function NewChangePage() {
                     value={form.affected_devices}
                     onChange={set("affected_devices")}
                     placeholder="core-sw-01, fw-edge-02"
-                    className="field font-mono"
+                    className="form-control font-monospace"
                   />
                 </div>
-                <div>
-                  <label htmlFor="affected_services" className="label">
+                <div className="col-md-6">
+                  <label htmlFor="affected_services" className="form-label">
                     Layanan terdampak
                   </label>
                   <input
@@ -183,18 +183,18 @@ export default function NewChangePage() {
                     value={form.affected_services}
                     onChange={set("affected_services")}
                     placeholder="VPN kantor pusat, e-mail"
-                    className="field"
+                    className="form-control"
                   />
                 </div>
               </div>
             </Card>
           </div>
 
-          <div className="mt-6 flex flex-wrap justify-end gap-3">
-            <button type="button" onClick={() => router.push("/changes")} className="btn-secondary">
+          <div className="d-flex flex-wrap justify-content-end gap-3 mt-4">
+            <button type="button" onClick={() => router.push("/changes")} className="btn btn-secondary">
               Batal
             </button>
-            <button type="submit" disabled={busy} className="btn-primary">
+            <button type="submit" disabled={busy} className="btn btn-primary">
               {busy ? "Menyimpan…" : "Simpan sebagai Draft"}
             </button>
           </div>

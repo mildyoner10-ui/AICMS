@@ -228,8 +228,8 @@ export default function ChangesPage() {
       />
 
       <Page wide>
-        <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-end">
-          <div className="flex-1">
+        <div className="mb-4 d-flex flex-column gap-3 align-items-start align-items-sm-end">
+          <div className="flex-grow-1" style={{ maxWidth: "none" }}>
             <label htmlFor="search" className="label">
               Cari
             </label>
@@ -245,7 +245,7 @@ export default function ChangesPage() {
               className="field"
             />
           </div>
-          <div className="sm:w-64">
+          <div style={{ minWidth: "16rem" }}>
             <label htmlFor="status" className="label">
               Status
             </label>
@@ -265,7 +265,7 @@ export default function ChangesPage() {
               ))}
             </select>
           </div>
-          <div className="sm:w-40">
+          <div style={{ minWidth: "10rem" }}>
             <label htmlFor="from_date" className="label">
               Dari tanggal
             </label>
@@ -280,7 +280,7 @@ export default function ChangesPage() {
               className="field"
             />
           </div>
-          <div className="sm:w-40">
+          <div style={{ minWidth: "10rem" }}>
             <label htmlFor="to_date" className="label">
               Sampai tanggal
             </label>
@@ -322,13 +322,13 @@ export default function ChangesPage() {
         )}
 
         {!loading && !error && pageItems.length > 0 && (
-          <Card className="overflow-hidden [&>div]:p-0">
+          <Card className="overflow-hidden p-0">
             <div className="overflow-x-auto">
-              <table className="w-full min-w-[900px]">
-                <thead className="border-b border-border bg-surface-muted">
+              <table className="w-100" style={{ minWidth: "900px" }}>
+                <thead className="border-bottom" style={{ backgroundColor: "var(--app-surface-secondary)" }}>
                   <tr>
                     {canDelete && (
-                      <th className="w-10 px-4 py-3">
+                      <th style={{ width: "2.5rem", padding: "0.75rem 1rem" }}>
                         <input
                           type="checkbox"
                           aria-label="Pilih semua perubahan di halaman ini"
@@ -340,7 +340,8 @@ export default function ChangesPage() {
                                 : new Set([...selected].filter((id) => !pageItems.some((c) => c.id === id))),
                             )
                           }
-                          className="h-4 w-4 rounded border-border-strong"
+                          className="form-check-input"
+                          style={{ width: "16px", height: "16px", borderColor: "var(--app-border-strong)" }}
                         />
                       </th>
                     )}
@@ -353,7 +354,7 @@ export default function ChangesPage() {
                     <th className="th">Peninjau</th>
                     <th className="th">Persetujuan</th>
                     <th className="th">Diperbarui</th>
-                    {canDelete && <th className="th text-right">Aksi</th>}
+                    {canDelete && <th className="th text-end">Aksi</th>}
                   </tr>
                 </thead>
                 <tbody>
@@ -361,8 +362,13 @@ export default function ChangesPage() {
                     <tr
                       key={change.id}
                       onClick={() => router.push(`/changes/${change.id}`)}
-                      className="cursor-pointer border-b border-border last:border-0 hover:bg-surface-muted"
+                      className="border-bottom"
+                      style={{ cursor: "pointer", borderBottomColor: "var(--app-border)", borderBottomWidth: "1px", borderBottomStyle: "solid" }}
+                      onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "var(--app-surface-secondary)")}
+                      onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "")}
                     >
+                      {change.id === pageItems[pageItems.length - 1].id &&
+                        (canDelete ? <td style={{ border: "none" }} /> : null)}
                       {canDelete && (
                         <td className="px-4 py-3" onClick={(e) => e.stopPropagation()}>
                           <input
@@ -370,27 +376,28 @@ export default function ChangesPage() {
                             aria-label={`Pilih ${change.change_number}`}
                             checked={selected.has(change.id)}
                             onChange={() => toggle(change.id)}
-                            className="h-4 w-4 rounded border-border-strong"
+                            className="form-check-input"
+                            style={{ width: "16px", height: "16px", borderColor: "var(--app-border-strong)" }}
                           />
                         </td>
                       )}
-                      <td className="td whitespace-nowrap font-mono text-brand">{change.change_number}</td>
-                      <td className="td max-w-[280px] font-medium">{change.title}</td>
+                      <td className="td text-nowrap font-monospace text-brand">{change.change_number}</td>
+                      <td className="td" style={{ maxWidth: "280px", fontWeight: 500 }}>{change.title}</td>
                       <td className="td">
                         <StatusBadge status={change.status} />
                       </td>
                       <td className="td">
                         <RiskBadge risk={change.risk_level ?? null} />
                       </td>
-                      <td className="td text-foreground-muted">{categoryLabel(change.category)}</td>
+                      <td className="td text-muted">{categoryLabel(change.category)}</td>
                       <td className="td">
                         <EnvTag env={environmentLabel(change.environment)} />
                       </td>
-                      <td className="td text-foreground-muted">{change.reviewer_name ?? "—"}</td>
-                      <td className="td text-foreground-muted">{change.approver_name ?? "—"}</td>
-                      <td className="td whitespace-nowrap text-foreground-muted">{fmtDateTime(change.updated_at)}</td>
+                      <td className="td text-muted">{change.reviewer_name ?? "—"}</td>
+                      <td className="td text-muted">{change.approver_name ?? "—"}</td>
+                      <td className="td text-nowrap text-muted">{fmtDateTime(change.updated_at)}</td>
                       {canDelete && (
-                        <td className="px-4 py-3 text-right" onClick={(e) => e.stopPropagation()}>
+                        <td className="px-4 py-3 text-end" onClick={(e) => e.stopPropagation()}>
                           <button
                             onClick={() => void deleteOne(change)}
                             disabled={deleting || !canDeleteThis(change.status)}
@@ -410,11 +417,11 @@ export default function ChangesPage() {
                 </tbody>
               </table>
             </div>
-            <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border bg-surface-muted px-4 py-3">
-              <p className="text-meta text-foreground-muted">
+            <div className="d-flex flex-wrap align-items-center justify-content-between gap-3 border-top" style={{ borderColor: "var(--app-border)", backgroundColor: "var(--app-surface-secondary)", padding: "0.75rem 1rem" }}>
+              <p className="text-meta text-muted mb-0">
                 Menampilkan {pageItems.length} dari {changes?.total ?? 0} perubahan
               </p>
-              <div className="flex gap-2">
+              <div className="d-flex gap-2">
                 <button onClick={() => setPage(Math.max(1, page - 1))} disabled={page <= 1} className="btn-secondary btn-sm">
                   ← Sebelumnya
                 </button>

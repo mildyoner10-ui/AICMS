@@ -2,13 +2,20 @@
 
 import { useEffect, useState, type ReactNode } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import { statusLabel, riskLabel, riskTone, statusTone, toneClass, toneMark } from "@/lib/labels";
+import { statusLabel, riskLabel, riskTone, statusTone } from "@/lib/labels";
 
 export function StatusBadge({ status, className = "" }: { status: string; className?: string }) {
   const tone = statusTone(status);
+  const colorClass = {
+    neutral: "bg-secondary",
+    info: "bg-info",
+    pending: "bg-warning text-dark",
+    success: "bg-success",
+    danger: "bg-danger",
+    done: "bg-secondary",
+  }[tone] || "bg-secondary";
   return (
-    <span className={`chip ${toneClass(tone)} ${className}`}>
-      <span aria-hidden>{toneMark(tone)}</span>
+    <span className={`badge ${colorClass} ${className}`} style={{ fontSize: "11px", fontWeight: 500 }}>
       {statusLabel(status)}
     </span>
   );
@@ -16,9 +23,16 @@ export function StatusBadge({ status, className = "" }: { status: string; classN
 
 export function RiskBadge({ risk, className = "" }: { risk: string | null | undefined; className?: string }) {
   const tone = riskTone(risk);
+  const colorClass = {
+    neutral: "bg-secondary",
+    info: "bg-info",
+    pending: "bg-warning text-dark",
+    success: "bg-success",
+    danger: "bg-danger",
+    done: "bg-secondary",
+  }[tone] || "bg-secondary";
   return (
-    <span className={`chip ${toneClass(tone)} ${className}`}>
-      <span aria-hidden>{toneMark(tone)}</span>
+    <span className={`badge ${colorClass} ${className}`} style={{ fontSize: "11px", fontWeight: 500 }}>
       Risiko: {riskLabel(risk)}
     </span>
   );
@@ -26,20 +40,13 @@ export function RiskBadge({ risk, className = "" }: { risk: string | null | unde
 
 export function EnvTag({ env }: { env: string }) {
   return (
-    <span className="chip bg-surface-muted text-text ring-1 ring-inset border border-border">
-      <span aria-hidden>⌂</span>
+    <span className="badge bg-light text-dark border" style={{ fontSize: "12px" }}>
       {env}
     </span>
   );
 }
 
-export function PageHeader({
-  title,
-  description,
-  back,
-  actions,
-  breadcrumb,
-}: {
+export function PageHeader({ title, description, back, actions, breadcrumb }: {
   title: ReactNode;
   description?: ReactNode;
   back?: { href: string; label: string };
@@ -48,23 +55,20 @@ export function PageHeader({
 }) {
   const router = useRouter();
   return (
-    <header className="border-b-2 border-dashed border-teal/30 bg-surface">
-      <div className="mx-auto max-w-[1280px] px-6 py-5 md:px-8">
+    <header style={{ borderBottom: "1px solid var(--app-border)", background: "var(--app-surface)", marginBottom: "20px" }}>
+      <div className="container-fluid px-4 py-3">
         {back && (
-          <button
-            onClick={() => router.push(back.href)}
-            className="mb-2 -ml-1 inline-flex items-center gap-1 rounded px-2 py-1 text-sm font-bold text-teal-dark hover:bg-teal-bg"
-          >
-            <span aria-hidden>←</span> {back.label}
+          <button onClick={() => router.push(back.href)} className="btn btn-link btn-sm text-decoration-none mb-2" style={{ color: "var(--app-primary)" }}>
+            <i className="bi bi-arrow-left me-1"></i> {back.label}
           </button>
         )}
-        {breadcrumb && <nav className="mb-1 text-meta text-text-muted">{breadcrumb}</nav>}
-        <div className="flex flex-wrap items-start justify-between gap-x-6 gap-y-3">
+        {breadcrumb && <nav className="mb-1 text-muted small">{breadcrumb}</nav>}
+        <div className="d-flex flex-wrap align-items-start justify-content-between gap-2">
           <div className="min-w-0">
-            <h1 className="page-title text-text">{title}</h1>
-            {description && <p className="mt-1 max-w-3xl text-sm text-text-muted">{description}</p>}
+            <h1 className="h4 mb-0" style={{ fontSize: "22px", fontWeight: 600 }}>{title}</h1>
+            {description && <p className="text-muted small mt-1 mb-0">{description}</p>}
           </div>
-          {actions && <div className="flex flex-wrap items-center gap-2">{actions}</div>}
+          {actions && <div className="d-flex flex-wrap gap-2">{actions}</div>}
         </div>
       </div>
     </header>
@@ -73,7 +77,9 @@ export function PageHeader({
 
 export function Page({ children, wide = false }: { children: ReactNode; wide?: boolean }) {
   return (
-    <main className={`mx-auto ${wide ? "max-w-[1280px]" : "max-w-5xl"} px-6 py-6 md:px-8 md:py-8`}>{children}</main>
+    <main className={wide ? "container-fluid px-4 py-4" : "container-fluid px-4 py-4"} style={{ maxWidth: wide ? "1440px" : "none" }}>
+      {children}
+    </main>
   );
 }
 
@@ -85,18 +91,18 @@ export function Card({ title, description, actions, children, className = "" }: 
   className?: string;
 }) {
   return (
-    <section className={`card ${className}`}>
+    <div className={`card mb-4 ${className}`}>
       {(title || actions) && (
-        <div className="flex flex-wrap items-start justify-between gap-3 px-5 py-4 md:px-6 section-divider">
+        <div className="card-header d-flex flex-wrap align-items-start justify-content-between gap-3" style={{ background: "transparent", borderBottom: "1px dashed var(--app-border)", padding: "16px 20px 4px" }}>
           <div>
-            {title && <h2 className="card-title text-text">{title}</h2>}
-            {description && <p className="mt-0.5 text-meta text-text-muted">{description}</p>}
+            {title && <h2 className="h6 mb-0" style={{ fontSize: "14px", fontWeight: 600 }}>{title}</h2>}
+            {description && <p className="text-muted small mb-0 mt-1">{description}</p>}
           </div>
-          {actions && <div className="flex flex-wrap items-center gap-2">{actions}</div>}
+          {actions && <div className="d-flex flex-wrap gap-2">{actions}</div>}
         </div>
       )}
-      <div className="p-5 md:p-6">{children}</div>
-    </section>
+      <div className="card-body p-4">{children}</div>
+    </div>
   );
 }
 
@@ -105,21 +111,14 @@ export function Notice({ kind = "info", children, onDismiss }: {
   children: ReactNode;
   onDismiss?: () => void;
 }) {
-  const cls = {
-    info: "bg-sky bg-opacity-15 text-sky border border-sky/30",
-    success: "bg-success bg-opacity-10 text-success border border-success/30",
-    danger: "bg-coral bg-opacity-10 text-coral-dark border border-coral/30",
-    warning: "bg-coral bg-opacity-10 text-coral-dark border border-coral/30",
-  }[kind];
-  const mark = { info: "i", success: "✓", danger: "!", warning: "!" }[kind];
+  const cls = { info: "alert-info", success: "alert-success", danger: "alert-danger", warning: "alert-warning" }[kind];
+  const icons = { info: "bi-info-circle", success: "bi-check-circle", danger: "bi-exclamation-circle", warning: "bi-exclamation-triangle" };
   return (
-    <div className={`mb-4 flex items-start gap-3 rounded-md px-4 py-3 text-sm font-bold ${cls}`} role={kind === "danger" ? "alert" : "status"}>
-      <span aria-hidden className="mt-0.5">{mark}</span>
-      <div className="flex-1">{children}</div>
+    <div className={`alert ${cls} ${onDismiss ? "alert-dismissible fade show" : ""} d-flex align-items-start gap-2 mb-3`} role={kind === "danger" ? "alert" : "status"}>
+      <i className={`bi ${icons[kind]} mt-1`}></i>
+      <div className="flex-grow-1">{children}</div>
       {onDismiss && (
-        <button onClick={onDismiss} aria-label="Tutup pemberitahuan" className="opacity-70 hover:opacity-100">
-          ✕
-        </button>
+        <button type="button" className="btn-close ms-auto" aria-label="Tutup" onClick={onDismiss}></button>
       )}
     </div>
   );
@@ -127,47 +126,48 @@ export function Notice({ kind = "info", children, onDismiss }: {
 
 export function EmptyState({ title, description, action }: { title: string; description: string; action?: ReactNode }) {
   return (
-    <div className="px-6 py-14 text-center">
-      <div aria-hidden className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-teal-bg text-teal-dark text-xl">
-        ◌
+    <div className="card mb-4">
+      <div className="card-body text-center py-5">
+        <i className="bi bi-circle text-muted mb-3" style={{ fontSize: "48px", opacity: 0.3 }}></i>
+        <p className="h6 mb-2">{title}</p>
+        <p className="text-muted small mb-3">{description}</p>
+        {action && <div className="d-flex justify-content-center">{action}</div>}
       </div>
-      <p className="font-extrabold text-text">{title}</p>
-      <p className="mx-auto mt-1 max-w-sm text-sm text-text-muted">{description}</p>
-      {action && <div className="mt-4 flex justify-center">{action}</div>}
     </div>
   );
 }
 
 export function ErrorState({ message, onRetry }: { message: string; onRetry?: () => void }) {
   return (
-    <div className="card card-coral px-6 py-10 text-center" role="alert">
-      <p className="font-extrabold text-coral-dark">Gagal memuat data</p>
-      <p className="mt-1 text-sm text-text-muted">{message}</p>
-      {onRetry && (
-        <button onClick={onRetry} className="btn-secondary btn-sm mt-4">
-          Coba lagi
-        </button>
-      )}
+    <div className="alert alert-danger d-flex align-items-center gap-2 mb-4" role="alert">
+      <i className="bi bi-exclamation-triangle"></i>
+      <div>
+        <strong>Gagal memuat data</strong>
+        <p className="mb-0 small text-muted">{message}</p>
+      </div>
+      {onRetry && <button onClick={onRetry} className="btn btn-sm btn-outline-danger ms-auto">Coba lagi</button>}
     </div>
   );
 }
 
 export function Skeleton({ rows = 4 }: { rows?: number }) {
   return (
-    <div className="space-y-3" role="status" aria-label="Memuat data">
+    <div role="status" aria-label="Memuat data">
       {Array.from({ length: rows }).map((_, i) => (
-        <div key={i} className="h-9 animate-pulse rounded-md bg-teal-bg" />
+        <div key={i} className="placeholder-glow mb-2">
+          <div className="placeholder col-12" style={{ height: "36px" }}></div>
+        </div>
       ))}
-      <span className="sr-only">Memuat…</span>
+      <span className="visually-hidden">Memuat…</span>
     </div>
   );
 }
 
 export function Spinner({ label = "Memuat…" }: { label?: string }) {
   return (
-    <div className="flex items-center justify-center gap-3 py-16 text-text-muted" role="status">
-      <span className="h-5 w-5 animate-spin rounded-full border-2 border-border-strong border-t-teal" aria-hidden />
-      <span className="text-sm font-bold">{label}</span>
+    <div className="d-flex align-items-center justify-content-center gap-3 py-4 text-muted" role="status">
+      <div className="spinner-border spinner-border-sm" style={{ borderWidth: "2px" }}></div>
+      <span className="small fw-medium">{label}</span>
     </div>
   );
 }

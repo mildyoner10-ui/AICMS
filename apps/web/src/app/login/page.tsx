@@ -38,77 +38,68 @@ export default function Login() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center px-4 bg-canvas">
-      <div className="w-full max-w-[400px]">
-        {/* Logo parallelogram */}
-        <div className="mb-6 flex items-center gap-3">
-          <div
-            className="relative flex h-12 w-20 items-center justify-center overflow-hidden rounded-sm bg-cream border-2 border-teal-dark"
-            style={{ transform: "skewX(-6deg)" }}
-          >
-            <span className="text-sm font-extrabold text-teal-dark tracking-wider" style={{ transform: "skewX(6deg)" }}>AICMS</span>
-          </div>
-          <div>
-            <h1 className="text-xl font-extrabold tracking-wide text-text">Manajemen Perubahan</h1>
-            <p className="text-meta text-text-muted">AI Change Management System</p>
-          </div>
+    <div className="d-flex align-items-center justify-content-center min-vh-100 py-4" style={{ background: "var(--app-bg)" }}>
+      <div className="w-100" style={{ maxWidth: "400px" }}>
+        {/* Brand */}
+        <div className="text-center mb-4">
+          <h4 className="fw-bold mb-1" style={{ color: "var(--app-text)", letterSpacing: "-0.02em" }}>
+            AICMS
+          </h4>
+          <p className="text-muted small mb-0">Manajemen Perubahan</p>
+          <p className="text-muted" style={{ fontSize: "12px" }}>AI Change Management System</p>
         </div>
 
-        <div className="card p-6">
-          <h2 className="text-section font-extrabold text-text">Masuk</h2>
-          <p className="mt-1 text-sm text-text-muted">Gunakan kredensial organisasi Anda.</p>
+        <div className="card">
+          <div className="card-body p-4">
+            <h5 className="fw-bold mb-1">Masuk</h5>
+            <p className="text-muted small mb-4">Gunakan kredensial organisasi Anda.</p>
 
-          <form onSubmit={handleSubmit} className="mt-5 space-y-4">
-            <div>
-              <label htmlFor="username" className="label">
-                Nama pengguna
-              </label>
-              <input
-                id="username"
-                type="text"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                className="field"
-                placeholder="admin"
-                required
-                autoComplete="username"
-              />
-            </div>
-
-            <div>
-              <label htmlFor="password" className="label">
-                Kata sandi
-              </label>
-              <input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="field"
-                placeholder="••••••••"
-                required
-                autoComplete="current-password"
-              />
-            </div>
-
-            {error && (
-              <div className="rounded-md bg-coral/10 px-3 py-2 text-sm text-coral-dark font-bold border border-coral/30" role="alert">
-                {error}
+            <form onSubmit={handleSubmit} className="mb-0">
+              <div className="mb-3">
+                <label htmlFor="username" className="form-label">Nama pengguna</label>
+                <input
+                  id="username"
+                  type="text"
+                  className="form-control"
+                  placeholder="admin"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  required
+                  autoComplete="username"
+                />
               </div>
-            )}
 
-            <button type="submit" disabled={loading} className="btn-primary w-full">
-              {loading ? "Memproses…" : "Masuk"}
-            </button>
-          </form>
+              <div className="mb-3">
+                <label htmlFor="password" className="form-label">Kata sandi</label>
+                <input
+                  id="password"
+                  type="password"
+                  className="form-control"
+                  placeholder="••••••••"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  autoComplete="current-password"
+                />
+              </div>
+
+              {error && (
+                <div className="alert alert-danger py-2 small mb-3" role="alert">
+                  <i className="bi bi-exclamation-circle me-1"></i> {error}
+                </div>
+              )}
+
+              <button type="submit" disabled={loading} className="btn btn-primary w-100" style={{ height: "36px" }}>
+                {loading ? <><span className="spinner-border spinner-border-sm me-2"></span>Memproses…</> : "Masuk"}
+              </button>
+            </form>
+          </div>
         </div>
 
-        <p className="mt-4 flex items-start gap-2 rounded-md bg-warning/10 px-3 py-2 text-meta text-coral-dark border border-coral/20">
-          <span aria-hidden className="font-bold">
-            !
-          </span>
+        <div className="alert alert-info py-2 mt-3 small" role="alert">
+          <i className="bi bi-info-circle me-1"></i>
           Mode pengembangan — login lokal aktif. Jangan gunakan data nyata.
-        </p>
+        </div>
       </div>
     </div>
   );

@@ -147,19 +147,25 @@ export default function UsersPage() {
           </Notice>
         )}
 
-        <div className="space-y-6">
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-            <div className="card p-4">
-              <p className="text-kpi tabular-nums">{users.length}</p>
-              <p className="mt-1 text-[13px] font-semibold">Total akun</p>
+        <div className="mb-4">
+          <div className="row g-3">
+            <div className="col-12 col-sm-4">
+              <div className="card p-4">
+                <p className="display-6 fw-bold" style={{ fontSize: "28px" }}>{users.length}</p>
+                <p className="mt-1 text-[13px] fw-semibold">Total akun</p>
+              </div>
             </div>
-            <div className="card p-4">
-              <p className="text-kpi tabular-nums text-success">{active}</p>
-              <p className="mt-1 text-[13px] font-semibold">Aktif</p>
+            <div className="col-12 col-sm-4">
+              <div className="card p-4">
+                <p className="display-6 fw-bold text-success" style={{ fontSize: "28px" }}>{active}</p>
+                <p className="mt-1 text-[13px] fw-semibold">Aktif</p>
+              </div>
             </div>
-            <div className="card p-4">
-              <p className="text-kpi tabular-nums text-foreground-muted">{users.length - active}</p>
-              <p className="mt-1 text-[13px] font-semibold">Nonaktif</p>
+            <div className="col-12 col-sm-4">
+              <div className="card p-4">
+                <p className="display-6 fw-bold text-muted" style={{ fontSize: "28px" }}>{users.length - active}</p>
+                <p className="mt-1 text-[13px] fw-semibold">Nonaktif</p>
+              </div>
             </div>
           </div>
 
@@ -169,50 +175,55 @@ export default function UsersPage() {
                 <Skeleton rows={5} />
               </div>
             ) : users.length === 0 ? (
-              <p className="p-5 text-sm text-foreground-muted">Belum ada pengguna.</p>
+              <p className="p-5 small text-muted">Belum ada pengguna.</p>
             ) : (
-              <div className="overflow-x-auto">
-                <table className="w-full min-w-[860px]">
-                  <thead className="border-b border-border bg-cream">
+              <div className="overflow-auto">
+                <table className="w-100 table table-hover mb-0" style={{ minWidth: "860px" }}>
+                  <thead className="border-bottom" style={{ borderBottom: `1px solid var(--app-border)`, backgroundColor: "var(--app-surface-secondary)" }}>
                     <tr>
-                      <th className="th">Nama</th>
-                      <th className="th">Username</th>
-                      <th className="th">Email</th>
-                      <th className="th">Peran</th>
-                      <th className="th">Status</th>
-                      <th className="th text-right">Aksi</th>
+                      <th className="text-nowrap py-2 px-3 fw-semibold small">Nama</th>
+                      <th className="text-nowrap py-2 px-3 fw-semibold small">Username</th>
+                      <th className="text-nowrap py-2 px-3 fw-semibold small">Email</th>
+                      <th className="text-nowrap py-2 px-3 fw-semibold small">Peran</th>
+                      <th className="text-nowrap py-2 px-3 fw-semibold small">Status</th>
+                      <th className="text-nowrap py-2 px-3 fw-semibold small text-end">Aksi</th>
                     </tr>
                   </thead>
                   <tbody>
                     {users.map((u) => (
-                      <tr key={u.id} className={`border-b border-border last:border-0 ${u.is_active ? "" : "bg-cream/60 text-text-muted"}`}>
-                        <td className="td font-medium">{u.display_name || u.username}</td>
-                        <td className="td font-mono text-meta">{u.username}</td>
-                        <td className="td text-meta text-foreground-muted">{u.email}</td>
-                        <td className="td">
+                      <tr key={u.id} className="border-bottom" style={{
+                        borderBottom: `1px solid var(--app-border)`,
+                        backgroundColor: (!u.is_active ? "var(--app-surface-secondary)" : undefined),
+                        opacity: (!u.is_active ? 0.6 : undefined),
+                      }}>
+                        <td className="py-2 px-3 fw-medium">{u.display_name || u.username}</td>
+                        <td className="py-2 px-3 font-monospace small text-muted">{u.username}</td>
+                        <td className="py-2 px-3 small text-muted">{u.email}</td>
+                        <td className="py-2 px-3">
                           {editing === u.id ? (
-                            <div className="flex max-w-xs flex-wrap gap-2">
+                            <div className="d-flex flex-wrap gap-2" style={{ maxWidth: "320px" }}>
                               {roles.map((r) => (
-                                <label key={r.code} className="flex items-center gap-1.5 text-meta">
+                                <label key={r.code} className="d-flex align-items-center gap-1 small text-muted">
                                   <input
                                     type="checkbox"
                                     checked={draftRoles.includes(r.code)}
                                     onChange={(e) =>
                                       setDraftRoles((cur) => (e.target.checked ? [...cur, r.code] : cur.filter((c) => c !== r.code)))
                                     }
-                                    className="h-3.5 w-3.5 rounded border-border-strong"
+                                    className="form-check-input"
+                                    style={{ width: "14px", height: "14px", borderRadius: "4px", borderColor: "var(--app-border-strong)" }}
                                   />
                                   {roleLabel(r.code)}
                                 </label>
                               ))}
                             </div>
                           ) : (
-                            <div className="flex flex-wrap gap-1">
+                            <div className="d-flex flex-wrap gap-1">
                               {u.roles.length === 0 ? (
-                                <span className="text-meta text-foreground-muted">—</span>
+                                <span className="small text-muted">—</span>
                               ) : (
                                 u.roles.map((r) => (
-                                  <span key={r} className="chip whitespace-nowrap bg-teal bg-opacity-15 text-teal-dark" title={r}>
+                                  <span key={r} className="badge bg-teal bg-opacity-15 text-teal-dark" title={r} style={{ borderRadius: "999px" }}>
                                     {roleLabel(r)}
                                   </span>
                                 ))
@@ -220,26 +231,34 @@ export default function UsersPage() {
                             </div>
                           )}
                         </td>
-                        <td className="td">
+                        <td className="py-2 px-3">
                           <span
-                            className={`chip ${
+                            className={`badge ${
                               u.is_active
-                                ? "bg-success-soft text-success ring-1 ring-inset ring-success/25"
-                                : "bg-cream text-text-muted ring-1 ring-inset ring-border-strong"
+                                ? "text-bg-success"
+                                : "bg-cream text-text-muted border"
                             }`}
+                            style={{
+                              borderRadius: "999px",
+                              ...(u.is_active ? {} : {
+                                backgroundColor: "var(--app-surface-secondary)",
+                                color: "var(--app-text-muted)",
+                                borderColor: "var(--app-border-strong)",
+                              }),
+                            }}
                           >
                             <span aria-hidden>{u.is_active ? "●" : "○"}</span>
                             {u.is_active ? "Aktif" : "Nonaktif"}
                           </span>
                         </td>
-                        <td className="td text-right">
-                          <div className="flex justify-end gap-1">
+                        <td className="py-2 px-3 text-end">
+                          <div className="d-flex justify-content-end gap-1">
                             {editing === u.id ? (
                               <>
-                                <button onClick={() => void saveRoles(u.id)} disabled={busy} className="btn-primary btn-sm">
+                                <button onClick={() => void saveRoles(u.id)} disabled={busy} className="btn btn-sm btn-primary">
                                   Simpan
                                 </button>
-                                <button onClick={() => setEditing(null)} className="btn-ghost btn-sm">
+                                <button onClick={() => setEditing(null)} className="btn btn-sm btn-link text-decoration-none p-0">
                                   Batal
                                 </button>
                               </>
@@ -249,13 +268,13 @@ export default function UsersPage() {
                                   setEditing(u.id);
                                   setDraftRoles(u.roles);
                                 }}
-                                className="btn-secondary btn-sm"
+                                className="btn btn-sm btn-outline-secondary"
                               >
                                 Ubah peran
                               </button>
                             )}
                             {u.id !== me && (
-                              <button onClick={() => void toggleActive(u)} disabled={busy} className="btn-ghost btn-sm">
+                              <button onClick={() => void toggleActive(u)} disabled={busy} className="btn btn-sm btn-link text-decoration-none p-0">
                                 {u.is_active ? "Nonaktifkan" : "Aktifkan"}
                               </button>
                             )}
@@ -269,101 +288,108 @@ export default function UsersPage() {
             )}
           </Card>
 
-          <div className="grid grid-cols-1 gap-6 lg:grid-cols-5">
-            <Card title="Tambah pengguna" description="Akun lokal dengan kata sandi awal" className="lg:col-span-3">
-              <form onSubmit={createUser} className="grid gap-4 md:grid-cols-2">
-                <div>
-                  <label htmlFor="username" className="label">
-                    Username
-                  </label>
-                  <input
-                    id="username"
-                    required
-                    minLength={3}
-                    value={form.username}
-                    onChange={(e) => setForm({ ...form, username: e.target.value })}
-                    className="field"
-                    autoComplete="off"
-                  />
-                </div>
-                <div>
-                  <label htmlFor="email" className="label">
-                    Email
-                  </label>
-                  <input
-                    id="email"
-                    required
-                    type="email"
-                    value={form.email}
-                    onChange={(e) => setForm({ ...form, email: e.target.value })}
-                    className="field"
-                    autoComplete="off"
-                  />
-                </div>
-                <div>
-                  <label htmlFor="display_name" className="label">
-                    Nama tampilan
-                  </label>
-                  <input
-                    id="display_name"
-                    value={form.display_name}
-                    onChange={(e) => setForm({ ...form, display_name: e.target.value })}
-                    className="field"
-                  />
-                </div>
-                <div>
-                  <label htmlFor="password" className="label">
-                    Kata sandi <span className="text-foreground-muted">(min. 8 karakter)</span>
-                  </label>
-                  <input
-                    id="password"
-                    required
-                    minLength={8}
-                    type="password"
-                    value={form.password}
-                    onChange={(e) => setForm({ ...form, password: e.target.value })}
-                    className="field"
-                    autoComplete="new-password"
-                  />
-                </div>
-                <fieldset className="md:col-span-2">
-                  <legend className="label">Peran</legend>
-                  <div className="flex flex-wrap gap-3">
-                    {roles.map((r) => (
-                      <label key={r.code} className="flex items-center gap-2 text-sm" title={r.description ?? undefined}>
-                        <input
-                          type="checkbox"
-                          checked={form.role_codes.includes(r.code)}
-                          onChange={(e) =>
-                            setForm((f) => ({
-                              ...f,
-                              role_codes: e.target.checked ? [...f.role_codes, r.code] : f.role_codes.filter((c) => c !== r.code),
-                            }))
-                          }
-                          className="h-4 w-4 rounded border-border-strong"
-                        />
-                        {roleLabel(r.code)}
-                      </label>
-                    ))}
+          <div className="row g-3">
+            <div className="col-12 col-lg-7">
+              <Card title="Tambah pengguna" description="Akun lokal dengan kata sandi awal">
+                <form onSubmit={createUser} className="row g-3">
+                  <div className="col-12 col-sm-6">
+                    <label htmlFor="username" className="form-label">
+                      Username
+                    </label>
+                    <input
+                      id="username"
+                      required
+                      minLength={3}
+                      value={form.username}
+                      onChange={(e) => setForm({ ...form, username: e.target.value })}
+                      className="form-control"
+                      autoComplete="off"
+                    />
                   </div>
-                </fieldset>
-                <div className="md:col-span-2">
-                  <button type="submit" disabled={busy} className="btn-primary">
-                    {busy ? "Menyimpan…" : "Buat pengguna"}
-                  </button>
-                </div>
-              </form>
-            </Card>
+                  <div className="col-12 col-sm-6">
+                    <label htmlFor="email" className="form-label">
+                      Email
+                    </label>
+                    <input
+                      id="email"
+                      required
+                      type="email"
+                      value={form.email}
+                      onChange={(e) => setForm({ ...form, email: e.target.value })}
+                      className="form-control"
+                      autoComplete="off"
+                    />
+                  </div>
+                  <div className="col-12 col-sm-6">
+                    <label htmlFor="display_name" className="form-label">
+                      Nama tampilan
+                    </label>
+                    <input
+                      id="display_name"
+                      value={form.display_name}
+                      onChange={(e) => setForm({ ...form, display_name: e.target.value })}
+                      className="form-control"
+                    />
+                  </div>
+                  <div className="col-12 col-sm-6">
+                    <label htmlFor="password" className="form-label">
+                      Kata sandi <span className="text-muted">(min. 8 karakter)</span>
+                    </label>
+                    <input
+                      id="password"
+                      required
+                      minLength={8}
+                      type="password"
+                      value={form.password}
+                      onChange={(e) => setForm({ ...form, password: e.target.value })}
+                      className="form-control"
+                      autoComplete="new-password"
+                    />
+                  </div>
+                  <div className="col-12">
+                    <fieldset className="border-0 p-0 mb-0">
+                      <legend className="form-label w-100">Peran</legend>
+                      <div className="d-flex flex-wrap gap-3">
+                        {roles.map((r) => (
+                          <label key={r.code} className="d-flex align-items-center gap-2 small" title={r.description ?? undefined}>
+                            <input
+                              type="checkbox"
+                              checked={form.role_codes.includes(r.code)}
+                              onChange={(e) =>
+                                setForm((f) => ({
+                                  ...f,
+                                  role_codes: e.target.checked ? [...f.role_codes, r.code] : f.role_codes.filter((c) => c !== r.code),
+                                }))
+                              }
+                              className="form-check-input"
+                              style={{ width: "16px", height: "16px", borderRadius: "4px", borderColor: "var(--app-border-strong)" }}
+                            />
+                            {roleLabel(r.code)}
+                          </label>
+                        ))}
+                      </div>
+                    </fieldset>
+                  </div>
+                  <div className="col-12">
+                    <button type="submit" disabled={busy} className="btn btn-primary">
+                      {busy ? "Menyimpan…" : "Buat pengguna"}
+                    </button>
+                  </div>
+                </form>
+              </Card>
+            </div>
 
-            <Card title="Daftar peran (RBAC)" description="Peran menentukan langkah persetujuan dan menu" className="lg:col-span-2">
-              <ul className="flex flex-wrap gap-2">
-                {roles.map((r) => (
-                  <li key={r.code}>
-                    <span className="chip bg-cream text-text-muted ring-1 ring-inset ring-border-strong">{roleLabel(r.code)}</span>
-                  </li>
-                ))}
-              </ul>
-            </Card>
+            <div className="col-12 col-lg-5">
+              <Card title="Daftar peran (RBAC)" description="Peran menentukan langkah persetujuan dan menu">
+                <ul className="d-flex flex-wrap gap-2 list-unstyled mb-0">
+                  {roles.map((r) => (
+                    <li key={r.code}>
+                      <span className="badge bg-light text-body border" style={{ borderRadius: "999px" }}>{roleLabel(r.code)}</span>
+                    </li>
+                  ))}
+                </ul>
+              </Card>
+            </div>
           </div>
         </div>
       </Page>

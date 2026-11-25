@@ -109,41 +109,42 @@ export default function ProfilePage() {
       />
 
       <Page>
-        <Card className="max-w-xl">
-          <div className="space-y-4">
+        <div className="mx-auto" style={{ maxWidth: "576px" }}>
+        <Card className="">
+          <div className="d-flex flex-column gap-3">
             <div>
-              <label htmlFor="displayName" className="label">Nama Tampilan</label>
+              <label htmlFor="displayName" className="form-label">Nama Tampilan</label>
               <input
                 id="displayName"
                 type="text"
                 value={displayName}
                 onChange={(e) => setDisplayName(e.target.value)}
-                className="field"
+                className="form-control"
               />
             </div>
 
             <div>
-              <label htmlFor="email" className="label">Email</label>
+              <label htmlFor="email" className="form-label">Email</label>
               <input
                 id="email"
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="field"
+                className="form-control"
               />
             </div>
 
             <div>
-              <label className="label">Nama Pengguna</label>
+              <label className="form-label">Nama Pengguna</label>
               <input
                 id="username"
                 type="text"
                 value={me.username}
                 disabled
-                className="field cursor-not-allowed opacity-60"
+                className="form-control cursor-not-allowed opacity-60"
                 aria-describedby="username-help"
               />
-              <p id="username-help" className="mt-1 text-xs text-foreground-muted">
+              <p id="username-help" className="form-text mt-1 mb-0">
                 Nama pengguna tidak dapat diubah.
               </p>
             </div>
@@ -151,56 +152,57 @@ export default function ProfilePage() {
             {authProvider === "local" && (
               <>
                 <div>
-                  <label htmlFor="oldPassword" className="label">Password Lama</label>
+                  <label htmlFor="oldPassword" className="form-label">Password Lama</label>
                   <input
                     id="oldPassword"
                     type="password"
                     value={oldPassword}
                     onChange={(e) => setOldPassword(e.target.value)}
                     placeholder="Diperlukan jika mengubah password"
-                    className="field"
+                    className="form-control"
                   />
                 </div>
 
                 <div>
-                  <label htmlFor="newPassword" className="label">Password Baru</label>
+                  <label htmlFor="newPassword" className="form-label">Password Baru</label>
                   <input
                     id="newPassword"
                     type="password"
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
-                    className="field"
+                    className="form-control"
                   />
                 </div>
 
                 <div>
-                  <label htmlFor="confirmPassword" className="label">Konfirmasi Password Baru</label>
+                  <label htmlFor="confirmPassword" className="form-label">Konfirmasi Password Baru</label>
                   <input
                     id="confirmPassword"
                     type="password"
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
-                    className="field"
+                    className="form-control"
                   />
                 </div>
               </>
             )}
 
-            <div className="flex items-center gap-3 pt-2">
+            <div className="d-flex align-items-center gap-3 pt-2">
               {notice && (
-                <p className="text-sm text-success">{notice}</p>
+                <p className="small text-success mb-0">{notice}</p>
               )}
             </div>
 
-            {error && <p className="text-sm text-destructive">{error}</p>}
+            {error && <p className="small text-danger mb-0">{error}</p>}
 
             <div className="pt-2">
-              <button onClick={onSave} disabled={saving} className="btn-primary">
+              <button onClick={onSave} disabled={saving} className="btn btn-primary">
                 {saving ? "Menyimpan..." : "Simpan Perubahan"}
               </button>
             </div>
           </div>
         </Card>
+        </div>
       </Page>
     </>
   );

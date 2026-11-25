@@ -1,5 +1,8 @@
 import type { Metadata } from "next";
 import "./globals.css";
+// Bootstrap CSS imported directly so responsive classes work
+import "bootstrap/dist/css/bootstrap.min.css";
+import "bootstrap-icons/font/bootstrap-icons.min.css";
 
 export const metadata: Metadata = {
   title: "AICMS - AI Change Management System",
@@ -12,8 +15,27 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="id">
-      <body className="min-h-screen bg-canvas text-foreground">{children}</body>
+    <html lang="id" suppressHydrationWarning>
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                try {
+                  var t = localStorage.getItem("app-theme");
+                  var theme = (t === "light" || t === "dark") ? t : (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+                  document.documentElement.setAttribute("data-bs-theme", theme);
+                } catch(e) {}
+              })();
+            `,
+          }}
+        />
+        <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+        />
+      </head>
+      <body>{children}</body>
     </html>
   );
 }

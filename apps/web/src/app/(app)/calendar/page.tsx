@@ -116,26 +116,26 @@ export default function CalendarPage() {
       />
 
       <Page>
-        <div className="space-y-4">
+        <div className="mb-3">
           <Card title="Filter" description="Rentang dan atribut perubahan">
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-5">
-              <div>
-                <label htmlFor="from" className="label">
+            <div className="row g-3">
+              <div className="col-12 col-sm-6 col-lg">
+                <label htmlFor="from" className="form-label">
                   Dari
                 </label>
-                <input id="from" type="date" value={from} onChange={(e) => setFrom(e.target.value)} className="field" />
+                <input id="from" type="date" value={from} onChange={(e) => setFrom(e.target.value)} className="form-control" />
               </div>
-              <div>
-                <label htmlFor="to" className="label">
+              <div className="col-12 col-sm-6 col-lg">
+                <label htmlFor="to" className="form-label">
                   Sampai
                 </label>
-                <input id="to" type="date" value={to} onChange={(e) => setTo(e.target.value)} className="field" />
+                <input id="to" type="date" value={to} onChange={(e) => setTo(e.target.value)} className="form-control" />
               </div>
-              <div>
-                <label htmlFor="status" className="label">
+              <div className="col-12 col-sm-6 col-lg">
+                <label htmlFor="status" className="form-label">
                   Status
                 </label>
-                <select id="status" value={status} onChange={(e) => setStatus(e.target.value)} className="field">
+                <select id="status" value={status} onChange={(e) => setStatus(e.target.value)} className="form-control">
                   <option value="">Semua</option>
                   {STATUSES.map((s) => (
                     <option key={s} value={s}>
@@ -144,11 +144,11 @@ export default function CalendarPage() {
                   ))}
                 </select>
               </div>
-              <div>
-                <label htmlFor="category" className="label">
+              <div className="col-12 col-sm-6 col-lg">
+                <label htmlFor="category" className="form-label">
                   Kategori
                 </label>
-                <select id="category" value={category} onChange={(e) => setCategory(e.target.value)} className="field">
+                <select id="category" value={category} onChange={(e) => setCategory(e.target.value)} className="form-control">
                   <option value="">Semua</option>
                   {Object.keys(CATEGORY).map((c) => (
                     <option key={c} value={c}>
@@ -157,11 +157,11 @@ export default function CalendarPage() {
                   ))}
                 </select>
               </div>
-              <div>
-                <label htmlFor="environment" className="label">
+              <div className="col-12 col-sm-6 col-lg">
+                <label htmlFor="environment" className="form-label">
                   Lingkungan
                 </label>
-                <select id="environment" value={environment} onChange={(e) => setEnvironment(e.target.value)} className="field">
+                <select id="environment" value={environment} onChange={(e) => setEnvironment(e.target.value)} className="form-control">
                   <option value="">Semua</option>
                   {Object.keys(ENVIRONMENT).map((e) => (
                     <option key={e} value={e}>
@@ -175,16 +175,16 @@ export default function CalendarPage() {
 
           {conflicts && verdict && (
             <div className={`rounded-card p-4 ${verdict.cls}`} aria-live="polite">
-              <p className="flex items-center gap-2 text-sm font-bold">
+              <p className="d-flex align-items-center gap-2 small fw-bold">
                 <span aria-hidden>{verdict.mark}</span>
                 {verdict.label}
               </p>
-              <p className="mt-1 text-sm opacity-90">{conflicts.note}</p>
+              <p className="mt-2 small opacity-90">{conflicts.note}</p>
               {conflicts.conflicts.length > 0 && (
-                <ul className="mt-2 space-y-1 text-sm">
+                <ul className="mt-2 space-y-1 small">
                   {conflicts.conflicts.map((c) => (
                     <li key={`${c.changes.join("-")}-${c.overlap_start}`}>
-                      <span className="font-mono">{c.changes.join(" ↔ ")}</span> ·{" "}
+                      <span className="font-monospace">{c.changes.join(" ↔ ")}</span> ·{" "}
                       {[...c.shared_devices, ...c.shared_services].join(", ")} · {fmtDateTime(c.overlap_start)}
                       {c.overlap_end ? ` – ${fmtDateTime(c.overlap_end)}` : ""}
                     </li>
@@ -193,7 +193,7 @@ export default function CalendarPage() {
               )}
               {conflicts.changes_without_dependency_data.length > 0 && (
                 <p className="mt-2 text-meta opacity-90">
-                  Tanpa data dependensi: <span className="font-mono">{conflicts.changes_without_dependency_data.join(", ")}</span>. Konflik
+                  Tanpa data dependensi: <span className="font-monospace">{conflicts.changes_without_dependency_data.join(", ")}</span>. Konflik
                   tidak diklaim untuk perubahan ini.
                 </p>
               )}
@@ -219,23 +219,32 @@ export default function CalendarPage() {
                 <li key={item.id}>
                   <button
                     onClick={() => router.push(`/changes/${item.id}`)}
-                    className="card w-full p-4 text-left transition-colors duration-ui hover:border-brand"
+                    className="card w-100 p-4 text-start d-block mb-3 border-0"
+                    style={{
+                      borderColor: "var(--app-border)",
+                      backgroundColor: "var(--app-surface)",
+                      transition: "border-color 150ms ease",
+                      borderRadius: "var(--app-radius)",
+                      cursor: "pointer",
+                    }}
+                    onMouseEnter={(e) => (e.currentTarget.style.borderColor = "var(--app-primary)")}
+                    onMouseLeave={(e) => (e.currentTarget.style.borderColor = "var(--app-border)")}
                   >
-                    <div className="flex flex-wrap items-start justify-between gap-3">
+                    <div className="d-flex flex-wrap align-items-start justify-content-between gap-3">
                       <div className="min-w-0">
-                        <p className="font-mono text-meta text-brand">{item.change_number}</p>
-                        <p className="text-sm font-semibold text-foreground">{item.title}</p>
-                        <p className="mt-1 text-meta text-foreground-muted">
+                        <p className="font-monospace small text-primary">{item.change_number}</p>
+                        <p className="small fw-semibold" style={{ color: "var(--app-text)" }}>{item.title}</p>
+                        <p className="mt-1 small text-muted">
                           {fmtDateTime(item.implementation_start)} – {fmtDateTime(item.implementation_end)} ·{" "}
                           {categoryLabel(item.category)}
                         </p>
                         {(item.affected_devices.length > 0 || item.affected_services.length > 0) && (
-                          <p className="mt-1 font-mono text-meta text-foreground-muted">
+                          <p className="mt-1 font-monospace small text-muted">
                             {[...item.affected_devices, ...item.affected_services].join(", ")}
                           </p>
                         )}
                       </div>
-                      <div className="flex flex-wrap items-center gap-2">
+                      <div className="d-flex flex-wrap align-items-center gap-2">
                         <EnvTag env={environmentLabel(item.environment)} />
                         <StatusBadge status={item.status} />
                       </div>
