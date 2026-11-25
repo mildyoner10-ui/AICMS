@@ -320,7 +320,7 @@ function Topbar({
         aria-label="Sempitkan sidebar"
         onClick={onToggleSidebar}
       >
-        <i className="bi bi-chevron-contract" style={{ fontSize: "16px" }}></i>
+        <i className="bi bi-chevron-double-left" style={{ fontSize: "16px" }}></i>
       </button>
 
       {/* Right side */}

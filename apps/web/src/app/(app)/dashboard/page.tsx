@@ -205,6 +205,15 @@ function WeeklyChart({ data }: { data: DashboardData["weekly_counts"] }) {
 
 // ── KPI card ────────────────────────────────────────────────────────────────
 
+const KPI_GRADIENTS: Record<string, { bg: string; glow: string }> = {
+  "text-body":     { bg: "linear-gradient(135deg, var(--app-gradient-start), var(--app-gradient-end))", glow: "rgba(0, 212, 255, 0.3)" },
+  "text-primary":  { bg: "linear-gradient(135deg, var(--app-gradient-start), var(--app-gradient-end))", glow: "rgba(0, 212, 255, 0.3)" },
+  "text-info":     { bg: "linear-gradient(135deg, var(--app-gradient-start), var(--app-gradient-end))", glow: "rgba(0, 212, 255, 0.3)" },
+  "text-warning":  { bg: "linear-gradient(135deg, #FFD60A, #FF9F0A)",                                   glow: "rgba(255, 214, 10, 0.35)" },
+  "text-success":  { bg: "linear-gradient(135deg, #30D158, #32D74B)",                                   glow: "rgba(48, 209, 88, 0.3)" },
+  "text-danger":   { bg: "linear-gradient(135deg, #FF453A, #FF6961)",                                   glow: "rgba(255, 69, 58, 0.3)" },
+};
+
 function KpiCard({
   label,
   help,
@@ -220,13 +229,14 @@ function KpiCard({
   href?: string;
   tone?: string;
 }) {
+  const gradient = KPI_GRADIENTS[tone] ?? KPI_GRADIENTS["text-body"];
   const wrap = href ? (
-    <Link href={href} className="card p-4" style={{ textDecoration: "none", color: "inherit" }}>
+    <Link href={href} className="card p-4 kpi-link-card" data-tone={tone} style={{ textDecoration: "none", color: "inherit" }}>
       <p className={`display-6 fw-bold font-mono kpi-value`} style={{ 
-        background: "linear-gradient(135deg, var(--app-gradient-start) 0%, var(--app-gradient-end) 100%)",
+        background: gradient.bg,
         WebkitBackgroundClip: "text",
         WebkitTextFillColor: "transparent",
-        filter: "drop-shadow(0 0 10px rgba(0, 212, 255, 0.25))"
+        filter: `drop-shadow(0 0 10px ${gradient.glow})`
       }}>
         {value}
       </p>
@@ -235,12 +245,12 @@ function KpiCard({
       {sub && <p className="mt-0.5 small text-muted">{sub}</p>}
     </Link>
   ) : (
-    <div className="card p-4">
+    <div className="card p-4" data-tone={tone}>
       <p className={`display-6 fw-bold font-mono kpi-value`} style={{
-        background: "linear-gradient(135deg, var(--app-gradient-start) 0%, var(--app-gradient-end) 100%)",
+        background: gradient.bg,
         WebkitBackgroundClip: "text",
         WebkitTextFillColor: "transparent",
-        filter: "drop-shadow(0 0 10px rgba(0, 212, 255, 0.25))"
+        filter: `drop-shadow(0 0 10px ${gradient.glow})`
       }}>
         {value}
       </p>
@@ -309,7 +319,7 @@ export default function Dashboard() {
           <div className="mb-5">
             {/* KPI row */}
             <div className="row g-3">
-              <div className="col-12 col-sm-6 col-xl-3">
+              <div className="col-6 col-sm-6 col-xl">
                 <KpiCard
                   label="Perubahan Aktif"
                   help="Belum sampai selesai atau ditutup"
@@ -318,7 +328,7 @@ export default function Dashboard() {
                   tone="text-body"
                 />
               </div>
-              <div className="col-12 col-sm-6 col-xl-3">
+              <div className="col-6 col-sm-6 col-xl">
                 <KpiCard
                   label="Menunggu Persetujuan"
                   help="CRF dalam antrian persetujuan"
@@ -327,7 +337,7 @@ export default function Dashboard() {
                   tone="text-warning"
                 />
               </div>
-              <div className="col-12 col-sm-6 col-xl-3">
+              <div className="col-6 col-sm-6 col-xl">
                 <KpiCard
                   label="Tinjauan AI Tertunda"
                   help="Antrean atau berjalan di worker"
@@ -336,17 +346,15 @@ export default function Dashboard() {
                   tone="text-info"
                 />
               </div>
-              <div className="col-12 col-sm-6 col-xl-3">
-                <div style={{ color: "var(--app-primary)" }}>
-                  <KpiCard
-                    label="Waktu Persetujuan"
-                    help="Rata-rata dari submit → disetujui"
-                    value={kpi.approval_avg_hours != null ? `${kpi.approval_avg_hours} jam` : "—"}
-                    tone="text-primary"
-                  />
-                </div>
+              <div className="col-6 col-sm-6 col-xl">
+                <KpiCard
+                  label="Waktu Persetujuan"
+                  help="Rata-rata dari submit → disetujui"
+                  value={kpi.approval_avg_hours != null ? `${kpi.approval_avg_hours} jam` : "—"}
+                  tone="text-primary"
+                />
               </div>
-              <div className="col-12 col-sm-6 col-xl-3">
+              <div className="col-12 col-xl">
                 <KpiCard
                   label="Tingkat Penerimaan"
                   help="Disetujui / (disetujui + ditutup)"

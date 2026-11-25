@@ -7,11 +7,12 @@
 :root,
 [data-bs-theme="dark"] {
   color-scheme: dark;
-  --app-bg: #0D0D0F;
-  --app-surface: #16161A;
-  --app-surface-hover: #1C1C22;
-  --app-border: #2A2A30;
-  --app-border-bright: #3A3A42;
+  --app-bg: #08080A;
+  --app-surface: #1A1A1F;
+  --app-surface-hover: #1E1E24;
+  --app-border: #2E2E34;
+  --app-border-bright: #424248;
+  --app-card-glow: rgba(0, 212, 255, 0.04);
   --app-text: #EDEDED;
   --app-text-muted: #8E8E93;
   --app-primary: #00D4FF;       /* cyan lebih vibrant */
@@ -67,8 +68,8 @@ body {
 
 [data-bs-theme="dark"] body {
   background:
-    radial-gradient(ellipse 80% 50% at 20% -10%, rgba(0, 212, 255, 0.06), transparent 70%),
-    radial-gradient(ellipse 60% 40% at 100% 100%, rgba(123, 97, 255, 0.05), transparent 70%),
+    radial-gradient(ellipse 80% 50% at 20% -10%, rgba(0, 212, 255, 0.08), transparent 70%),
+    radial-gradient(ellipse 60% 40% at 100% 100%, rgba(123, 97, 255, 0.07), transparent 70%),
     var(--app-bg);
   background-attachment: fixed;
 }
@@ -79,7 +80,12 @@ body {
   font-weight: 700;
 }
 
-/* Cards — gradient surface, visible border, subtle shadow */
+.kpi-value {
+  font-size: clamp(1.6rem, 2.4vw, 2.25rem) !important;
+  line-height: 1.15 !important;
+}
+
+/* Cards — gradient surface, visible border, subtle shadow, accent bar */
 .card {
   background: linear-gradient(135deg, var(--app-surface) 0%, color-mix(in srgb, var(--app-surface) 95%, var(--app-border)) 100%) !important;
   border: 1px solid var(--app-border-bright) !important;
@@ -104,6 +110,43 @@ body {
   border-bottom: 1px solid var(--app-border) !important;
   padding: 16px var(--app-card-padding) !important;
   color: var(--app-text) !important;
+}
+
+/* KPI cards — accent bar top */
+.kpi-link-card {
+  position: relative !important;
+  overflow: hidden !important;
+}
+
+.kpi-link-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--kpi-accent, linear-gradient(90deg, var(--app-gradient-start), var(--app-gradient-end)));
+  opacity: 0.8;
+  transition: opacity .2s ease;
+}
+
+.kpi-link-card:hover::before {
+  opacity: 1;
+}
+
+.kpi-link-card[data-tone="text-warning"]::before,
+.card[data-tone="text-warning"] {
+  --kpi-accent: linear-gradient(90deg, #FFD60A, #FF9F0A) !important;
+}
+
+.kpi-link-card[data-tone="text-success"]::before,
+.card[data-tone="text-success"] {
+  --kpi-accent: linear-gradient(90deg, #30D158, #32D74B) !important;
+}
+
+.kpi-link-card[data-tone="text-danger"]::before,
+.card[data-tone="text-danger"] {
+  --kpi-accent: linear-gradient(90deg, #FF453A, #FF6961) !important;
 }
 
 /* Text muted */
