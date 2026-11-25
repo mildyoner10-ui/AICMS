@@ -41,7 +41,7 @@ docker run --rm --network aicms_default \
 
 ## Stack
 
-- Frontend: Next.js 14+ (App Router) + TypeScript + Tailwind CSS
+- Frontend: Next.js 14+ (App Router) + TypeScript + Bootstrap 5.3
 - Backend: FastAPI + Python 3.12 + SQLAlchemy async + Alembic
 - Database: PostgreSQL 16
 - Queue: Redis + RQ
