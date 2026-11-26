@@ -57,7 +57,29 @@ sudo docker compose logs api 2>&1 | grep "Seed"
 # Harus ada: "Seed completed successfully."
 ```
 
-## 5. Login
+## 5. Verifikasi Skema Database
+
+```bash
+sudo docker compose exec api alembic current
+# Harus: (head)
+
+sudo docker compose exec postgres psql -U aicms -d aicms -c \
+  "SELECT n.nspname,t.typname,string_agg(e.enumlabel,',' ORDER BY e.enumsortorder) labels FROM pg_type t JOIN pg_namespace n ON n.oid=t.typnamespace JOIN pg_enum e ON e.enumtypid=t.oid WHERE t.typname LIKE 'changecategory%' GROUP BY n.nspname,t.typname;"
+```
+
+Harus keluar **satu** baris:
+
+```
+ public | changecategory | HEAD_OFFICE,CHANNEL,BRANCH_OFFICE,OTHER
+```
+
+Kaluar `changecategory_v2` atau error `type "changecategory" does not exist` → jalankan repair:
+
+```bash
+sudo docker compose exec api alembic upgrade head
+```
+
+## 6. Login
 
 Buka `http://<IP-SERVER>:3000`
 
@@ -72,11 +94,24 @@ Default user:
 | cm1 | CM@123 | Change Manager |
 | auditor1 | Auditor@123 | Auditor |
 
-## 6. Masalah Umum
+## 7. Masalah Umum
 
-### Login gagal / create CRF error `type "changecategory" does not exist`
+### Error `type "changecategory" does not exist`
 
-Migration enum belum jalan. Reset database:
+Enum type name tidak cocok dengan model. Coba repair dulu (tanpa hapus data):
+
+```bash
+sudo docker compose exec api alembic upgrade head
+```
+
+Kalau masih error, cek migration:
+
+```bash
+sudo docker compose exec api alembic current
+# Harus: e5f6a7b8c9d0 (head)
+```
+
+Kalau bukan head, reset database (data akan hilang):
 
 ```bash
 sudo docker compose down
