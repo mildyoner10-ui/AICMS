@@ -3,9 +3,8 @@
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.config import settings
 from app.integrations.ai.review_provider import (
-    PROMPT_VERSION,
-    RULESET_VERSION,
     ReviewRequest,
     get_review_provider,
     validate_review_output,
@@ -96,8 +95,8 @@ async def run_review(session: AsyncSession, job) -> None:
         validated["overall_risk_score"] = risk["score"]
         validated["risk_level"] = risk["risk_level"]
         validated["hard_blockers"] = hard_blockers
-        validated["prompt_version"] = PROMPT_VERSION
-        validated["ruleset_version"] = RULESET_VERSION
+        validated["prompt_version"] = settings.ai_prompt_version
+        validated["ruleset_version"] = settings.ai_ruleset_version
         validated["document_hashes"] = [
             {"id": d["id"], "sha256": d["sha256"], "filename": d["original_filename"]} for d in documents
         ]

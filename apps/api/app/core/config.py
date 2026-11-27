@@ -45,6 +45,9 @@ class Settings(BaseSettings):
     ai_timeout_seconds: float = 60.0
     ai_max_documents: int = 10
     ai_max_document_chars: int = 12000
+    # Recorded on every review for traceability. Bump when the prompt/rules change.
+    ai_prompt_version: str = "v1"
+    ai_ruleset_version: str = "v1"
 
     # Logging
     log_level: str = "DEBUG"

@@ -15,8 +15,9 @@ from pydantic import BaseModel, Field, ValidationError, field_validator
 from app.core.config import settings
 from app.services import document_extract
 
-PROMPT_VERSION = "v1"
-RULESET_VERSION = "v1"
+# Versions come from .env / environment so they can be bumped without code edits.
+PROMPT_VERSION = settings.ai_prompt_version
+RULESET_VERSION = settings.ai_ruleset_version
 
 
 class EvidenceRef(BaseModel):
