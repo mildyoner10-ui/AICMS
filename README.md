@@ -8,6 +8,8 @@ Enterprise web application for IT infrastructure change management. RFC creation
 # Start stack (postgres, redis, api, worker, web)
 docker compose up -d --build
 
+#eksekusi ini jika ada isu di db postgre
+sudo docker compose exec api alembic upgrade head
 # API + worker containers auto-run: alembic upgrade head, seed.py, uvicorn
 # Web serves on http://localhost:3000, API on http://localhost:8000
 ```
@@ -96,6 +98,22 @@ The active provider is exposed at `GET /api/v1/ai/status` and shown as a badge i
 real-model review is never mistaken for the mock. Even with a real model, the AI stays advisory: its
 output is schema-validated, unverifiable checks stay `NOT_ASSESSED`, and it never approves or executes
 anything. A missing key or unreachable endpoint fails the review job instead of falling back silently.
+
+### Prompt versions
+
+The system prompt is a file, not hardcoded. Edit or add files in `apps/api/prompts/`:
+
+- `v1.txt` — original English prompt.
+- `v2.txt` — Indonesian-output variant (default in `.env.example`).
+
+Set `AI_PROMPT_VERSION` in `.env` to the filename without `.txt`, then recreate the API and worker:
+
+```powershell
+docker compose up -d --force-recreate api worker
+```
+
+Every review records the active prompt and ruleset versions (`prompt_version`, `ruleset_version`).
+An unknown version fails loudly; it never silently falls back.
 
 
 ## MVP Acceptance
